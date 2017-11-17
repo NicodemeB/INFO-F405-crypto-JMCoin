@@ -34,54 +34,14 @@ public class CipherAES128 {
 	
 	
 	public byte[] decrypt(byte[] pPlainText) throws BadPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
-		try {
-			Cipher cipher = Cipher.getInstance(this.algo);
-			cipher.init(Cipher.DECRYPT_MODE, this.secretKey, this.initVector);
-			return cipher.doFinal(pPlainText);
-		}
-		catch(NoSuchAlgorithmException nsae) {
-			throw nsae;
-		}
-		catch(NoSuchPaddingException nspe) {
-			throw nspe;
-		}
-		catch(InvalidKeyException ike) {
-			throw ike;
-		}
-		catch(InvalidAlgorithmParameterException iape) {
-			throw iape;
-		}
-		catch(IllegalBlockSizeException ibse) {
-			throw ibse;
-		}
-		catch(BadPaddingException bpe) {
-			throw bpe;
-		}
+		Cipher cipher = Cipher.getInstance(this.algo);
+		cipher.init(Cipher.DECRYPT_MODE, this.secretKey, this.initVector);
+		return cipher.doFinal(pPlainText);
 	}
 	
 	public byte[] encrypt(byte[] pPlainText) throws BadPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
-		try {
-			Cipher cipher = Cipher.getInstance(this.algo);
-			cipher.init(Cipher.ENCRYPT_MODE, this.secretKey, this.initVector);
-			return cipher.doFinal(pPlainText);
-		}
-		catch(NoSuchAlgorithmException nsae) {
-			throw nsae;
-		}
-		catch(NoSuchPaddingException nspe) {
-			throw nspe;
-		}
-		catch(InvalidKeyException ike) {
-			throw ike;
-		}
-		catch(InvalidAlgorithmParameterException iape) {
-			throw iape;
-		}
-		catch(IllegalBlockSizeException ibse) {
-			throw ibse;
-		}
-		catch(BadPaddingException bpe) {
-			throw bpe;
-		}
+		Cipher cipher = Cipher.getInstance(this.algo);
+		cipher.init(Cipher.ENCRYPT_MODE, this.secretKey, this.initVector);
+		return cipher.doFinal(pPlainText);
 	}
 }

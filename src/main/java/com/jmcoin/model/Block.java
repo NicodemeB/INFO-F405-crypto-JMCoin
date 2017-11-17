@@ -1,7 +1,5 @@
 package com.jmcoin.model;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -10,7 +8,7 @@ import java.util.List;
  * @author franckfadeur
  *
  */
-public class Bloc {
+public class Block {
 	private List<Transaction> transactions;
 	private int difficulty;
 	private long timeCreation;

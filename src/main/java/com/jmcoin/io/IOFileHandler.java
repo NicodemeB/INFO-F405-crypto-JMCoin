@@ -1,12 +1,6 @@
 package com.jmcoin.io;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 
 /**
  * Class IOFileHandler
@@ -43,8 +37,6 @@ public abstract class IOFileHandler {
 				builder.append(line);
 			}
 			result = builder.toString();
-		} catch (FileNotFoundException e) {
-			throw e;
 		} catch (IOException e) {
 			throw e;
 		}
