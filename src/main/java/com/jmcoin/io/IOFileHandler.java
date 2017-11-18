@@ -1,7 +1,6 @@
 package com.jmcoin.io;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -73,7 +72,24 @@ public abstract class IOFileHandler {
 		return true;
 	}
 
+	/**
+	 * Converts from JSON
+	 * @param fileName
+	 * @param type xxxx.class
+	 * @return GSON object
+	 * @throws FileNotFoundException
+	 */
 	public static <T> T getFromJsonFile(String fileName, Class<T> type) throws FileNotFoundException {
 		return new Gson().fromJson(new BufferedReader(new FileReader(fileName)), type);
+	}
+	
+	/**
+	 * Converts from JSON
+	 * @param obj
+	 * @param type
+	 * @return
+	 */
+	public static <T> T getFromJsonString(String obj, Class<T> type) {
+		return new Gson().fromJson(obj, type);
 	}
 }

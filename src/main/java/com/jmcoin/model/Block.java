@@ -15,7 +15,14 @@ public class Block {
 	private int size;
 	private String finalHash;
 	private String prevHash;
+	private int nonce;
 	
+	public int getNonce() {
+		return nonce;
+	}
+	public void setNonce(int nonce) {
+		this.nonce = nonce;
+	}
 	public List<Transaction> getTransactions() {
 		return transactions;
 	}
