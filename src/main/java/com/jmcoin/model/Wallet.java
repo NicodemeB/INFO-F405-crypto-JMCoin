@@ -67,7 +67,8 @@ public class Wallet {
         //ByteArrayOutputStream encryptedPrivateKey = new ByteArrayOutputStream();
         
         //AES.encrypt(128, AESpw, inputPrivateKey ,outArray);
-        
+
+        // TODO - correct path
         keyGen.writeToFile("/Users/Famille/Documents/PublicKeys/publicKey_"+new Date().getTime()+".txt", publicKey.getEncoded());
         keyGen.writeToFile("/Users/Famille/Documents/PrivateKeys/privateKey_"+new Date().getTime()+".txt", privateKey.getEncoded());
         //keyGen.SaveKeyPair("/Users/Famille/Documents/", pair);
@@ -102,6 +103,7 @@ public class Wallet {
         KeyFactory kf = KeyFactory.getInstance("RSA");
         ArrayList<PrivateKey> privateKeyList = new ArrayList();
         ArrayList<PublicKey> publicKeyList = new ArrayList();;
+        // TODO - correct path
         try (Stream<Path> paths = Files.walk(Paths.get("/Users/Famille/Documents/PrivateKeys"))) {
             paths
             .filter(Files::isRegularFile)
@@ -118,8 +120,8 @@ public class Wallet {
                     Logger.getLogger(Wallet.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }); 
-        } 
-        
+        }
+        // TODO - correct path
         try (Stream<Path> paths = Files.walk(Paths.get("/Users/Famille/Documents/PublicKeys"))) {
             paths
             .filter(Files::isRegularFile)
