@@ -22,7 +22,9 @@ public class TestWallet {
     public static void main(String args[]){
         try {
         Wallet w = new Wallet("a","a");
-            //w.createKeys("yo");
+            w.createKeys("yo");
+            w.getAddresses();
+            System.out.println("end");
         } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(TestWallet.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NoSuchProviderException ex) {
@@ -36,6 +38,8 @@ public class TestWallet {
         } catch (AES.InvalidAESStreamException ex) {
             Logger.getLogger(TestWallet.class.getName()).log(Level.SEVERE, null, ex);
         } catch (AES.StrongEncryptionNotAvailableException ex) {
+            Logger.getLogger(TestWallet.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (AES.InvalidKeyLengthException ex) {
             Logger.getLogger(TestWallet.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

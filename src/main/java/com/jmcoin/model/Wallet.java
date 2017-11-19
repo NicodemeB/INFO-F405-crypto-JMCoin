@@ -46,8 +46,7 @@ public class Wallet {
     {
         this.email = email;
         this.password = password;
-        HashMap<String,String> keysFromFile = getWalletKeysFromFile(this.password);
-        this.keys = decryptKeys(getPassword(),keysFromFile);
+        this.keys = getWalletKeysFromFile(this.password);
         this.balance = getBalance(addresses);
         this.addresses = new ArrayList<String>();
     }   
@@ -64,17 +63,16 @@ public class Wallet {
         //System.out.println("cle privée " +b64PublicKey);
         
         char[] AESpw = password.toCharArray();
-        ByteArrayInputStream inputPrivateKey = new ByteArrayInputStream(privateKey.getEncoded());
-        ByteArrayOutputStream encryptedPrivateKey = new ByteArrayOutputStream();
+        //ByteArrayInputStream inputPrivateKey = new ByteArrayInputStream(privateKey.getEncoded());
+        //ByteArrayOutputStream encryptedPrivateKey = new ByteArrayOutputStream();
         
         //AES.encrypt(128, AESpw, inputPrivateKey ,outArray);
         
         keyGen.writeToFile("/Users/Famille/Documents/PublicKeys/publicKey_"+new Date().getTime()+".txt", publicKey.getEncoded());
         keyGen.writeToFile("/Users/Famille/Documents/PrivateKeys/privateKey_"+new Date().getTime()+".txt", privateKey.getEncoded());
         //keyGen.SaveKeyPair("/Users/Famille/Documents/", pair);
-        
         keys.put(privateKey,publicKey);
-
+        computeAddresses(this.keys);
     }
     public void computeAddresses(HashMap<PrivateKey,PublicKey> keys) throws IOException
     {
@@ -95,16 +93,15 @@ public class Wallet {
             getAddresses().add(hashedAddress);
         }  
     }
-    public HashMap<PrivateKey,PublicKey> decryptKeys(String password, HashMap<String,String> keysFromFile)
+    public HashMap<PrivateKey,PublicKey> decryptPrivateKey(String password, HashMap<String,String> keysFromFile)
     {
         return new HashMap<PrivateKey,PublicKey>();
     }
-
-    public HashMap<String,String> getWalletKeysFromFile(String password) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, AES.InvalidPasswordException, AES.InvalidAESStreamException, AES.StrongEncryptionNotAvailableException 
+    public HashMap<PrivateKey,PublicKey> getWalletKeysFromFile(String password) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, AES.InvalidPasswordException, AES.InvalidAESStreamException, AES.StrongEncryptionNotAvailableException 
     {
         KeyFactory kf = KeyFactory.getInstance("RSA");
         ArrayList<PrivateKey> privateKeyList = new ArrayList();
-        ArrayList<PublicKey> publicKeylist = new ArrayList();;
+        ArrayList<PublicKey> publicKeyList = new ArrayList();;
         try (Stream<Path> paths = Files.walk(Paths.get("/Users/Famille/Documents/PrivateKeys"))) {
             paths
             .filter(Files::isRegularFile)
@@ -120,8 +117,7 @@ public class Wallet {
                 } catch (InvalidKeySpecException ex) {
                     Logger.getLogger(Wallet.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            });
-            
+            }); 
         } 
         
         try (Stream<Path> paths = Files.walk(Paths.get("/Users/Famille/Documents/PublicKeys"))) {
@@ -131,23 +127,27 @@ public class Wallet {
                 try {
                     byte[] bytePubKey = keyGen.getFileInBytes(filePath.toString());
                     PublicKey pubKey = kf.generatePublic(new X509EncodedKeySpec(bytePubKey));
-                    publicKeylist.add(pubKey);
+                    publicKeyList.add(pubKey);
                 } 
                 catch (IOException ex) {
                     //throws new exception
                     Logger.getLogger(Wallet.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (InvalidKeySpecException ex) {
-                    Logger.getLogger(Wallet.class.getName()).log(Level.SEVERE, null, ex);
+                    System.out.println("InvalidKeySpecException : Fchier caché dans le dossier des clés");
                 }
             });
-            
         } 
         
-        //keyGen.LoadKeyPair("/Users/Famille/Documents/", "RSA");
+        HashMap<PrivateKey,PublicKey> keyCouples = new HashMap<PrivateKey,PublicKey>();
+        for(int i = 0; i< privateKeyList.size(); i++)
+        {
+            keyCouples.put(privateKeyList.get(i), publicKeyList.get(i));
+        }
+        
         //ByteArrayInputStream encryptedPrivKey = new ByteArrayInputStream(privKey);
         //ByteArrayOutputStream decryptedPrivKey = new ByteArrayOutputStream();
         //AES.decrypt(password.toCharArray(), encryptedPrivKey, decryptedPrivKey);
-        return new HashMap<String,String>();
+        return keyCouples;
     }
     //--------------------------------------------Transactions
     public void createTransaction()
