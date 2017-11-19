@@ -10,9 +10,11 @@ public class MultiThreadedServer implements Runnable{
     protected ServerSocket serverSocket = null;
     protected boolean      isStopped    = false;
     protected Thread       runningThread= null;
+    protected JMProtocolImpl protocol	= null;
 
-    public MultiThreadedServer(int port){
+    public MultiThreadedServer(int port, JMProtocolImpl protocol){
         this.serverPort = port;
+        this.protocol = protocol;
     }
 
     public void run(){
@@ -34,7 +36,7 @@ public class MultiThreadedServer implements Runnable{
             }
             try {
                 new Thread(
-                        new WorkerRunnable(clientSocket, "Multithreaded Server")
+                        new WorkerRunnable(clientSocket, protocol,  "Multithreaded Server")
                 ).start();
             } catch (IOException e) {
                 e.printStackTrace();

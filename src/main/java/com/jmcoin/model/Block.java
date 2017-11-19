@@ -1,5 +1,7 @@
 package com.jmcoin.model;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,6 +18,10 @@ public class Block {
 	private String finalHash;
 	private String prevHash;
 	private int nonce;
+	
+	public Block() {
+		transactions = new ArrayList<>(10); //FIXME do we need to set an arbitrary value ?
+	}
 	
 	public int getNonce() {
 		return nonce;
@@ -58,5 +64,14 @@ public class Block {
 	}
 	public void setPrevHash(String prevHash) {
 		this.prevHash = prevHash;
+	}
+	
+	public String hashMe() {
+		return null;
+	}
+	
+	public boolean verifyHash() {
+		BigInteger value = new BigInteger(finalHash, 16);
+		return value.shiftRight(32*8 - difficulty).intValue() == 0;
 	}
 }

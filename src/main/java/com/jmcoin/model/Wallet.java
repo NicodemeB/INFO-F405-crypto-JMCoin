@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import java.util.stream.Stream;
 import org.bouncycastle.crypto.digests.RIPEMD160Digest;
 import org.bouncycastle.util.encoders.Hex;
+import org.omg.CORBA.PUBLIC_MEMBER;
 
 
 public class Wallet {
@@ -44,15 +45,18 @@ public class Wallet {
     private double balance;
     private String sep = System.getProperty("file.separator");
     private String rep = System.getProperty("user.home") + sep + "Documents";
+    
+    private final String PRIV_KEY_FILE = rep+sep+"PrivateKeys";
+    private final String PUBL_KEY_FILE = rep+sep+"PublicKeys";
 
 
     public Wallet(String email, String password) throws NoSuchAlgorithmException, NoSuchProviderException, IOException, InvalidKeySpecException, AES.InvalidPasswordException, AES.InvalidAESStreamException, AES.StrongEncryptionNotAvailableException
     {
-        File pk = new File (rep+sep+"PublicKeys"+sep);
+        File pk = new File (PUBL_KEY_FILE+sep);
         if (!pk.exists()){
             pk.mkdir();
         }
-        File prk = new File (rep+sep+"PrivateKeys"+sep);
+        File prk = new File (PRIV_KEY_FILE+sep);
         if (!prk.exists()){
             prk.mkdir();
         }
@@ -82,8 +86,8 @@ public class Wallet {
 
 //        keyGen.writeToFile("/Users/Famille/Documents/PublicKeys/publicKey_"+new Date().getTime()+".txt", publicKey.getEncoded());
 //        keyGen.writeToFile("/Users/Famille/Documents/PrivateKeys/privateKey_"+new Date().getTime()+".txt", privateKey.getEncoded());
-        keyGen.writeToFile(rep+sep+"PublicKeys"+sep+"publicKey_"+new Date().getTime()+".txt", publicKey.getEncoded());
-        keyGen.writeToFile(rep+sep+"PrivateKeys"+sep+"privateKey_"+new Date().getTime()+".txt", privateKey.getEncoded());
+        keyGen.writeToFile(PUBL_KEY_FILE+sep+"publicKey_"+new Date().getTime()+".txt", publicKey.getEncoded());
+        keyGen.writeToFile(PRIV_KEY_FILE+sep+"privateKey_"+new Date().getTime()+".txt", privateKey.getEncoded());
         //keyGen.SaveKeyPair("/Users/Famille/Documents/", pair);
         keys.put(privateKey,publicKey);
         computeAddresses(this.keys);
@@ -115,11 +119,11 @@ public class Wallet {
     {
         KeyFactory kf = KeyFactory.getInstance("RSA");
         ArrayList<PrivateKey> privateKeyList = new ArrayList();
-        ArrayList<PublicKey> publicKeyList = new ArrayList();;
+        ArrayList<PublicKey> publicKeyList = new ArrayList();
 
 //        try (Stream<Path> paths = Files.walk(Paths.get("/Users/Famille/Documents/PrivateKeys"))) {
 
-        try (Stream<Path> paths = Files.walk(Paths.get(rep+sep+"PrivateKeys"))) {
+        try (Stream<Path> paths = Files.walk(Paths.get(PRIV_KEY_FILE))) {
 
             paths
             .filter(Files::isRegularFile)
@@ -139,7 +143,7 @@ public class Wallet {
         }
 
 //        try (Stream<Path> paths = Files.walk(Paths.get("/Users/Famille/Documents/PublicKeys"))) {
-        try (Stream<Path> paths = Files.walk(Paths.get(rep+sep+"PublicKeys"))) {
+        try (Stream<Path> paths = Files.walk(Paths.get(PUBL_KEY_FILE))) {
 
             paths
             .filter(Files::isRegularFile)
@@ -159,8 +163,7 @@ public class Wallet {
         } 
         
         HashMap<PrivateKey,PublicKey> keyCouples = new HashMap<PrivateKey,PublicKey>();
-        for(int i = 0; i< privateKeyList.size(); i++)
-        {
+        for(int i = 0; i< privateKeyList.size() && i < publicKeyList.size(); i++){
             keyCouples.put(privateKeyList.get(i), publicKeyList.get(i));
         }
         

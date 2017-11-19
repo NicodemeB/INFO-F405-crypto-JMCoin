@@ -1,11 +1,14 @@
 package com.jmcoin.test;
 
+import com.jmcoin.network.MasterJMProtocolImpl;
 import com.jmcoin.network.MultiThreadedServer;
+import com.jmcoin.network.NetConst;
+import com.jmcoin.network.RelayNodeJMProtocolImpl;
 
 public class TestNetworkServer {
 
     void run(){
-        MultiThreadedServer server = new MultiThreadedServer(9000);
+        MultiThreadedServer server = new MultiThreadedServer(NetConst.RELAY_NODE_LISTEN_PORT, new RelayNodeJMProtocolImpl());
         new Thread(server).start();
 
 //        try {

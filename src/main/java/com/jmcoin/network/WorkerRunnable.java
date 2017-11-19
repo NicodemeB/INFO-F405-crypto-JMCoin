@@ -15,12 +15,12 @@ public class WorkerRunnable implements Runnable{
     
     protected JMProtocolImpl jmProtocol;
 
-    public WorkerRunnable(Socket clientSocket, String serverText) throws  IOException{
+    public WorkerRunnable(Socket clientSocket, JMProtocolImpl protocol, String serverText) throws  IOException{
         this.clientSocket = clientSocket;
         this.serverText   = serverText;
         in  = new ObjectInputStream(clientSocket.getInputStream());
         out = new ObjectOutputStream(clientSocket.getOutputStream());
-        jmProtocol = new JMProtocolImpl();
+        jmProtocol = protocol;
     }
 
     public void sendMessage(String msg) throws IOException {
@@ -43,10 +43,9 @@ public class WorkerRunnable implements Runnable{
             //**************************************
             // Client server interaction
             // TODO - PROTOCOL IMPLEMENTATION
-            System.out.println(readMessage());
-            
+            //System.out.println(readMessage());
 //            Thread.sleep(10 * 1000);
-//            sendMessage("ok ok");
+            //sendMessage("ok ok");
             sendMessage(jmProtocol.processInput(readMessage()));
             
             close();

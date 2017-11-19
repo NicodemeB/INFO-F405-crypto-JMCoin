@@ -1,6 +1,7 @@
 package com.jmcoin.io;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -62,7 +63,7 @@ public abstract class IOFileHandler {
 	public static boolean writeFile(String fileName, String content, boolean append) throws IOException {
 		if(content == null) return false;
 		File file = IOFileHandler.doesFileExist(fileName);
-		if(file == null) return false;
+		if(file == null && append) return false;
 		try (BufferedWriter br = new BufferedWriter(new FileWriter(file, append))){
 			br.write(content);
 		}
@@ -89,7 +90,7 @@ public abstract class IOFileHandler {
 	 * @param type
 	 * @return
 	 */
-	public static <T> T getFromJsonString(String obj, Class<T> type) {
+	public static <T> T getFromJsonString(String obj, Class<T> type) throws JsonSyntaxException{
 		return new Gson().fromJson(obj, type);
 	}
 }
