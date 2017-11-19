@@ -41,6 +41,8 @@ public class Wallet {
     public ArrayList<String> addresses;
     private List<Transaction> transactions;
     private double balance;
+    private String rep;
+    private String sep;
 
     public Wallet(String email, String password) throws NoSuchAlgorithmException, NoSuchProviderException, IOException, InvalidKeySpecException, AES.InvalidPasswordException, AES.InvalidAESStreamException, AES.StrongEncryptionNotAvailableException
     {
@@ -49,6 +51,9 @@ public class Wallet {
         this.keys = getWalletKeysFromFile(this.password);
         this.balance = getBalance(addresses);
         this.addresses = new ArrayList<String>();
+        this.rep = System.getProperty("user.home");
+        this.sep = System.getProperty("file.separator");
+        this.rep+=sep + "Documents";
     }   
     // ------------------------------------------Keys
     public void createKeys(String password) throws IOException, AES.InvalidKeyLengthException, AES.StrongEncryptionNotAvailableException
@@ -69,8 +74,12 @@ public class Wallet {
         //AES.encrypt(128, AESpw, inputPrivateKey ,outArray);
 
         // TODO - correct path
-        keyGen.writeToFile("/Users/Famille/Documents/PublicKeys/publicKey_"+new Date().getTime()+".txt", publicKey.getEncoded());
-        keyGen.writeToFile("/Users/Famille/Documents/PrivateKeys/privateKey_"+new Date().getTime()+".txt", privateKey.getEncoded());
+
+
+//        keyGen.writeToFile("/Users/Famille/Documents/PublicKeys/publicKey_"+new Date().getTime()+".txt", publicKey.getEncoded());
+//        keyGen.writeToFile("/Users/Famille/Documents/PrivateKeys/privateKey_"+new Date().getTime()+".txt", privateKey.getEncoded());
+        keyGen.writeToFile(rep+sep+"PublicKeys"+sep+"publicKey_"+new Date().getTime()+".txt", publicKey.getEncoded());
+        keyGen.writeToFile(rep+sep+"PrivateKeys"+sep+"privateKey_"+new Date().getTime()+".txt", privateKey.getEncoded());
         //keyGen.SaveKeyPair("/Users/Famille/Documents/", pair);
         keys.put(privateKey,publicKey);
         computeAddresses(this.keys);
@@ -104,7 +113,9 @@ public class Wallet {
         ArrayList<PrivateKey> privateKeyList = new ArrayList();
         ArrayList<PublicKey> publicKeyList = new ArrayList();;
         // TODO - correct path
-        try (Stream<Path> paths = Files.walk(Paths.get("/Users/Famille/Documents/PrivateKeys"))) {
+//        try (Stream<Path> paths = Files.walk(Paths.get("/Users/Famille/Documents/PrivateKeys"))) {
+        try (Stream<Path> paths = Files.walk(Paths.get(rep+sep+"PrivateKeys"))) {
+
             paths
             .filter(Files::isRegularFile)
             .forEach(filePath-> {
@@ -122,7 +133,9 @@ public class Wallet {
             }); 
         }
         // TODO - correct path
-        try (Stream<Path> paths = Files.walk(Paths.get("/Users/Famille/Documents/PublicKeys"))) {
+//        try (Stream<Path> paths = Files.walk(Paths.get("/Users/Famille/Documents/PublicKeys"))) {
+        try (Stream<Path> paths = Files.walk(Paths.get(rep+sep+"PublicKeys"))) {
+
             paths
             .filter(Files::isRegularFile)
             .forEach(filePath-> {
