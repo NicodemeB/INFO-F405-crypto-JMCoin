@@ -16,8 +16,28 @@ public class Chain implements Iterable<Block> {
     }
 
     //TODO check if block is valid and can be added
-    private boolean canBeAdded(Block b){
-         throw new UnsupportedOperationException("Not done yet");
+    private boolean canBeAdded(Block pBlock){
+    	if(!pBlock.verifyHash()) return false;
+    	if (!doesPrevBlocKExists(pBlock)) return false;
+    	if (pBlock.getSize() > Block.MAX_BLOCK_SIZE) return false;
+    	for(Transaction transaction : pBlock.getTransactions()) {
+    		
+    	}
+    	return true;
+    }
+    
+    /**
+     * Checks if the previous block exists in the chain, based on the hash
+     * @param pBlock
+     * @return
+     */
+    private boolean doesPrevBlocKExists(Block pBlock) {
+    	for(Block block : this.blocks) {
+    		if (block.getFinalHash().equals(pBlock.getPrevHash())) {
+    			return true;
+			}
+    	}
+    	return false;
     }
 
     @Override

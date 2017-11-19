@@ -1,6 +1,5 @@
 package com.jmcoin.test;
 
-import com.jmcoin.network.MasterJMProtocolImpl;
 import com.jmcoin.network.MultiThreadedServer;
 import com.jmcoin.network.NetConst;
 import com.jmcoin.network.RelayNodeJMProtocolImpl;

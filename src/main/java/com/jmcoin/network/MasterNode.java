@@ -1,11 +1,13 @@
 package com.jmcoin.network;
 
+import com.jmcoin.model.Block;
+
 public class MasterNode extends Peer{
 
     private static MasterNode instance = new MasterNode();
 
     private MasterNode(){
-    	super();
+    	super();		
     }
 
     public static MasterNode getInstance(){
@@ -20,8 +22,12 @@ public class MasterNode extends Peer{
     	return "Here is last version of the blockchain";
     }
     
+    //FIXME remove this
     public int getRewardAmount() {
     	return 42;
-    	//FIXME remove this
+    }
+    
+    //TODO process block
+    public void processBlock(Block pBlock) {
     }
 }

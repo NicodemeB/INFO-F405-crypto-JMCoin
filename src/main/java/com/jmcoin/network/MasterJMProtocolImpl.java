@@ -1,6 +1,10 @@
 package com.jmcoin.network;
 
-public class MasterJMProtocolImpl extends JMProtocolImpl{
+import com.google.gson.JsonSyntaxException;
+import com.jmcoin.io.IOFileHandler;
+import com.jmcoin.model.Block;
+
+public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 
 	public MasterJMProtocolImpl() {
 		super(MasterNode.getInstance());
@@ -8,26 +12,37 @@ public class MasterJMProtocolImpl extends JMProtocolImpl{
 
 	@Override
 	protected String giveMeBlockChainCopyImpl() {
-		return ((MasterNode)peer).getBlockChain();
+		return peer.getBlockChain();
 	}
 
 	@Override
 	protected String giveMeRewardAmountImpl() {
-		return Integer.toString(50); //FIXME remove arbitrary value
+		return Integer.toString(peer.getRewardAmount());
 	}
 
 	@Override
 	protected String giveMeUnverifiedTransactionsImpl() {return null;}
 
 	@Override
-	protected void takeMyMinedBlockImpl(String payload) {}
+	protected boolean takeMyMinedBlockImpl(String payload) {
+		if (payload != null) {
+			try {
+				Block block = IOFileHandler.getFromJsonString(payload, Block.class);
+				peer.processBlock(block);
+			}
+			catch(JsonSyntaxException jse) {
+				jse.printStackTrace();
+				return false;
+			}
+			return true;
+			
+		}
+		return false;
+	}
 
 	@Override
-	protected void takeMyNewTransactionImpl(String payload) {}
+	protected boolean takeMyNewTransactionImpl(String payload) {return false;}
 
 	@Override
-	protected void takeUpdatedDifficultyImpl(String payload) {}
-	
-	
-
+	protected boolean takeUpdatedDifficultyImpl(String payload) {return false;}
 }

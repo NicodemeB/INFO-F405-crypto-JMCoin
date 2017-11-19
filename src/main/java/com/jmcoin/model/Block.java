@@ -11,6 +11,8 @@ import java.util.List;
  *
  */
 public class Block {
+	
+	public static final int MAX_BLOCK_SIZE = 1024; //TODO do we need to set this value ?
 	private List<Transaction> transactions;
 	private int difficulty;
 	private long timeCreation;

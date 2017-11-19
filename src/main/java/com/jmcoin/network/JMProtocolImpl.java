@@ -2,15 +2,18 @@ package com.jmcoin.network;
 
 import java.util.StringTokenizer;
 
+import com.jmcoin.model.Block;
+import com.jmcoin.model.Transaction;
+
 /**
- * 
+ * Global protocol. Is redefined is sub-classes in order to fit requirements for each node
  * @author enzo
  */
-public abstract class JMProtocolImpl {
+public abstract class JMProtocolImpl<X extends Peer> {
 	
-	protected Peer peer;
+	protected X peer;
 	
-	public JMProtocolImpl(Peer peer) {
+	public JMProtocolImpl(X peer) {
 		this.peer = peer;
 	}
 	
@@ -21,7 +24,7 @@ public abstract class JMProtocolImpl {
 		String content = (String)message;
 		/**
 		 * Will assume that the payload is built as follows:
-		 * x$yyyyyyyyyyyyy$
+		 * x$yyyyyyyyyyyyy$#
 		 * where x is the type
 		 * and y the payload itself (can be empty, like 0$$#)
 		 */
@@ -53,19 +56,61 @@ public abstract class JMProtocolImpl {
 				takeUpdatedDifficultyImpl(tokenizer.nextToken());
 				break;
 			default:
-				break;
+				return NetConst.ERR_NOT_A_REQUEST;
 			}
 		}
-		return null;
+		return NetConst.ERR_BAD_REQUEST;
 	}
 	
+	/**
+	 * Returns the last version of the blockchain
+	 * @return blockchain as a string
+	 */
 	protected abstract String giveMeBlockChainCopyImpl();
-	protected abstract String giveMeRewardAmountImpl();
-	protected abstract String giveMeUnverifiedTransactionsImpl();
-	protected abstract void takeMyMinedBlockImpl(String payload);
-	protected abstract void takeMyNewTransactionImpl(String payload);
-	protected abstract void takeUpdatedDifficultyImpl(String payload);
 	
+	/**
+	 * Returns the last amount of the reward, computed according to the time
+	 * (or arbitrarily set)
+	 * @return amount of the reward
+	 */
+	protected abstract String giveMeRewardAmountImpl();
+	
+	/**
+	 * Returns all non-verified pending transactions
+	 * @return set of transactions
+	 */
+	protected abstract String giveMeUnverifiedTransactionsImpl();
+	
+	/**
+	 * Gets a new mined {@link Block}, and returns false only if the body cannot be parsed
+	 * Getting a "true" doesn't mean that the {@link Block} is valid regarding to the protocol
+	 * @param payload {@link Block} to parse
+	 * @return true if the {@link Block} has been received properly
+	 */
+	protected abstract boolean takeMyMinedBlockImpl(String payload);
+	
+	/**
+	 * Gets a new {@link Transaction}, and returns false only if the body cannot be parsed
+	 * Getting a "true" doesn't mean that the {@link Transaction} is valid regarding to the protocol
+	 * @param payload {@link Transaction} to parse
+	 * @return true if the {@link Transaction} has been received properly
+	 */
+	protected abstract boolean takeMyNewTransactionImpl(String payload);
+	
+	/**
+	 * Gets the new diffiulty from the master, computed according to the power of the network
+	 * (or arbitrarily set)
+	 * @param payload the difficulty, expessed as a number of bits
+	 * @return true if value has been received properly
+	 */
+	protected abstract boolean takeUpdatedDifficultyImpl(String payload);
+	
+	/**
+	 * Builds a message to send over the network, compliant with the protocol
+	 * @param request {@link NetConst}.xxxxx
+	 * @param body JSON object if needed
+	 * @return message
+	 */
 	public static String craftMessage(int request, String body) {
 		return request + "$" + body + "$#";
 	}
