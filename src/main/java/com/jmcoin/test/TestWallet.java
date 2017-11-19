@@ -24,29 +24,29 @@ public class TestWallet {
         String sep = System.getProperty("file.separator");
         rep += sep + "Documents" + sep + "PublicKeys";
         System.out.println(rep);
-//
-//        try {
-//        Wallet w = new Wallet("a","a");
-//            w.createKeys("yo");
-//            w.getAddresses();
-//            System.out.println("end");
-//        } catch (NoSuchAlgorithmException ex) {
-//            Logger.getLogger(TestWallet.class.getName()).log(Level.SEVERE, null, ex);
-//        } catch (NoSuchProviderException ex) {
-//            Logger.getLogger(TestWallet.class.getName()).log(Level.SEVERE, null, ex);
-//        } catch (IOException ex) {
-//            Logger.getLogger(TestWallet.class.getName()).log(Level.SEVERE, null, ex);
-//        } catch (InvalidKeySpecException ex) {
-//            Logger.getLogger(TestWallet.class.getName()).log(Level.SEVERE, null, ex);
-//        } catch (AES.InvalidPasswordException ex) {
-//            Logger.getLogger(TestWallet.class.getName()).log(Level.SEVERE, null, ex);
-//        } catch (AES.InvalidAESStreamException ex) {
-//            Logger.getLogger(TestWallet.class.getName()).log(Level.SEVERE, null, ex);
-//        } catch (AES.StrongEncryptionNotAvailableException ex) {
-//            Logger.getLogger(TestWallet.class.getName()).log(Level.SEVERE, null, ex);
-//        } catch (AES.InvalidKeyLengthException ex) {
-//            Logger.getLogger(TestWallet.class.getName()).log(Level.SEVERE, null, ex);
-//        }
+
+        try {
+        Wallet w = new Wallet("a","a");
+            w.createKeys("yo");
+            w.getAddresses();
+            System.out.println("end");
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(TestWallet.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchProviderException ex) {
+            Logger.getLogger(TestWallet.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(TestWallet.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidKeySpecException ex) {
+            Logger.getLogger(TestWallet.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (AES.InvalidPasswordException ex) {
+            Logger.getLogger(TestWallet.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (AES.InvalidAESStreamException ex) {
+            Logger.getLogger(TestWallet.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (AES.StrongEncryptionNotAvailableException ex) {
+            Logger.getLogger(TestWallet.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (AES.InvalidKeyLengthException ex) {
+            Logger.getLogger(TestWallet.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }
 
