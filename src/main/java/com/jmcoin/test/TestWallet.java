@@ -26,7 +26,7 @@ public class TestWallet {
         System.out.println(rep);
 
         try {
-        Wallet w = new Wallet("a","a");
+            Wallet w = new Wallet("a","a");
             w.createKeys("yo");
             w.getAddresses();
             System.out.println("end");

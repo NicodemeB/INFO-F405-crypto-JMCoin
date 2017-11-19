@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -41,19 +42,25 @@ public class Wallet {
     public ArrayList<String> addresses;
     private List<Transaction> transactions;
     private double balance;
-    private String rep;
-    private String sep;
+    private String sep = System.getProperty("file.separator");
+    private String rep = System.getProperty("user.home") + sep + "Documents";
+
 
     public Wallet(String email, String password) throws NoSuchAlgorithmException, NoSuchProviderException, IOException, InvalidKeySpecException, AES.InvalidPasswordException, AES.InvalidAESStreamException, AES.StrongEncryptionNotAvailableException
     {
+        File pk = new File (rep+sep+"PublicKeys"+sep);
+        if (!pk.exists()){
+            pk.mkdir();
+        }
+        File prk = new File (rep+sep+"PrivateKeys"+sep);
+        if (!prk.exists()){
+            prk.mkdir();
+        }
         this.email = email;
         this.password = password;
         this.keys = getWalletKeysFromFile(this.password);
         this.balance = getBalance(addresses);
         this.addresses = new ArrayList<String>();
-        this.rep = System.getProperty("user.home");
-        this.sep = System.getProperty("file.separator");
-        this.rep+=sep + "Documents";
     }   
     // ------------------------------------------Keys
     public void createKeys(String password) throws IOException, AES.InvalidKeyLengthException, AES.StrongEncryptionNotAvailableException
@@ -72,9 +79,6 @@ public class Wallet {
         //ByteArrayOutputStream encryptedPrivateKey = new ByteArrayOutputStream();
         
         //AES.encrypt(128, AESpw, inputPrivateKey ,outArray);
-
-        // TODO - correct path
-
 
 //        keyGen.writeToFile("/Users/Famille/Documents/PublicKeys/publicKey_"+new Date().getTime()+".txt", publicKey.getEncoded());
 //        keyGen.writeToFile("/Users/Famille/Documents/PrivateKeys/privateKey_"+new Date().getTime()+".txt", privateKey.getEncoded());
@@ -112,8 +116,9 @@ public class Wallet {
         KeyFactory kf = KeyFactory.getInstance("RSA");
         ArrayList<PrivateKey> privateKeyList = new ArrayList();
         ArrayList<PublicKey> publicKeyList = new ArrayList();;
-        // TODO - correct path
+
 //        try (Stream<Path> paths = Files.walk(Paths.get("/Users/Famille/Documents/PrivateKeys"))) {
+
         try (Stream<Path> paths = Files.walk(Paths.get(rep+sep+"PrivateKeys"))) {
 
             paths
@@ -132,7 +137,7 @@ public class Wallet {
                 }
             }); 
         }
-        // TODO - correct path
+
 //        try (Stream<Path> paths = Files.walk(Paths.get("/Users/Famille/Documents/PublicKeys"))) {
         try (Stream<Path> paths = Files.walk(Paths.get(rep+sep+"PublicKeys"))) {
 
@@ -148,7 +153,7 @@ public class Wallet {
                     //throws new exception
                     Logger.getLogger(Wallet.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (InvalidKeySpecException ex) {
-                    System.out.println("InvalidKeySpecException : Fchier caché dans le dossier des clés");
+                    System.out.println("InvalidKeySpecException : file hidden in keys folder ");
                 }
             });
         } 
