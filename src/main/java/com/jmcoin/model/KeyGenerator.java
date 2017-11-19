@@ -70,7 +70,7 @@ public class KeyGenerator {
 		fos.close();
 	}
         
-        public KeyPair LoadKeyPair(String path, String algorithm) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException
+        /*public KeyPair LoadKeyPair(String path, String algorithm) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException
         {
             // Read Public Key.
             File filePublicKey = new File(path + "/public.key");
@@ -97,20 +97,20 @@ public class KeyGenerator {
             PrivateKey privateKey = keyFactory.generatePrivate(privateKeySpec);
 
             return new KeyPair(publicKey, privateKey);
-	}
+	}*/
         
 	public void writeToFile(String path, byte[] key) throws IOException {
 		File f = new File(path);
 		f.getParentFile().mkdirs();
-
 		FileOutputStream fos = new FileOutputStream(f);
 		fos.write(key);
 		fos.flush();
 		fos.close();
 	}
         
-        public byte[] getFileInBytes(File f) throws IOException {
+        public byte[] getFileInBytes(String path) throws IOException {
 		
+                File f = new File(path);
                 FileInputStream fis = new FileInputStream(f);
 		byte[] fbytes = new byte[(int) f.length()];
 		fis.read(fbytes);

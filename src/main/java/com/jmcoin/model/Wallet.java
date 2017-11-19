@@ -7,17 +7,27 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Stream;
 import org.bouncycastle.crypto.digests.RIPEMD160Digest;
 import org.bouncycastle.util.encoders.Hex;
 
@@ -26,7 +36,7 @@ public class Wallet {
     
     private String email;
     private String password;
-    private KeyGenerator keyGen;
+    private KeyGenerator keyGen = new KeyGenerator(1024);
     private HashMap<PrivateKey,PublicKey> keys;
     public ArrayList<String> addresses;
     private List<Transaction> transactions;
@@ -39,7 +49,6 @@ public class Wallet {
         HashMap<String,String> keysFromFile = getWalletKeysFromFile(this.password);
         this.keys = decryptKeys(getPassword(),keysFromFile);
         this.balance = getBalance(addresses);
-        this.keyGen = new KeyGenerator(1024);
         this.addresses = new ArrayList<String>();
     }   
     // ------------------------------------------Keys
@@ -56,14 +65,13 @@ public class Wallet {
         
         char[] AESpw = password.toCharArray();
         ByteArrayInputStream inputPrivateKey = new ByteArrayInputStream(privateKey.getEncoded());
+        ByteArrayOutputStream encryptedPrivateKey = new ByteArrayOutputStream();
         
-        ByteArrayOutputStream outArray = new ByteArrayOutputStream();
+        //AES.encrypt(128, AESpw, inputPrivateKey ,outArray);
         
-        AES.encrypt(128, AESpw, inputPrivateKey ,outArray);
-        
-        keyGen.writeToFile("/Users/Famille/Documents/publicKeys.txt", publicKey.getEncoded());
-        keyGen.writeToFile("/Users/Famille/Documents/privateKeys.txt", outArray.toByteArray());
-                //keyGen.SaveKeyPair("/Users/Famille/Documents/", pair);
+        keyGen.writeToFile("/Users/Famille/Documents/PublicKeys/publicKey_"+new Date().getTime()+".txt", publicKey.getEncoded());
+        keyGen.writeToFile("/Users/Famille/Documents/PrivateKeys/privateKey_"+new Date().getTime()+".txt", privateKey.getEncoded());
+        //keyGen.SaveKeyPair("/Users/Famille/Documents/", pair);
         
         keys.put(privateKey,publicKey);
 
@@ -94,11 +102,51 @@ public class Wallet {
 
     public HashMap<String,String> getWalletKeysFromFile(String password) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, AES.InvalidPasswordException, AES.InvalidAESStreamException, AES.StrongEncryptionNotAvailableException 
     {
+        KeyFactory kf = KeyFactory.getInstance("RSA");
+        ArrayList<PrivateKey> privateKeyList = new ArrayList();
+        ArrayList<PublicKey> publicKeylist = new ArrayList();;
+        try (Stream<Path> paths = Files.walk(Paths.get("/Users/Famille/Documents/PrivateKeys"))) {
+            paths
+            .filter(Files::isRegularFile)
+            .forEach(filePath-> {
+                try {
+                    byte[] bytePrivKey = keyGen.getFileInBytes(filePath.toString());
+                    PrivateKey privateKey = kf.generatePrivate(new PKCS8EncodedKeySpec(bytePrivKey));
+                    privateKeyList.add(privateKey);
+                } 
+                catch (IOException ex) {
+                    //throws new exception
+                    Logger.getLogger(Wallet.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InvalidKeySpecException ex) {
+                    Logger.getLogger(Wallet.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            });
+            
+        } 
+        
+        try (Stream<Path> paths = Files.walk(Paths.get("/Users/Famille/Documents/PublicKeys"))) {
+            paths
+            .filter(Files::isRegularFile)
+            .forEach(filePath-> {
+                try {
+                    byte[] bytePubKey = keyGen.getFileInBytes(filePath.toString());
+                    PublicKey pubKey = kf.generatePublic(new X509EncodedKeySpec(bytePubKey));
+                    publicKeylist.add(pubKey);
+                } 
+                catch (IOException ex) {
+                    //throws new exception
+                    Logger.getLogger(Wallet.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InvalidKeySpecException ex) {
+                    Logger.getLogger(Wallet.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            });
+            
+        } 
+        
         //keyGen.LoadKeyPair("/Users/Famille/Documents/", "RSA");
-        byte[] privKey = new byte[20]; // key retrieved from file
-        ByteArrayInputStream encryptedPrivKey = new ByteArrayInputStream(privKey);
-        ByteArrayOutputStream decryptedPrivKey = new ByteArrayOutputStream();
-        AES.decrypt(password.toCharArray(), encryptedPrivKey, decryptedPrivKey);
+        //ByteArrayInputStream encryptedPrivKey = new ByteArrayInputStream(privKey);
+        //ByteArrayOutputStream decryptedPrivKey = new ByteArrayOutputStream();
+        //AES.decrypt(password.toCharArray(), encryptedPrivKey, decryptedPrivKey);
         return new HashMap<String,String>();
     }
     //--------------------------------------------Transactions
