@@ -7,9 +7,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.io.File;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -31,7 +32,6 @@ import java.util.logging.Logger;
 import java.util.stream.Stream;
 import org.bouncycastle.crypto.digests.RIPEMD160Digest;
 import org.bouncycastle.util.encoders.Hex;
-import org.omg.CORBA.PUBLIC_MEMBER;
 
 
 public class Wallet {
@@ -43,28 +43,20 @@ public class Wallet {
     public ArrayList<String> addresses;
     private List<Transaction> transactions;
     private double balance;
-    private String sep = System.getProperty("file.separator");
-    private String rep = System.getProperty("user.home") + sep + "Documents";
-    
-    private final String PRIV_KEY_FILE = rep+sep+"PrivateKeys";
-    private final String PUBL_KEY_FILE = rep+sep+"PublicKeys";
-
+    private String rep;
+    private String sep;
 
     public Wallet(String email, String password) throws NoSuchAlgorithmException, NoSuchProviderException, IOException, InvalidKeySpecException, AES.InvalidPasswordException, AES.InvalidAESStreamException, AES.StrongEncryptionNotAvailableException
     {
-        File pk = new File (PUBL_KEY_FILE+sep);
-        if (!pk.exists()){
-            pk.mkdir();
-        }
-        File prk = new File (PRIV_KEY_FILE+sep);
-        if (!prk.exists()){
-            prk.mkdir();
-        }
+        this.rep = System.getProperty("user.home");
+        this.sep = System.getProperty("file.separator");
+        this.rep+=sep + "Documents";
         this.email = email;
         this.password = password;
         this.keys = getWalletKeysFromFile(this.password);
         this.balance = getBalance(addresses);
         this.addresses = new ArrayList<String>();
+        
     }   
     // ------------------------------------------Keys
     public void createKeys(String password) throws IOException, AES.InvalidKeyLengthException, AES.StrongEncryptionNotAvailableException
@@ -79,15 +71,13 @@ public class Wallet {
         //System.out.println("cle privée " +b64PublicKey);
         
         char[] AESpw = password.toCharArray();
-        //ByteArrayInputStream inputPrivateKey = new ByteArrayInputStream(privateKey.getEncoded());
-        //ByteArrayOutputStream encryptedPrivateKey = new ByteArrayOutputStream();
+        ByteArrayInputStream inputPrivateKey = new ByteArrayInputStream(privateKey.getEncoded());
+        ByteArrayOutputStream encryptedPrivateKey = new ByteArrayOutputStream();
         
-        //AES.encrypt(128, AESpw, inputPrivateKey ,outArray);
+        AES.encrypt(128, AESpw, inputPrivateKey , encryptedPrivateKey);
 
-//        keyGen.writeToFile("/Users/Famille/Documents/PublicKeys/publicKey_"+new Date().getTime()+".txt", publicKey.getEncoded());
-//        keyGen.writeToFile("/Users/Famille/Documents/PrivateKeys/privateKey_"+new Date().getTime()+".txt", privateKey.getEncoded());
-        keyGen.writeToFile(PUBL_KEY_FILE+sep+"publicKey_"+new Date().getTime()+".txt", publicKey.getEncoded());
-        keyGen.writeToFile(PRIV_KEY_FILE+sep+"privateKey_"+new Date().getTime()+".txt", privateKey.getEncoded());
+        keyGen.writeToFile(rep+sep+"PublicKeys"+sep+"publicKey_"+new Date().getTime()+".txt", publicKey.getEncoded());
+        keyGen.writeToFile(rep+sep+"PrivateKeys"+sep+"privateKey_"+new Date().getTime()+".txt", encryptedPrivateKey.toByteArray());
         //keyGen.SaveKeyPair("/Users/Famille/Documents/", pair);
         keys.put(privateKey,publicKey);
         computeAddresses(this.keys);
@@ -120,50 +110,72 @@ public class Wallet {
         KeyFactory kf = KeyFactory.getInstance("RSA");
         ArrayList<PrivateKey> privateKeyList = new ArrayList();
         ArrayList<PublicKey> publicKeyList = new ArrayList();
-
+        
+        
+                
+        // TODO - correct path
 //        try (Stream<Path> paths = Files.walk(Paths.get("/Users/Famille/Documents/PrivateKeys"))) {
-
-        try (Stream<Path> paths = Files.walk(Paths.get(PRIV_KEY_FILE))) {
+        try (Stream<Path> paths = Files.walk(Paths.get(rep+sep+"PrivateKeys"))) {
 
             paths
             .filter(Files::isRegularFile)
             .forEach(filePath-> {
                 try {
-                    byte[] bytePrivKey = keyGen.getFileInBytes(filePath.toString());
-                    PrivateKey privateKey = kf.generatePrivate(new PKCS8EncodedKeySpec(bytePrivKey));
-                    privateKeyList.add(privateKey);
+                    //PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:*.txt");
+                    char[] AESpw = password.toCharArray();
+                    String name = filePath.getFileName().toString();
+                    if (name.endsWith("txt")) {
+                        byte[] bytePrivKey = keyGen.getFileInBytes(filePath.toString());
+                        ByteArrayOutputStream decryptedPrivateKey = new ByteArrayOutputStream();
+                        AES.decrypt(AESpw, new ByteArrayInputStream(bytePrivKey), decryptedPrivateKey);
+                        PrivateKey privateKey = kf.generatePrivate(new PKCS8EncodedKeySpec(decryptedPrivateKey.toByteArray()));
+                        privateKeyList.add(privateKey);
+                    }
+                    
                 } 
                 catch (IOException ex) {
                     //throws new exception
                     Logger.getLogger(Wallet.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (InvalidKeySpecException ex) {
+                    Logger.getLogger(Wallet.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (AES.InvalidPasswordException ex) {
+                    Logger.getLogger(Wallet.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (AES.InvalidAESStreamException ex) {
+                    Logger.getLogger(Wallet.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (AES.StrongEncryptionNotAvailableException ex) {
                     Logger.getLogger(Wallet.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }); 
         }
-
-//        try (Stream<Path> paths = Files.walk(Paths.get("/Users/Famille/Documents/PublicKeys"))) {
-        try (Stream<Path> paths = Files.walk(Paths.get(PUBL_KEY_FILE))) {
+        // TODO - correct path
+//      try (Stream<Path> paths = Files.walk(Paths.get("/Users/Famille/Documents/PublicKeys"))) {
+        try (Stream<Path> paths = Files.walk(Paths.get(rep+sep+"PublicKeys"))) {
 
             paths
             .filter(Files::isRegularFile)
             .forEach(filePath-> {
+                
                 try {
-                    byte[] bytePubKey = keyGen.getFileInBytes(filePath.toString());
-                    PublicKey pubKey = kf.generatePublic(new X509EncodedKeySpec(bytePubKey));
-                    publicKeyList.add(pubKey);
+                    if(filePath.endsWith(".txt"))
+                    {
+                        byte[] bytePubKey = keyGen.getFileInBytes(filePath.toString());
+                        PublicKey pubKey = kf.generatePublic(new X509EncodedKeySpec(bytePubKey));
+                        publicKeyList.add(pubKey);
+                    }
+                    
                 } 
                 catch (IOException ex) {
                     //throws new exception
                     Logger.getLogger(Wallet.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (InvalidKeySpecException ex) {
-                    System.out.println("InvalidKeySpecException : file hidden in keys folder ");
+                    System.out.println("InvalidKeySpecException : Fichier caché dans le dossier des clés");
                 }
             });
         } 
         
         HashMap<PrivateKey,PublicKey> keyCouples = new HashMap<PrivateKey,PublicKey>();
-        for(int i = 0; i< privateKeyList.size() && i < publicKeyList.size(); i++){
+        for(int i = 0; i< privateKeyList.size(); i++)
+        {
             keyCouples.put(privateKeyList.get(i), publicKeyList.get(i));
         }
         
@@ -220,7 +232,6 @@ public class Wallet {
     public void setKeys(HashMap<PrivateKey,PublicKey> keys) {
         this.keys = keys;
     }
-    
     //partie réseau à faire
 }
  
