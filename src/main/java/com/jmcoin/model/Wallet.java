@@ -4,13 +4,8 @@ import com.jmcoin.crypto.AES;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -65,7 +60,6 @@ public class Wallet {
         PrivateKey privateKey = keyGen.getPrivateKey();
         PublicKey publicKey = keyGen.getPublicKey();
         KeyPair pair = keyGen.getKeypair();
-        byte[] encodedPublicKey = publicKey.getEncoded();
         
         //String b64PublicKey = Base64.getEncoder().encodeToString(encodedPublicKey);
         //System.out.println("cle privée " +b64PublicKey);
@@ -78,8 +72,8 @@ public class Wallet {
 
         keyGen.writeToFile(rep+sep+"PublicKeys"+sep+"publicKey_"+new Date().getTime()+".txt", publicKey.getEncoded());
         keyGen.writeToFile(rep+sep+"PrivateKeys"+sep+"privateKey_"+new Date().getTime()+".txt", encryptedPrivateKey.toByteArray());
-        //keyGen.SaveKeyPair("/Users/Famille/Documents/", pair);
         keys.put(privateKey,publicKey);
+        //System.out.println("Clé privée écrite :"+base64Encode(privateKey.getEncoded()));
         computeAddresses(this.keys);
     }
     public void computeAddresses(HashMap<PrivateKey,PublicKey> keys) throws IOException
@@ -110,18 +104,13 @@ public class Wallet {
         KeyFactory kf = KeyFactory.getInstance("RSA");
         ArrayList<PrivateKey> privateKeyList = new ArrayList();
         ArrayList<PublicKey> publicKeyList = new ArrayList();
-        
-        
-                
-        // TODO - correct path
-//        try (Stream<Path> paths = Files.walk(Paths.get("/Users/Famille/Documents/PrivateKeys"))) {
+           
         try (Stream<Path> paths = Files.walk(Paths.get(rep+sep+"PrivateKeys"))) {
 
             paths
             .filter(Files::isRegularFile)
             .forEach(filePath-> {
                 try {
-                    //PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:*.txt");
                     char[] AESpw = password.toCharArray();
                     String name = filePath.getFileName().toString();
                     if (name.endsWith("txt")) {
@@ -147,8 +136,7 @@ public class Wallet {
                 }
             }); 
         }
-        // TODO - correct path
-//      try (Stream<Path> paths = Files.walk(Paths.get("/Users/Famille/Documents/PublicKeys"))) {
+        
         try (Stream<Path> paths = Files.walk(Paths.get(rep+sep+"PublicKeys"))) {
 
             paths
@@ -156,8 +144,8 @@ public class Wallet {
             .forEach(filePath-> {
                 
                 try {
-                    if(filePath.endsWith(".txt"))
-                    {
+                    String name = filePath.getFileName().toString();
+                    if (name.endsWith("txt")) {
                         byte[] bytePubKey = keyGen.getFileInBytes(filePath.toString());
                         PublicKey pubKey = kf.generatePublic(new X509EncodedKeySpec(bytePubKey));
                         publicKeyList.add(pubKey);
@@ -173,15 +161,12 @@ public class Wallet {
             });
         } 
         
-        HashMap<PrivateKey,PublicKey> keyCouples = new HashMap<PrivateKey,PublicKey>();
-        for(int i = 0; i< privateKeyList.size(); i++)
+        HashMap<PrivateKey,PublicKey> keyCouples = new HashMap<>();
+        for(int i = 0; i < privateKeyList.size() && i < publicKeyList.size(); i++)
         {
             keyCouples.put(privateKeyList.get(i), publicKeyList.get(i));
         }
-        
-        //ByteArrayInputStream encryptedPrivKey = new ByteArrayInputStream(privKey);
-        //ByteArrayOutputStream decryptedPrivKey = new ByteArrayOutputStream();
-        //AES.decrypt(password.toCharArray(), encryptedPrivKey, decryptedPrivKey);
+
         return keyCouples;
     }
     //--------------------------------------------Transactions

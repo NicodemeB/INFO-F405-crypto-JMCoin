@@ -27,7 +27,7 @@ public class TestWallet {
 
         try {
             Wallet w = new Wallet("a","a");
-            w.createKeys("yo");
+            w.createKeys("a");
             w.getAddresses();
             System.out.println("end");
         } catch (NoSuchAlgorithmException ex) {
