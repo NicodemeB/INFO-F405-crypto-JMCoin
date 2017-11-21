@@ -104,7 +104,7 @@ public class Wallet {
     }
     public HashMap<PrivateKey,PublicKey> getWalletKeysFromFile(String password) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, AES.InvalidPasswordException, AES.InvalidAESStreamException, AES.StrongEncryptionNotAvailableException 
     {
-        KeyFactory kf = KeyFactory.getInstance("RSA");
+        KeyFactory kf = KeyFactory.getInstance("DSA");
         ArrayList<PrivateKey> privateKeyList = new ArrayList<>();
         ArrayList<PublicKey> publicKeyList = new ArrayList<>();
            
