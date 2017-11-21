@@ -94,4 +94,8 @@ public abstract class IOFileHandler {
 		return new Gson().fromJson(obj, type);
 	}
 
+	public static String toJson(Object o){
+		return new Gson().toJson(o);
+	}
+
 }
