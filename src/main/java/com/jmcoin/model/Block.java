@@ -68,10 +68,6 @@ public class Block {
 		this.prevHash = prevHash;
 	}
 	
-	public String hashMe() {
-		return null;
-	}
-	
 	public boolean verifyHash() {
 		BigInteger value = new BigInteger(finalHash, 16);
 		return value.shiftRight(32*8 - difficulty).intValue() == 0;

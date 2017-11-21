@@ -93,4 +93,5 @@ public abstract class IOFileHandler {
 	public static <T> T getFromJsonString(String obj, Class<T> type) throws JsonSyntaxException{
 		return new Gson().fromJson(obj, type);
 	}
+
 }

@@ -1,18 +1,22 @@
 package com.jmcoin.model;
 
 import java.util.*;
-import java.util.function.Consumer;
 
-public class Chain implements Iterable<Block> {
+public class Chain {
 
-    private List<Block> blocks;
+    private Map<String, Block> blocks;
 
     public Chain() {
-        this.blocks = new LinkedList<>();
+        this.blocks = new HashMap<>();
     }
 
-    public void addBlock(Block block){
-        blocks.add(Objects.requireNonNull(block));
+    public boolean addBlock(Block block){
+        Objects.requireNonNull(block);
+        if(canBeAdded(block)) {
+            blocks.put(block.getFinalHash() + block.getTimeCreation(), block);
+            return true;
+        }
+        return false;
     }
 
     //TODO check if block is valid and can be added
@@ -32,27 +36,12 @@ public class Chain implements Iterable<Block> {
      * @return
      */
     private boolean doesPrevBlocKExists(Block pBlock) {
-    	for(Block block : this.blocks) {
-    		if (block.getFinalHash().equals(pBlock.getPrevHash())) {
+    	for(String key : this.blocks.keySet()) {
+    		if (blocks.get(key).getFinalHash().equals(pBlock.getPrevHash())) {
     			return true;
 			}
     	}
     	return false;
-    }
-
-    @Override
-    public Iterator<Block> iterator() {
-        return blocks.iterator();
-    }
-
-    @Override
-    public void forEach(Consumer<? super Block> action) {
-        blocks.forEach(action);
-    }
-
-    @Override
-    public Spliterator<Block> spliterator() {
-        return blocks.spliterator();
     }
 
 }

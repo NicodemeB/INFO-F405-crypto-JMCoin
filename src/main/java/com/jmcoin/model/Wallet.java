@@ -102,8 +102,8 @@ public class Wallet {
     public HashMap<PrivateKey,PublicKey> getWalletKeysFromFile(String password) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, AES.InvalidPasswordException, AES.InvalidAESStreamException, AES.StrongEncryptionNotAvailableException 
     {
         KeyFactory kf = KeyFactory.getInstance("RSA");
-        ArrayList<PrivateKey> privateKeyList = new ArrayList();
-        ArrayList<PublicKey> publicKeyList = new ArrayList();
+        ArrayList<PrivateKey> privateKeyList = new ArrayList<>();
+        ArrayList<PublicKey> publicKeyList = new ArrayList<>();
            
         try (Stream<Path> paths = Files.walk(Paths.get(rep+sep+"PrivateKeys"))) {
 
@@ -122,16 +122,8 @@ public class Wallet {
                     }
                     
                 } 
-                catch (IOException ex) {
+                catch (IOException | InvalidKeySpecException | AES.InvalidPasswordException | AES.StrongEncryptionNotAvailableException | AES.InvalidAESStreamException ex) {
                     //throws new exception
-                    Logger.getLogger(Wallet.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InvalidKeySpecException ex) {
-                    Logger.getLogger(Wallet.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (AES.InvalidPasswordException ex) {
-                    Logger.getLogger(Wallet.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (AES.InvalidAESStreamException ex) {
-                    Logger.getLogger(Wallet.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (AES.StrongEncryptionNotAvailableException ex) {
                     Logger.getLogger(Wallet.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }); 
@@ -179,6 +171,8 @@ public class Wallet {
     {
         transactions.add(transaction);
     }
+
+    // FIXME O_o ?
     // ------------------------------------------- Chain
     public double getAddressBalance(String address)
     {
