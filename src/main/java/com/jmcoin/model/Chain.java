@@ -44,4 +44,8 @@ public class Chain {
     	return false;
     }
 
+    public int getSize(){
+        return blocks.size();
+    }
+
 }

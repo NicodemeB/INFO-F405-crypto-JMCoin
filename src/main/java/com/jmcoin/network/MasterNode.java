@@ -1,6 +1,9 @@
 package com.jmcoin.network;
 
+import com.jmcoin.io.IOFileHandler;
 import com.jmcoin.model.Block;
+import com.jmcoin.model.Chain;
+import com.jmcoin.model.Reward;
 
 public class MasterNode extends Peer{
 
@@ -22,9 +25,9 @@ public class MasterNode extends Peer{
     	return "Here is last version of the blockchain";
     }
     
-    //FIXME remove this
+    //FIXME computes the value of the next reward ?
     public int getRewardAmount() {
-    	return 42;
+    	return Reward.REWARD_START_VALUE / ((IOFileHandler.getFromJsonString(getBlockChain(), Chain.class).getSize() / Reward.REWARD_RATE) + 1);
     }
     
     //TODO process block
