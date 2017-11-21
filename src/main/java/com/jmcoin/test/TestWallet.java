@@ -5,15 +5,10 @@
  */
 package com.jmcoin.test;
 
-import com.jmcoin.crypto.AES;
 import com.jmcoin.model.Input;
 import com.jmcoin.model.Output;
 import com.jmcoin.model.Transaction;
 import com.jmcoin.model.Wallet;
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,7 +35,7 @@ public class TestWallet {
             tr.addInputOutput(in, out);
             byte[] signature = w.signTransaction(tr, w.getKeys().entrySet().iterator().next().getKey());
             boolean b = w.verifyTransaction(signature, tr, w.getKeys().entrySet().iterator().next().getValue());
-            
+            System.out.println(b);
             System.out.println("end");
         } catch (Exception ex) {
             Logger.getLogger(TestWallet.class.getName()).log(Level.SEVERE, null, ex);
