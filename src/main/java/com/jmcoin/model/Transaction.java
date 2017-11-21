@@ -1,9 +1,10 @@
 package com.jmcoin.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-public class Transaction {
+public class Transaction implements Serializable {
 	
 	private HashSet<Input> inputs;
 	private ArrayList<Output> outputs;

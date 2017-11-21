@@ -1,18 +1,25 @@
 
 package com.jmcoin.model;
 import com.jmcoin.crypto.AES;
+import com.jmcoin.util.*;
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -60,10 +67,7 @@ public class Wallet {
         PrivateKey privateKey = keyGen.getPrivateKey();
         PublicKey publicKey = keyGen.getPublicKey();
         KeyPair pair = keyGen.getKeypair();
-        
-        //String b64PublicKey = Base64.getEncoder().encodeToString(encodedPublicKey);
-        //System.out.println("cle privée " +b64PublicKey);
-        
+
         char[] AESpw = password.toCharArray();
         ByteArrayInputStream inputPrivateKey = new ByteArrayInputStream(privateKey.getEncoded());
         ByteArrayOutputStream encryptedPrivateKey = new ByteArrayOutputStream();
@@ -73,7 +77,6 @@ public class Wallet {
         keyGen.writeToFile(rep+sep+"PublicKeys"+sep+"publicKey_"+new Date().getTime()+".txt", publicKey.getEncoded());
         keyGen.writeToFile(rep+sep+"PrivateKeys"+sep+"privateKey_"+new Date().getTime()+".txt", encryptedPrivateKey.toByteArray());
         keys.put(privateKey,publicKey);
-        //System.out.println("Clé privée écrite :"+base64Encode(privateKey.getEncoded()));
         computeAddresses(this.keys);
     }
     public void computeAddresses(HashMap<PrivateKey,PublicKey> keys) throws IOException
@@ -82,8 +85,8 @@ public class Wallet {
         RIPEMD160Digest dgst;
         PublicKey pk;
         
-        while (it.hasNext()) {
-            
+        while (it.hasNext()) 
+        {
             Map.Entry pair = (Map.Entry)it.next();
             pk = (PublicKey)pair.getValue();
             byte[] key = pk.getEncoded();
@@ -119,11 +122,9 @@ public class Wallet {
                         AES.decrypt(AESpw, new ByteArrayInputStream(bytePrivKey), decryptedPrivateKey);
                         PrivateKey privateKey = kf.generatePrivate(new PKCS8EncodedKeySpec(decryptedPrivateKey.toByteArray()));
                         privateKeyList.add(privateKey);
-                    }
-                    
+                    }   
                 } 
                 catch (IOException | InvalidKeySpecException | AES.InvalidPasswordException | AES.StrongEncryptionNotAvailableException | AES.InvalidAESStreamException ex) {
-                    //throws new exception
                     Logger.getLogger(Wallet.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }); 
@@ -144,10 +145,11 @@ public class Wallet {
                     }
                     
                 } 
-                catch (IOException ex) {
-                    //throws new exception
+                catch (IOException ex) 
+                {
                     Logger.getLogger(Wallet.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InvalidKeySpecException ex) {
+                } 
+                catch (InvalidKeySpecException ex) {
                     System.out.println("InvalidKeySpecException : Fichier caché dans le dossier des clés");
                 }
             });
@@ -171,8 +173,47 @@ public class Wallet {
     {
         transactions.add(transaction);
     }
-
-    // FIXME O_o ?
+    public byte[] signTransaction(Transaction tr, PrivateKey privKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, FileNotFoundException, IOException, SignatureException
+    {
+        Signature dsa = Signature.getInstance("SHA1withDSA", "SUN"); 
+        dsa.initSign(privKey);
+        byte[] bytesTr = BytesUtil.toByteArray(tr);
+        BufferedInputStream bufIn = new BufferedInputStream(new ByteArrayInputStream(bytesTr));
+        byte[] buffer = new byte[1024];
+        int len;
+        while ((len = bufIn.read(buffer)) >= 0) {
+            dsa.update(buffer, 0, len);
+        };
+        bufIn.close();
+        byte[] signature = dsa.sign();
+        return signature;
+    }
+    public boolean verifyTransaction(byte[] signature, Transaction tr, PublicKey pubKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, SignatureException
+    {
+        boolean verifies = false;
+        if(/*pas de signature || */ tr == null || pubKey == null)
+        {
+            //Impossible de vérifier la transaction il manque des éléments.
+        }
+        else
+        {
+            Signature sig = Signature.getInstance("SHA1withDSA", "SUN");
+            sig.initVerify(pubKey);
+            byte[] bytesTr = BytesUtil.toByteArray(tr);
+            BufferedInputStream bufIn = new BufferedInputStream(new ByteArrayInputStream(bytesTr));
+            byte[] buffer = new byte[1024];
+            int len;
+            while ((len = bufIn.read(buffer)) >= 0) {
+                sig.update(buffer, 0, len);
+            };
+            bufIn.close();
+            verifies = sig.verify(signature);
+        } 
+        
+        return verifies; 
+    }
+            
+    // To do when we know how to fetch the chain
     // ------------------------------------------- Chain
     public double getAddressBalance(String address)
     {
@@ -186,7 +227,7 @@ public class Wallet {
     }
     public Block getBlockByHash(String hash)
     {
-        //recuperer le bloc de la chaine
+        //récuperer le bloc de la chaine
         Block block = new Block();
         return block;
     }

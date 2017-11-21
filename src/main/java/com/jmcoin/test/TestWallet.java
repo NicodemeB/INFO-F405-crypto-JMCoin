@@ -6,6 +6,9 @@
 package com.jmcoin.test;
 
 import com.jmcoin.crypto.AES;
+import com.jmcoin.model.Input;
+import com.jmcoin.model.Output;
+import com.jmcoin.model.Transaction;
 import com.jmcoin.model.Wallet;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -27,24 +30,19 @@ public class TestWallet {
 
         try {
             Wallet w = new Wallet("a","a");
-            w.createKeys("a");
             w.getAddresses();
+            w.createKeys("a");
+            Input in = new Input();
+            in.setAmount(10);
+            Output out = new Output();
+            out.setAmount(10);
+            Transaction tr = new Transaction();
+            tr.addInputOutput(in, out);
+            byte[] signature = w.signTransaction(tr, w.getKeys().entrySet().iterator().next().getKey());
+            boolean b = w.verifyTransaction(signature, tr, w.getKeys().entrySet().iterator().next().getValue());
+            
             System.out.println("end");
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(TestWallet.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NoSuchProviderException ex) {
-            Logger.getLogger(TestWallet.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(TestWallet.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InvalidKeySpecException ex) {
-            Logger.getLogger(TestWallet.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (AES.InvalidPasswordException ex) {
-            Logger.getLogger(TestWallet.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (AES.InvalidAESStreamException ex) {
-            Logger.getLogger(TestWallet.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (AES.StrongEncryptionNotAvailableException ex) {
-            Logger.getLogger(TestWallet.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (AES.InvalidKeyLengthException ex) {
+        } catch (Exception ex) {
             Logger.getLogger(TestWallet.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

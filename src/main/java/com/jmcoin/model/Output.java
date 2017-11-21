@@ -1,12 +1,14 @@
 package com.jmcoin.model;
 
+import java.io.Serializable;
+
 /**
  * Class Output.
  * Represents an output in a {@link Transaction}
  * @author enzo
  *
  */
-public class Output {
+public class Output implements Serializable {
 	
 	private int amount;
 	private int inputIndex;

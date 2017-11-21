@@ -28,7 +28,7 @@ public class KeyGenerator {
 	private PublicKey publicKey;
 
 	public KeyGenerator(int keylength) throws NoSuchAlgorithmException, NoSuchProviderException {
-		this.keyGen = KeyPairGenerator.getInstance("RSA");
+		this.keyGen = KeyPairGenerator.getInstance("DSA");
 		this.keyGen.initialize(keylength);
 	}
 
