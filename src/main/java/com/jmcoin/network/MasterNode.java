@@ -9,8 +9,11 @@ public class MasterNode extends Peer{
 
     private static MasterNode instance = new MasterNode();
 
+    private Chain chain;
+
     private MasterNode(){
-    	super();		
+    	super();
+    	chain = new Chain();
     }
 
     public static MasterNode getInstance(){
@@ -22,7 +25,8 @@ public class MasterNode extends Peer{
      * @return the blockchain data in JSON
      */
     public String getBlockChain() {
-    	return "Here is last version of the blockchain";
+        return IOFileHandler.toJson(chain);
+    	//return "Here is last version of the blockchain";
     }
     
     //FIXME computes the value of the next reward ?
