@@ -10,7 +10,9 @@ public class TestNetworkClient {
     public static void main(String args[]){
         try
         {
-            Client cli = new Client(NetConst.RELAY_NODE_LISTEN_PORT, NetConst.RELAY_DEBUG_HOST_NAME);
+            Client cli = new Client(NetConst.MASTER_NODE_LISTEN_PORT, "crypto-win.nicode.me");
+            //Client cli = new Client(NetConst.MASTER_NODE_LISTEN_PORT, "localhost");
+
             cli.sendMessage(JMProtocolImpl.craftMessage(NetConst.GIVE_ME_BLOCKCHAIN_COPY));
             System.out.println("Received answer from Master " +  cli.readMessage());
             cli.close();

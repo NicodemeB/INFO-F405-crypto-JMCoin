@@ -43,10 +43,10 @@ public class WorkerRunnable implements Runnable{
             //**************************************
             // Client server interaction
             // TODO - PROTOCOL IMPLEMENTATION
-            //System.out.println(readMessage());
-//            Thread.sleep(10 * 1000);
-            //sendMessage("ok ok");
-            sendMessage(jmProtocol.processInput(readMessage()));
+            // TODO - Implement abstract class and return a correct value
+            System.out.println(readMessage());
+            sendMessage("TODO - Implement abstract class and return a correct value");
+//            sendMessage(jmProtocol.processInput(readMessage()));
             
             close();
             //**************************************

@@ -7,9 +7,9 @@ package com.jmcoin.network;
  */
 public abstract class NetConst {
 	
-	public static final int RELAY_NODE_LISTEN_PORT 			= 0xbabe;
-	public static final int MASTER_NODE_LISTEN_PORT			= 0xb00b;
-	public static final int MINER_NODE_LISTEN_PORT			= 0xc001;
+	public static final int RELAY_NODE_LISTEN_PORT 			= 33333;
+	public static final int MASTER_NODE_LISTEN_PORT			= 33334;
+	public static final int MINER_NODE_LISTEN_PORT			= 33335;
 	public static final String MASTER_HOST_NAME				= "localhost"; //TODO remove this
 	public static final String RELAY_DEBUG_HOST_NAME		= "localhost"; //TODO remove this
 	//public static final String BROADCAST_HOST_NAME		= "255.255.255.255";
