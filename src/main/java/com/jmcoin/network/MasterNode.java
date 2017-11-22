@@ -34,7 +34,6 @@ public class MasterNode extends Peer{
     	return Reward.REWARD_START_VALUE / ((IOFileHandler.getFromJsonString(getBlockChain(), Chain.class).getSize() / Reward.REWARD_RATE) + 1);
     }
     
-    //TODO process block
     public void processBlock(Block pBlock) {
     	Chain chain = IOFileHandler.getFromJsonString(getBlockChain(), Chain.class);
     	if(chain.canBeAdded(pBlock))
