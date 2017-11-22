@@ -36,5 +36,8 @@ public class MasterNode extends Peer{
     
     //TODO process block
     public void processBlock(Block pBlock) {
+    	Chain chain = IOFileHandler.getFromJsonString(getBlockChain(), Chain.class);
+    	if(chain.canBeAdded(pBlock))
+    		chain.addBlock(pBlock);
     }
 }
