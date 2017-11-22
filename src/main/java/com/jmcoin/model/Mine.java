@@ -1,8 +1,12 @@
 package com.jmcoin.model;
 
-import java.io.InputStream;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import org.bouncycastle.util.encoders.Hex;
 /**
  * 
  * 
@@ -10,66 +14,31 @@ import java.security.NoSuchAlgorithmException;
  * @author Arbib Mohamed
  */
 public class Mine {
-   private int nounce;
-   private String previousHash;
-   private InputStream bloc;
-   private String hash;
-   private static String complexity="000";
-   private String Proof="";
+	
+   private Block block;
+   private MessageDigest digest;
 
- 
-
-
-
-   public Mine(String previousHash, InputStream bloc)
-   {
-      this.bloc=bloc;
-      nounce=0;
-      this.previousHash=previousHash;
+   public Mine(Block pBlock) throws NoSuchAlgorithmException{
+	   this.block = pBlock;
+	   this.digest = MessageDigest.getInstance("SHA-256");
+   }
+      
+   private byte[] calculateHash(int nonce) {
+	   block.setNonce(nonce);
+	   this.digest.update(block.toString().getBytes());
+	   return this.digest.digest();
    }
    
-   public int getNounce(){return nounce;}
-   public String getProof(){return Proof;}
-   public String getPreviousHash(){return previousHash;}
-   
-   public String calculateHash() throws NoSuchAlgorithmException 
-   {
-	MessageDigest md = MessageDigest.getInstance("SHA-256");
-        md.update((nounce + previousHash + bloc).getBytes());
-        byte[] currentHash=md.digest(); 
-        StringBuffer sb = new StringBuffer(); 
-        for (byte b1 : currentHash) {sb.append(Integer.toHexString(b1 & 0xff)); } 
-        String hash=sb.toString(); 
-        return hash;
-   }
-   
-   
-
-   
-   
-   public String proofOfWork()
-   {
-        try
-        {
-            boolean done=false;
-            while(!(done))
-                {
-                    hash = calculateHash();  
-                    if(hash.substring(0, 3).equals(complexity))
-                        {
-                            Proof= hash;
-                            nounce=nounce;
-                            done=true;
-                        }
-                nounce++;    
-                     
-                }
-        }
-        catch (NoSuchAlgorithmException e){return null;}
-   
-        return Proof;
-   }
-   
-    
-   
+   public String proofOfWork() {
+	   if(block.getSize() > Block.MAX_BLOCK_SIZE) return null;
+	   int nonce = Integer.MIN_VALUE;
+	   byte[] hash = null;
+       while(nonce <= Integer.MAX_VALUE){
+    	   if(this.block.verifyHash((hash = calculateHash(nonce++)))) {
+    		   this.block.setFinalHash(Hex.toHexString(hash));
+    	       return block.getFinalHash();
+    	   }
+       }
+       return null;
+    }   
 }

@@ -4,6 +4,8 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gson.Gson;
+
 /**
  * Class bloc
  * Represent the bloc containing transactions
@@ -68,8 +70,13 @@ public class Block {
 		this.prevHash = prevHash;
 	}
 	
-	public boolean verifyHash() {
-		BigInteger value = new BigInteger(finalHash, 16);
+	public boolean verifyHash(byte[] bytes) {
+		BigInteger value = new BigInteger(bytes);
 		return value.shiftRight(32*8 - difficulty).intValue() == 0;
+	}
+	
+	@Override
+	public String toString() {
+		return new Gson().toJson(this);
 	}
 }

@@ -1,5 +1,6 @@
 package com.jmcoin.model;
 
+import java.math.BigInteger;
 import java.util.*;
 
 public class Chain {
@@ -20,8 +21,8 @@ public class Chain {
     }
 
     //TODO check if block is valid and can be added
-    private boolean canBeAdded(Block pBlock){
-    	if(!pBlock.verifyHash()) return false;
+    public boolean canBeAdded(Block pBlock){
+    	if(!pBlock.verifyHash(pBlock.getFinalHash().getBytes())) return false;
     	if (!doesPrevBlocKExists(pBlock)) return false;
     	if (pBlock.getSize() > Block.MAX_BLOCK_SIZE) return false;
     	for(Transaction transaction : pBlock.getTransactions()) {
@@ -30,6 +31,10 @@ public class Chain {
     	return true;
     }
     
+    public boolean isFinalHashRight(Block pBlock) {
+    	BigInteger value = new BigInteger(pBlock.getFinalHash(), 16);
+    	return value.shiftRight(32*8 - pBlock.getDifficulty()).intValue() == 0;
+    }
     /**
      * Checks if the previous block exists in the chain, based on the hash
      * @param pBlock
