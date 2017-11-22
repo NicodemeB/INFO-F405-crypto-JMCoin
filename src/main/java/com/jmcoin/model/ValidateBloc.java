@@ -1,5 +1,5 @@
 
-package crypto;
+package com.jmcoin.model;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -14,13 +14,13 @@ import java.security.NoSuchAlgorithmException;
  * @author Arbib Mohamed
  */
 
-public class validateBloc 
+public class ValidateBloc 
 {
     private int nbTransactions=0;
     private FileInputStream verifiedBlock;
-    private mine mine = null;
+    private Mine mine = null;
     
-    public validateBloc(mine mine,  FileInputStream verifiedBlock)
+    public ValidateBloc(Mine mine,  FileInputStream verifiedBlock)
     {
         this.mine=mine;
         this.verifiedBlock=verifiedBlock;

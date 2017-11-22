@@ -1,4 +1,4 @@
-package crypto;
+package com.jmcoin.model;
 
 import java.io.InputStream;
 import java.security.MessageDigest;
@@ -9,7 +9,7 @@ import java.security.NoSuchAlgorithmException;
  * @author Trifi Mohamed Nabil
  * @author Arbib Mohamed
  */
-public class mine {
+public class Mine {
    private int nounce;
    private String previousHash;
    private InputStream bloc;
@@ -21,7 +21,7 @@ public class mine {
 
 
 
-   public mine(String previousHash, InputStream bloc)
+   public Mine(String previousHash, InputStream bloc)
    {
       this.bloc=bloc;
       nounce=0;
