@@ -45,7 +45,7 @@ public class WorkerRunnable implements Runnable{
             // TODO - PROTOCOL IMPLEMENTATION
             // TODO - Implement abstract class and return a correct value
             System.out.println(readMessage());
-            sendMessage("TODO - Implement abstract class and return a correct value TEST5");
+            sendMessage("TODO - Implement abstract class and return a correct value TEST6");
 //            sendMessage(jmProtocol.processInput(readMessage()));
             
             close();
