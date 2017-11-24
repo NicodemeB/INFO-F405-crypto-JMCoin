@@ -10,7 +10,7 @@ public class TestNetworkClient {
     public static void main(String args[]){
         try
         {
-            Client cli = new Client(NetConst.MASTER_NODE_LISTEN_PORT, "crypto-win.nicode.me");
+            Client cli = new Client(NetConst.MASTER_NODE_LISTEN_PORT, "kali.nicode.me");
             //Client cli = new Client(NetConst.MASTER_NODE_LISTEN_PORT, "localhost");
 
             cli.sendMessage(JMProtocolImpl.craftMessage(NetConst.GIVE_ME_BLOCKCHAIN_COPY));
