@@ -49,6 +49,17 @@ public class Transaction implements Serializable {
 		return false;
 	}
 	
+	public int getSize() {
+		int size = 0;
+		for(int i = 0; i < this.inputs.size(); i++) {
+			size += this.inputs.get(i).getSize();
+		}
+		for(int i = 0; i < this.outputs.size(); i++) {
+			size += this.outputs.get(i).getSize();
+		}
+		return size;
+	}
+	
 	public boolean equals(Transaction transaction) {
 		if(transaction == null || transaction.inputs == null || transaction.outputs == null || this.inputs.size() != transaction.inputs.size() || this.outputs.size() != transaction.outputs.size()) return false;
 		for(int i = 0; i < this.inputs.size() && i < transaction.inputs.size(); i++) {

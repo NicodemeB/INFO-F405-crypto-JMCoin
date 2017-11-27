@@ -56,6 +56,8 @@ public abstract class JMProtocolImpl<X extends Peer> {
 			case NetConst.TAKE_UPDATED_DIFFICULTY:
 				takeUpdatedDifficultyImpl(tokenizer.nextToken());
 				break;
+			case NetConst.GIVE_ME_DIFFICULTY:
+				return Integer.toString(giveMeDifficulty());
 			default:
 				return NetConst.ERR_NOT_A_REQUEST;
 			}
@@ -106,6 +108,8 @@ public abstract class JMProtocolImpl<X extends Peer> {
 	 */
 	protected abstract boolean takeUpdatedDifficultyImpl(String payload);
 	
+	
+	protected abstract int giveMeDifficulty();
 	/**
 	 * Builds a message to send over the network, compliant with the protocol
 	 * @param request {@link NetConst}.xxxxx

@@ -7,34 +7,31 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
 	}
 
 	@Override
-	protected String giveMeBlockChainCopyImpl() {
-		return null;
-	}
+	//unused
+	protected String giveMeBlockChainCopyImpl() {return null;}
 
 	@Override
-	protected String giveMeRewardAmountImpl() {
-		return null;
-	}
+	//unused
+	protected String giveMeRewardAmountImpl() {return null;}
 
 	@Override
-	protected String giveMeUnverifiedTransactionsImpl() {
-		return null;
-	}
+	//unused
+	protected String giveMeUnverifiedTransactionsImpl() {return null;}
 
 	@Override
-	protected boolean takeMyMinedBlockImpl(String payload) {
-		return false;
-	}
+	//unused
+	protected boolean takeMyMinedBlockImpl(String payload) {return false;}
 
 	@Override
-	protected boolean takeMyNewTransactionImpl(String payload) {
-		return false;
-	}
+	//unused
+	protected boolean takeMyNewTransactionImpl(String payload) {return false;}
 
 	@Override
-	protected boolean takeUpdatedDifficultyImpl(String payload) {
-		return false;
-	}
-	//TODO Reward Transaction
+	protected boolean takeUpdatedDifficultyImpl(String payload) {return false;}
 
+	@Override
+	protected int giveMeDifficulty() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }

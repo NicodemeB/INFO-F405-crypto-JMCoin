@@ -19,10 +19,15 @@ public abstract class NetConst {
 	public static final char TAKE_MY_MINED_BLOCK			= '3'; //from miners
 	public static final char TAKE_MY_NEW_TRANSACTION		= '4'; //from wallets
 	public static final char TAKE_UPDATED_DIFFICULTY		= '5';
+	public static final char STOP_MINING					= '6';
+	public static final char GIVE_ME_DIFFICULTY				= '7';
 	public static final char DELIMITER						= '$';
 	public static final char END							= '#';
 	public static final String ERR_NOT_A_REQUEST			= "err_not_req";
 	public static final String RES_OKAY						= "res_ok";
 	public static final String RES_NOK						= "res_nok";
 	public static final String ERR_BAD_REQUEST				= "bad_req";
+	public static final int MAX_SENT_TRANSACTIONS 			= 1000;
+	public static final int DEFAULT_DIFFICULTY 				= 16;
+	
 }

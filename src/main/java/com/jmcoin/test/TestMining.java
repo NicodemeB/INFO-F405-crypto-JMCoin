@@ -1,22 +1,19 @@
 package com.jmcoin.test;
 
-import java.math.BigInteger;
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.ExecutionException;
 
-import org.bouncycastle.util.encoders.Hex;
-
-import com.google.gson.Gson;
 import com.jmcoin.model.Block;
-import com.jmcoin.model.Chain;
 import com.jmcoin.model.Input;
-import com.jmcoin.model.Mine;
+import com.jmcoin.model.Mining;
 import com.jmcoin.model.Output;
 import com.jmcoin.model.Transaction;
 
-public class TestBlockVerify {
-	
+public class TestMining {
+
 	public static void main(String[] args) {
-		Input in = new Input();
+		/*Input in = new Input();
 		in.setHashSha256("h1");
 		in.setSignature("sig1");
 		Output out = new Output();
@@ -36,6 +33,24 @@ public class TestBlockVerify {
 			System.out.println(mine.proofOfWork());
 			System.out.println("Can be added to chain: "+chain.isFinalHashRight(block));
 		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}*/
+		Mining mining = new Mining();
+		try {
+			mining.buildBlock();
+			System.out.println(mining.mine());
+		}
+		catch(ClassNotFoundException cnfe) {
+			cnfe.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

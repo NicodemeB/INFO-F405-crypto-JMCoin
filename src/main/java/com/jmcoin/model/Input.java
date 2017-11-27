@@ -12,7 +12,7 @@ public class Input implements Serializable{
 	
 	private static final long serialVersionUID = -7496600791646424812L;
 	private String hashSha256, signature;
-        public int amount;
+	public int amount;
 	
 	public Input() {}
 
@@ -42,5 +42,9 @@ public class Input implements Serializable{
 	
 	public boolean equals(Input pInput) {
 		return this.amount == pInput.amount && this.signature.equals(pInput.signature)  && this.hashSha256.equals(pInput.hashSha256);
+	}
+	
+	public int getSize() {
+		return 4 + this.hashSha256.getBytes().length + this.signature.getBytes().length;
 	}
 }

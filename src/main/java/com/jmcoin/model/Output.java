@@ -44,4 +44,8 @@ public class Output implements Serializable {
 	public boolean equals(Output pOutput) {
 		return this.amount == pOutput.amount && this.inputIndex == pOutput.inputIndex;
 	}
+	
+	public int getSize() {
+		return 8 + this.publicKey.getBytes().length;
+	}
 }

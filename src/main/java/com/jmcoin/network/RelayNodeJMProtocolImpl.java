@@ -1,9 +1,7 @@
 package com.jmcoin.network;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.List;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -19,11 +17,9 @@ import com.jmcoin.model.Transaction;
  */
 public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
 
-	private Queue<Transaction> unverifiedTransactions;
 	
 	public RelayNodeJMProtocolImpl() {
 		super(new RelayNode());
-		this.unverifiedTransactions = new LinkedList<>();
 	}
 
 	@Override
@@ -53,8 +49,14 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
 	 * Miner <- Relay
 	 */
 	protected String giveMeUnverifiedTransactionsImpl() {
-		Transaction transactions = this.unverifiedTransactions.poll();
-		return transactions == null ? null : new Gson().toJson(transactions);
+		List<Transaction> transactions;
+		if(this.peer.getUnverifiedTransactions().size() > NetConst.MAX_SENT_TRANSACTIONS) {
+			transactions = this.peer.getUnverifiedTransactions().subList(0, NetConst.MAX_SENT_TRANSACTIONS);
+		}
+		else {
+			transactions = this.peer.getUnverifiedTransactions();
+		}
+		return new Gson().toJson(transactions);
 	}
 
 	@Override
@@ -66,23 +68,12 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
 	protected boolean takeMyMinedBlockImpl(String payload) {
 		if(payload != null) {
 			try {
-				Block block = IOFileHandler.getFromJsonString(payload, Block.class);
-				if(block == null || block.getTransactions() != null)return false;
-				ArrayList<Integer> indexes = new ArrayList<>(block.getTransactions().size());
-				for(int i = 0; i < block.getTransactions().size(); i++) {
-					int k = 0;
-					for(Transaction unvfTransaction : this.unverifiedTransactions) {
-						if(block.getTransactions().get(i).equals(unvfTransaction)) {
-							indexes.add(k);
-						}
-					}
-				}
 				Client client = new Client(NetConst.MASTER_NODE_LISTEN_PORT, NetConst.MASTER_HOST_NAME);
 				client.sendMessage(JMProtocolImpl.craftMessage(NetConst.TAKE_MY_MINED_BLOCK, payload));
 				client.close();
 				Block b = IOFileHandler.getFromJsonString(payload, Block.class);
 				for(final Transaction t : b.getTransactions()){
-					unverifiedTransactions.removeIf(t::equals);
+					this.peer.getUnverifiedTransactions().removeIf(t::equals);
 				}
 				return true;
 			} catch (IOException e) {
@@ -101,7 +92,7 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
 		if (payload != null) {
 			try {
 				Transaction transaction = IOFileHandler.getFromJsonString(payload, Transaction.class);
-				this.unverifiedTransactions.add(transaction);
+				this.peer.getUnverifiedTransactions().add(transaction);
 				return true;
 			}
 			catch(JsonSyntaxException jse) {
@@ -121,6 +112,11 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
 			//TODO broadcast the difficulty
 		}
 		return false;
+	}
+
+	@Override
+	protected int giveMeDifficulty() {
+		return peer.getDifficulty();
 	}
 
 }

@@ -45,4 +45,9 @@ public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 
 	@Override
 	protected boolean takeUpdatedDifficultyImpl(String payload) {return false;}
+
+	@Override
+	protected int giveMeDifficulty() {
+		return 0;
+	}
 }
