@@ -35,5 +35,6 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
 	protected boolean takeUpdatedDifficultyImpl(String payload) {
 		return false;
 	}
+	//TODO Reward Transaction
 
 }

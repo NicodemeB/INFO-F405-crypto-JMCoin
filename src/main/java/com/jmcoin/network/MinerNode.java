@@ -6,4 +6,6 @@ public class MinerNode extends Peer{
 		super();
 	}
 
+	//TODO Reward Transaction
+
 }

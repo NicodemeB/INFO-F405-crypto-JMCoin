@@ -32,13 +32,19 @@ public class Mine {
    public String proofOfWork() {
 	   if(block.getSize() > Block.MAX_BLOCK_SIZE) return null;
 	   int nonce = Integer.MIN_VALUE;
-	   byte[] hash = null;
-       while(nonce <= Integer.MAX_VALUE){
-    	   if(this.block.verifyHash((hash = calculateHash(nonce++)))) {
-    		   this.block.setFinalHash(Hex.toHexString(hash));
-    	       return block.getFinalHash();
-    	   }
+       while(nonce < Integer.MAX_VALUE){
+		   if (verifyAndSetHash(nonce++)) return block.getFinalHash();
        }
-       return null;
-    }   
+	   if (verifyAndSetHash(nonce)) return block.getFinalHash();
+	   return null;
+    }
+
+	private boolean verifyAndSetHash(int nonce) {
+		byte[] hash;
+		if(this.block.verifyHash((hash = calculateHash(nonce)))){
+            this.block.setFinalHash(Hex.toHexString(hash));
+			return true;
+        }
+		return false;
+	}
 }
