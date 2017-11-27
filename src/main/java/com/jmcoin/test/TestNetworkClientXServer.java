@@ -1,19 +1,26 @@
 package com.jmcoin.test;
 
 import com.jmcoin.network.Client;
-import com.jmcoin.network.JMProtocolImpl;
+import com.jmcoin.network.MultiThreadedServer;
 import com.jmcoin.network.NetConst;
+import com.jmcoin.network.RelayNodeJMProtocolImpl;
 
 import java.io.IOException;
 
-public class TestNetworkClient {
-    private static boolean iHaveSomethingToReceive = false;
-    private static boolean iHaveSomethingToSend = false;
+public class TestNetworkClientXServer {
+    void run(){
 
-    public static void main(String args[]){
+        MultiThreadedServer server = new MultiThreadedServer(NetConst.RELAY_NODE_LISTEN_PORT, new RelayNodeJMProtocolImpl());
+        new Thread(server).start();
+    }
+    public static void main(String args[])
+    {
+        TestNetworkClientXServer tn = new TestNetworkClientXServer();
+        tn.run();
+
         try
         {
-            Client cli = new Client(NetConst.RELAY_NODE_LISTEN_PORT, "localhost");
+            Client cli = new Client(NetConst.MASTER_NODE_LISTEN_PORT, "localhost");
             cli.sendMessage((Object)"client");
             boolean loop = true;
             do {
@@ -37,6 +44,4 @@ public class TestNetworkClient {
             e.printStackTrace();
         }
     }
-
-
 }
