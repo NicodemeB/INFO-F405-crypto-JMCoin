@@ -10,13 +10,6 @@ public class TestNetworkServer {
         MultiThreadedServer server = new MultiThreadedServer(NetConst.MASTER_NODE_LISTEN_PORT, new RelayNodeJMProtocolImpl());
         new Thread(server).start();
 
-//        try {
-//            Thread.sleep(20 * 1000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//        System.out.println("Stopping Server");
-//        server.stop();
     }
     public static void main(String args[])
     {
@@ -25,4 +18,8 @@ public class TestNetworkServer {
             tn.run();
 //        }
     }
+    //TEST DEPLOYEMENT
+    //TEST DEPLOYEMENT2
+    //TEST DEPLOYEMENT3
+    //TEST DEPLOYEMENT4
 }
