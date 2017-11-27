@@ -71,8 +71,7 @@ public class Block {
 	}
 	
 	public boolean verifyHash(byte[] bytes) {
-		BigInteger value = new BigInteger(bytes);
-		return value.shiftRight(32*8 - difficulty).intValue() == 0;
+		return new BigInteger(bytes).shiftRight(32*8 - difficulty).intValue() == 0;
 	}
 	
 	@Override

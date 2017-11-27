@@ -8,8 +8,9 @@ import java.io.Serializable;
  * @author enzo
  *
  */
-public class Input implements Serializable {
+public class Input implements Serializable{
 	
+	private static final long serialVersionUID = -7496600791646424812L;
 	private String hashSha256, signature;
         public int amount;
 	
@@ -38,5 +39,8 @@ public class Input implements Serializable {
 	public void setSignature(String signature) {
 		this.signature = signature;
 	}
-        
+	
+	public boolean equals(Input pInput) {
+		return this.amount == pInput.amount && this.signature.equals(pInput.signature)  && this.hashSha256.equals(pInput.hashSha256);
+	}
 }

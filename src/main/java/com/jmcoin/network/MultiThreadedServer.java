@@ -10,9 +10,9 @@ public class MultiThreadedServer implements Runnable{
     protected ServerSocket serverSocket = null;
     protected boolean      isStopped    = false;
     protected Thread       runningThread= null;
-    protected JMProtocolImpl protocol	= null;
+    protected JMProtocolImpl<? extends Peer> protocol	= null;
 
-    public MultiThreadedServer(int port, JMProtocolImpl protocol){
+    public MultiThreadedServer(int port, JMProtocolImpl<? extends Peer> protocol){
         this.serverPort = port;
         this.protocol = protocol;
     }

@@ -1,12 +1,14 @@
 package com.jmcoin.network;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.jmcoin.io.IOFileHandler;
+import com.jmcoin.model.Block;
 import com.jmcoin.model.Transaction;
 
 /**
@@ -23,7 +25,6 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
 		super(new RelayNode());
 		this.unverifiedTransactions = new LinkedList<>();
 	}
-	
 
 	@Override
 	/**
@@ -32,16 +33,7 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
 	 * Wallet <- Relay <- Master 
 	 */
 	protected String giveMeBlockChainCopyImpl() {
-		try {
-			Client client = new Client(NetConst.MASTER_NODE_LISTEN_PORT, NetConst.MASTER_HOST_NAME);
-			client.sendMessage(JMProtocolImpl.craftMessage(NetConst.GIVE_ME_BLOCKCHAIN_COPY));
-			String response = client.readMessage().toString();
-			client.close();
-			return response;
-		} catch (IOException | ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		return null;
+		return sendRequest(NetConst.MASTER_NODE_LISTEN_PORT, NetConst.MASTER_HOST_NAME, NetConst.GIVE_ME_BLOCKCHAIN_COPY);
 	}
 
 	@Override
@@ -51,16 +43,7 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
 	 * Miner <- Relay <- Master
 	 */
 	protected String giveMeRewardAmountImpl() {
-		try {
-			Client client = new Client(NetConst.MASTER_NODE_LISTEN_PORT, NetConst.MASTER_HOST_NAME);
-			client.sendMessage(JMProtocolImpl.craftMessage(NetConst.GIVE_ME_REWARD_AMOUNT));
-			String response = client.readMessage().toString();
-			client.close();
-			return response;
-		} catch (IOException | ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		return null;
+		return sendRequest(NetConst.MASTER_NODE_LISTEN_PORT, NetConst.MASTER_HOST_NAME, NetConst.GIVE_ME_REWARD_AMOUNT);
 	}
 
 	@Override
@@ -70,8 +53,8 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
 	 * Miner <- Relay
 	 */
 	protected String giveMeUnverifiedTransactionsImpl() {
-		Transaction transaction = this.unverifiedTransactions.poll();
-		return transaction == null ? null : new Gson().toJson(transaction);
+		Transaction transactions = this.unverifiedTransactions.poll();
+		return transactions == null ? null : new Gson().toJson(transactions);
 	}
 
 	@Override
@@ -83,6 +66,17 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
 	protected boolean takeMyMinedBlockImpl(String payload) {
 		if(payload != null) {
 			try {
+				Block block = IOFileHandler.getFromJsonString(payload, Block.class);
+				if(block == null || block.getTransactions() != null)return false;
+				ArrayList<Integer> indexes = new ArrayList<>(block.getTransactions().size());
+				for(int i = 0; i < block.getTransactions().size(); i++) {
+					int k = 0;
+					for(Transaction unvfTransaction : this.unverifiedTransactions) {
+						if(block.getTransactions().get(i).equals(unvfTransaction)) {
+							indexes.add(k);
+						}
+					}
+				}
 				Client client = new Client(NetConst.MASTER_NODE_LISTEN_PORT, NetConst.MASTER_HOST_NAME);
 				client.sendMessage(JMProtocolImpl.craftMessage(NetConst.TAKE_MY_MINED_BLOCK, payload));
 				client.close();

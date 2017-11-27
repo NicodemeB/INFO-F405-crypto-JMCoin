@@ -9,7 +9,7 @@ import java.io.Serializable;
  *
  */
 public class Output implements Serializable {
-	
+	private static final long serialVersionUID = -1699190505094955025L;
 	private int amount;
 	private int inputIndex;
 	
@@ -40,4 +40,8 @@ public class Output implements Serializable {
 	private String publicKey;
 	
 	public Output() {}
+	
+	public boolean equals(Output pOutput) {
+		return this.amount == pOutput.amount && this.inputIndex == pOutput.inputIndex;
+	}
 }

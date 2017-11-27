@@ -1,5 +1,6 @@
 package com.jmcoin.network;
 
+import java.io.IOException;
 import java.util.StringTokenizer;
 
 import com.jmcoin.model.Block;
@@ -117,5 +118,21 @@ public abstract class JMProtocolImpl<X extends Peer> {
 	
 	public static String craftMessage(int request) {
 		return JMProtocolImpl.craftMessage(request, "");
+	}
+	
+	public static String sendRequest(int port, String host, int req) {
+		try {
+			Client client = new Client(port, host);
+			client.sendMessage(JMProtocolImpl.craftMessage(req));
+			String response = client.readMessage().toString();
+			client.close();
+			return response;
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		return null;
+		
 	}
 }
