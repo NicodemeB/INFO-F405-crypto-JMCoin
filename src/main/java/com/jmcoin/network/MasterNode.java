@@ -31,11 +31,10 @@ public class MasterNode extends Peer{
     
     //FIXME computes the value of the next reward ?
     public int getRewardAmount() {
-    	return Reward.REWARD_START_VALUE / ((IOFileHandler.getFromJsonString(getBlockChain(), Chain.class).getSize() / Reward.REWARD_RATE) + 1);
+    	return Reward.REWARD_START_VALUE / ((chain.getSize() / Reward.REWARD_RATE) + 1);
     }
     
     public void processBlock(Block pBlock) {
-    	Chain chain = IOFileHandler.getFromJsonString(getBlockChain(), Chain.class);
     	if(chain.canBeAdded(pBlock))
     		chain.addBlock(pBlock);
     }

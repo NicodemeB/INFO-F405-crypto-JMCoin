@@ -7,6 +7,7 @@ import java.util.Queue;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.jmcoin.io.IOFileHandler;
+import com.jmcoin.model.Block;
 import com.jmcoin.model.Transaction;
 
 /**
@@ -86,6 +87,10 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
 				Client client = new Client(NetConst.MASTER_NODE_LISTEN_PORT, NetConst.MASTER_HOST_NAME);
 				client.sendMessage(JMProtocolImpl.craftMessage(NetConst.TAKE_MY_MINED_BLOCK, payload));
 				client.close();
+				Block b = IOFileHandler.getFromJsonString(payload, Block.class);
+				for(final Transaction t : b.getTransactions()){
+					unverifiedTransactions.removeIf(t::equals);
+				}
 				return true;
 			} catch (IOException e) {
 				e.printStackTrace();
