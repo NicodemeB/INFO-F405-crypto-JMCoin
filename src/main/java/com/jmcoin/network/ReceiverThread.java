@@ -41,6 +41,9 @@ public class ReceiverThread implements Runnable{
                                 ((WorkerRunnable)parent).setToSend("Connected");
                             }
                             break;
+                        default:
+                            System.out.println("Default case; case not defined; drop packet");
+                            break;
                     }
 
                 }
