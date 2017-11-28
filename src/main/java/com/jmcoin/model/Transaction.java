@@ -1,25 +1,33 @@
 package com.jmcoin.model;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
+@Entity
 public class Transaction implements Serializable {
 	
 	private static final long serialVersionUID = -1113345289965914322L;
-	private ArrayList<Input> inputs;
-	private ArrayList<Output> outputs;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Basic(optional = false)
+	private Long id;
+	@OneToMany(cascade = CascadeType.ALL)
+	private List<Input> inputs;
+	@OneToMany(cascade = CascadeType.ALL)
+	private List<Output> outputs;
 	
 	public Transaction() {
 		//TODO do we need to set a max ?
 		inputs = new ArrayList<>();
 		outputs = new ArrayList<>();
 	}
-	
-	
-	public ArrayList<Input> getInputs() {
+
+	public List<Input> getInputs() {
 		return inputs;
 	}
-	public ArrayList<Output> getOutputs() {
+	public List<Output> getOutputs() {
 		return outputs;
 	}
 	/**
