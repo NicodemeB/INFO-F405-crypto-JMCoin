@@ -22,7 +22,7 @@ public class Input implements Serializable{
 	@Basic(optional = false)
 	private String signature;
 	@Basic(optional = false)
-	public int amount;
+	private int amount;
 	
 	public Input() {}
 
