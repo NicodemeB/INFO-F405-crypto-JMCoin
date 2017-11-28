@@ -1,5 +1,6 @@
 package com.jmcoin.model;
 
+import javax.persistence.*;
 import java.io.Serializable;
 
 /**
@@ -8,10 +9,19 @@ import java.io.Serializable;
  * @author enzo
  *
  */
+@Entity
 public class Input implements Serializable{
 	
 	private static final long serialVersionUID = -7496600791646424812L;
-	private String hashSha256, signature;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Basic(optional = false)
+	private Long id;
+	@Basic(optional = false)
+	private String hashSha256;
+	@Basic(optional = false)
+	private String signature;
+	@Basic(optional = false)
 	public int amount;
 	
 	public Input() {}
