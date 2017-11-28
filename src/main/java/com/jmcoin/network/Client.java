@@ -9,12 +9,11 @@ import java.net.Socket;
 public class Client {
     Socket requestSocket;
     ObjectOutputStream out;
-    ObjectInputStream in;
-//    private boolean iHaveSomethingToReceive = false;
-//    private boolean iHaveSomethingToSend = false;
+    public ObjectInputStream in;
     String buffer = null;
     Object receivedMessage = "";
-    boolean sendFlag = false;
+    private boolean sendFlag = false;
+    Object toSend;
 
     //Client
     public Client (int port, String host) throws IOException {
@@ -30,37 +29,23 @@ public class Client {
         requestSocket.close();
     }
 
-    public void sendMessage(Object msg) throws IOException {
+    public synchronized void sendMessage(Object msg) throws IOException {
         out.writeObject(msg);
         out.flush();
+        toSend = null;
+        sendFlag = false;
     }
 
     public Object readMessage() throws IOException, ClassNotFoundException {
         return  in.readObject();
     }
 
-    public Object getMessage() {
-        return receivedMessage;
+    public synchronized void setToSend(Object ts){
+        toSend = ts;
+        sendFlag = true;
     }
 
-    public boolean iHaveSomethingToReceive () throws ClassNotFoundException, IOException {
-        try {
-            Object temp = readMessage();
-            receivedMessage = temp;
-            return true;
-        } catch (EOFException e){
-            receivedMessage = null;
-            return false;
-        }
-    }
-    public boolean doIHaveSomethingToSend (){
-        if (sendFlag == true ) {
-            sendFlag = false;
-            return true;
-        }
-        return false;
-    }
-    public void iHaveSomethingToSend (){
-        sendFlag = true;
+    public synchronized Object getToSend(){
+        return toSend;
     }
 }
