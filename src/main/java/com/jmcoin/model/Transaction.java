@@ -13,9 +13,9 @@ public class Transaction implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Basic(optional = false)
 	private Long id;
-	@OneToMany
+	@OneToMany(cascade = CascadeType.ALL)
 	private List<Input> inputs;
-	@OneToMany
+	@OneToMany(cascade = CascadeType.ALL)
 	private List<Output> outputs;
 	
 	public Transaction() {
@@ -23,8 +23,7 @@ public class Transaction implements Serializable {
 		inputs = new ArrayList<>();
 		outputs = new ArrayList<>();
 	}
-	
-	
+
 	public List<Input> getInputs() {
 		return inputs;
 	}

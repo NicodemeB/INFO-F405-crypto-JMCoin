@@ -19,7 +19,7 @@ public class Chain implements Serializable {
     @Basic(optional = false)
     private Long id;
 
-    @ElementCollection
+    @OneToMany(cascade = CascadeType.ALL)
     private Map<String, Block> blocks;
 
     public Chain() {

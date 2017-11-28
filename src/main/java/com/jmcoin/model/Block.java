@@ -27,7 +27,7 @@ public class Block implements Serializable {
 	@Transient
 	public static final int MAX_BLOCK_SIZE = 1024; //TODO do we need to set this value ?
 
-	@OneToMany
+	@OneToMany(cascade = CascadeType.ALL)
 	private List<Transaction> transactions;
 	@Basic(optional = false)
 	private int difficulty;
