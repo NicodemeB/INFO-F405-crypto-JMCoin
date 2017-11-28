@@ -20,9 +20,6 @@ public class Chain implements Serializable {
     private Long id;
 
     @ElementCollection
-    //@MapKeyColumn(name = "key")
-    //@Column(name = "block")
-    //@CollectionTable(name = "blocks", joinColumns = @JoinColumn(name = "block_id"))
     private Map<String, Block> blocks;
 
     public Chain() {
