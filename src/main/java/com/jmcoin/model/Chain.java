@@ -20,6 +20,7 @@ public class Chain implements Serializable {
     private Long id;
 
     @OneToMany(cascade = CascadeType.ALL)
+    @MapKeyColumn(name="BLOCKS_KEY", table="CHAIN_BLOCK")
     private Map<String, Block> blocks;
 
     public Chain() {
