@@ -1,6 +1,7 @@
 package com.jmcoin.model;
 
 import java.io.Serializable;
+import java.security.PublicKey;
 
 /**
  * Class Output.
@@ -12,6 +13,7 @@ public class Output implements Serializable {
 	private static final long serialVersionUID = -1699190505094955025L;
 	private int amount;
 	private int inputIndex;
+	private PublicKey pubKey;
 	
 	public int getInputIndex() {
 		return inputIndex;
@@ -29,15 +31,9 @@ public class Output implements Serializable {
 		this.amount = amount;
 	}
 
-	public String getPublicKey() {
-		return publicKey;
+	public PublicKey getPubKey() {
+		return pubKey;
 	}
-
-	public void setPublicKey(String publicKey) {
-		this.publicKey = publicKey;
-	}
-
-	private String publicKey;
 	
 	public Output() {}
 	
@@ -46,6 +42,6 @@ public class Output implements Serializable {
 	}
 	
 	public int getSize() {
-		return 8 + this.publicKey.getBytes().length;
+		return 8 + this.pubKey.getEncoded().length;
 	}
 }

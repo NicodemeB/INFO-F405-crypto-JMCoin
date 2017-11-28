@@ -19,6 +19,10 @@ public class Chain {
         }
         return false;
     }
+    
+    public Map<String, Block> getBlocks() {
+		return blocks;
+	}
 
     //TODO check if block is valid and can be added
     public boolean canBeAdded(Block pBlock){

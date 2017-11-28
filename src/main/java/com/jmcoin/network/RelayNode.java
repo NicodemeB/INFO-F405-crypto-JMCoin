@@ -21,18 +21,6 @@ public class RelayNode extends Peer{
 		super();
 		this.difficulty = NetConst.DEFAULT_DIFFICULTY;
 		this.unverifiedTransactions = new LinkedList<>();
-		for(int i = 0 ;i < 5; i++) {
-			Input in = new Input();
-			in.setAmount(i);
-			in.setHashSha256("H"+i);
-			in.setSignature("S"+i);
-			Output out = new Output();
-			out.setAmount(i+42);
-			out.setPublicKey("Pk"+i);
-			Transaction trans = new Transaction();
-			trans.addInputOutput(in, out);
-			this.unverifiedTransactions.add(trans);
-		}
 	}	
 	
 	public LinkedList<Transaction> getUnverifiedTransactions() {
@@ -41,5 +29,9 @@ public class RelayNode extends Peer{
 
 	public int getDifficulty() {
 		return this.difficulty;
+	}
+	
+	public void setDifficulty(int difficulty) {
+		this.difficulty = difficulty;
 	}
 }

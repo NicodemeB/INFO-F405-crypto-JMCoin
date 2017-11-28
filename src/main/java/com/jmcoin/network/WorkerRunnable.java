@@ -13,14 +13,14 @@ public class WorkerRunnable implements Runnable{
     protected ObjectInputStream in;
     protected ObjectOutputStream out;
     
-    protected JMProtocolImpl jmProtocol;
+    protected JMProtocolImpl<? extends Peer> jmProtocol;
 
     Object receivedMessage = "";
     boolean sendFlag = false;
     Object toSend;
     boolean loop = true;
 
-    public WorkerRunnable(Socket clientSocket, JMProtocolImpl protocol, String serverText) throws  IOException{
+    public WorkerRunnable(Socket clientSocket, JMProtocolImpl<? extends Peer> protocol, String serverText) throws  IOException{
         this.clientSocket = clientSocket;
         this.serverText   = serverText;
         in  = new ObjectInputStream(clientSocket.getInputStream());
@@ -75,7 +75,7 @@ public class WorkerRunnable implements Runnable{
             // Client server interaction
             // TODO - PROTOCOL IMPLEMENTATION
             // TODO - Implement abstract class and return a correct value
-            new Thread( new Reader(this, in)).start();
+            /*new Thread( new Reader(this, in)).start();
             boolean loop = true;
             do {
                 if (toSend != null){
@@ -86,7 +86,8 @@ public class WorkerRunnable implements Runnable{
             } while (loop);
 
             System.out.println(readMessage());
-            sendMessage("TODO - Implement abstract class and return a correct value TEST8");
+            sendMessage("TODO - Implement abstract class and return a correct value TEST8");*/
+        	sendMessage(this.jmProtocol.processInput(readMessage()));
 
             close();
 
@@ -98,8 +99,6 @@ public class WorkerRunnable implements Runnable{
                 e1.printStackTrace();
             }
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }

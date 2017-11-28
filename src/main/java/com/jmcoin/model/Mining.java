@@ -28,9 +28,13 @@ public class Mining{
 		this.block = new Block();
 	}
 	
+	public Block getBlock() {
+		return block;
+	}
+	
 	public void buildBlock() throws IOException, ClassNotFoundException {
-		String unvf = JMProtocolImpl.sendRequest(NetConst.RELAY_NODE_LISTEN_PORT, NetConst.RELAY_DEBUG_HOST_NAME, NetConst.GIVE_ME_UNVERIFIED_TRANSACTIONS);
-		String diff = JMProtocolImpl.sendRequest(NetConst.RELAY_NODE_LISTEN_PORT, NetConst.RELAY_DEBUG_HOST_NAME, NetConst.GIVE_ME_DIFFICULTY);
+		String unvf = JMProtocolImpl.sendRequest(NetConst.RELAY_NODE_LISTEN_PORT, NetConst.RELAY_DEBUG_HOST_NAME, NetConst.GIVE_ME_UNVERIFIED_TRANSACTIONS, null);
+		String diff = JMProtocolImpl.sendRequest(NetConst.RELAY_NODE_LISTEN_PORT, NetConst.RELAY_DEBUG_HOST_NAME, NetConst.GIVE_ME_DIFFICULTY, null);
 		int difficulty = -1;
 		try {
 			difficulty = Integer.parseInt(diff);

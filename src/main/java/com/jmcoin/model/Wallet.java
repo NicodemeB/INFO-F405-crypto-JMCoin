@@ -78,6 +78,7 @@ public class Wallet {
         keys.put(privateKey,publicKey);
         computeAddresses(this.keys);
     }
+    
     public void computeAddresses(HashMap<PrivateKey,PublicKey> keys) throws IOException
     {
         RIPEMD160Digest dgst = new RIPEMD160Digest();
@@ -89,25 +90,7 @@ public class Wallet {
             getAddresses().add(new String(Hex.encode(bytes)));
         }
     }
-    /*public void computeAddresses(HashMap<PrivateKey,PublicKey> keys) throws IOException
-    {
-        Iterator it = keys.entrySet().iterator();
-        RIPEMD160Digest dgst;
-        PublicKey pk;
-        
-        while (it.hasNext()) 
-        {
-            Map.Entry pair = (Map.Entry)it.next();
-            pk = (PublicKey)pair.getValue();
-            byte[] key = pk.getEncoded();
-            dgst = new RIPEMD160Digest();
-            dgst.update(key, 0, key.length);
-            byte[] bytes = new byte[dgst.getDigestSize()];
-            dgst.doFinal(bytes, 0);
-            String hashedAddress = new String(Hex.encode(bytes));
-            getAddresses().add(hashedAddress);
-        }  
-    }*/
+    
     public HashMap<PrivateKey,PublicKey> decryptPrivateKey(String password, HashMap<String,String> keysFromFile)
     {
         return new HashMap<PrivateKey,PublicKey>();
@@ -198,31 +181,6 @@ public class Wallet {
         bufIn.close();
         return dsa.sign();
     }
-    
-    public boolean verifyTransaction(byte[] signature, Transaction tr, PublicKey pubKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, SignatureException
-    {
-        boolean verifies = false;
-        if(/*pas de signature || */ tr == null || pubKey == null)
-        {
-            //Impossible de vérifier la transaction il manque des éléments.
-        }
-        else
-        {
-            Signature sig = Signature.getInstance("SHA1withDSA", "SUN");
-            sig.initVerify(pubKey);
-            byte[] bytesTr = BytesUtil.toByteArray(tr);
-            BufferedInputStream bufIn = new BufferedInputStream(new ByteArrayInputStream(bytesTr));
-            byte[] buffer = new byte[1024];
-            int len;
-            while ((len = bufIn.read(buffer)) >= 0) {
-                sig.update(buffer, 0, len);
-            };
-            bufIn.close();
-            verifies = sig.verify(signature);
-        } 
-        
-        return verifies; 
-    }
             
     // //TODO To do when we know how to fetch the chain
     // ------------------------------------------- Chain
@@ -238,12 +196,10 @@ public class Wallet {
     
     public Block getBlockByHash(String hash)
     {
-        //récuperer le bloc de la chaine
         return new Block();
     }
     public List<Block> getFullBlockchain()
     {
-        //demande au relay la liste de block
         return new ArrayList<Block>();
     }
     
@@ -263,6 +219,5 @@ public class Wallet {
     public void setKeys(HashMap<PrivateKey,PublicKey> keys) {
         this.keys = keys;
     }
-    //partie réseau à faire
 }
  

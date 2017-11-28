@@ -29,7 +29,7 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
 	 * Wallet <- Relay <- Master 
 	 */
 	protected String giveMeBlockChainCopyImpl() {
-		return sendRequest(NetConst.MASTER_NODE_LISTEN_PORT, NetConst.MASTER_HOST_NAME, NetConst.GIVE_ME_BLOCKCHAIN_COPY);
+		return sendRequest(NetConst.MASTER_NODE_LISTEN_PORT, NetConst.MASTER_HOST_NAME, NetConst.GIVE_ME_BLOCKCHAIN_COPY, null);
 	}
 
 	@Override
@@ -39,7 +39,7 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
 	 * Miner <- Relay <- Master
 	 */
 	protected String giveMeRewardAmountImpl() {
-		return sendRequest(NetConst.MASTER_NODE_LISTEN_PORT, NetConst.MASTER_HOST_NAME, NetConst.GIVE_ME_REWARD_AMOUNT);
+		return sendRequest(NetConst.MASTER_NODE_LISTEN_PORT, NetConst.MASTER_HOST_NAME, NetConst.GIVE_ME_REWARD_AMOUNT, null);
 	}
 
 	@Override
@@ -71,9 +71,16 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
 				Client client = new Client(NetConst.MASTER_NODE_LISTEN_PORT, NetConst.MASTER_HOST_NAME);
 				client.sendMessage(JMProtocolImpl.craftMessage(NetConst.TAKE_MY_MINED_BLOCK, payload));
 				client.close();
+				for(Transaction tr : this.peer.getUnverifiedTransactions()) {
+					System.out.println(tr);
+				}
+				System.out.println("----------------------");
 				Block b = IOFileHandler.getFromJsonString(payload, Block.class);
 				for(final Transaction t : b.getTransactions()){
 					this.peer.getUnverifiedTransactions().removeIf(t::equals);
+				}
+				for(Transaction tr : this.peer.getUnverifiedTransactions()) {
+					System.out.println(tr);
 				}
 				return true;
 			} catch (IOException e) {
@@ -109,7 +116,14 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
 	 */
 	protected boolean takeUpdatedDifficultyImpl(String payload) {
 		if(payload != null) {
-			//TODO broadcast the difficulty
+			try {
+				int difficulty = Integer.parseInt(payload);
+				peer.setDifficulty(difficulty);
+				return true;
+			}
+			catch (NumberFormatException nfe) {
+				nfe.printStackTrace();
+			}
 		}
 		return false;
 	}

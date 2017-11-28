@@ -18,6 +18,10 @@ public abstract class JMProtocolImpl<X extends Peer> {
 		this.peer = peer;
 	}
 	
+	public X getPeer() {
+		return peer;
+	}
+	
 	public String processInput(Object message) {
 		//FIXME the content of this method depends on the way we exchange data. Please update
 		//the following carefully.
@@ -120,14 +124,10 @@ public abstract class JMProtocolImpl<X extends Peer> {
 		return request + "$" + body + "$#";
 	}
 	
-	public static String craftMessage(int request) {
-		return JMProtocolImpl.craftMessage(request, "");
-	}
-	
-	public static String sendRequest(int port, String host, int req) {
+	public static String sendRequest(int port, String host, int req, String payload) {
 		try {
 			Client client = new Client(port, host);
-			client.sendMessage(JMProtocolImpl.craftMessage(req));
+			client.sendMessage(JMProtocolImpl.craftMessage(req, payload == null ? "" : payload));
 			String response = client.readMessage().toString();
 			client.close();
 			return response;

@@ -5,10 +5,14 @@
  */
 package com.jmcoin.test;
 
+import com.jmcoin.crypto.SignaturesVerification;
 import com.jmcoin.model.Input;
 import com.jmcoin.model.Output;
 import com.jmcoin.model.Transaction;
 import com.jmcoin.model.Wallet;
+
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,15 +22,10 @@ import java.util.logging.Logger;
  */
 public class TestWallet {
     public static void main(String args[]){
-        String rep = System.getProperty("user.home");
-        String sep = System.getProperty("file.separator");
-        rep += sep + "Documents" + sep + "PublicKeys";
-        System.out.println(rep);
-
         try {
             Wallet w = new Wallet("a","a");
             w.getAddresses();
-            w.createKeys("a");
+            //w.createKeys("a");
             Input in = new Input();
             in.setAmount(10);
             Output out = new Output();
@@ -34,9 +33,12 @@ public class TestWallet {
             Transaction tr = new Transaction();
             tr.addInputOutput(in, out);
             byte[] signature = w.signTransaction(tr, w.getKeys().entrySet().iterator().next().getKey());
-            boolean b = w.verifyTransaction(signature, tr, w.getKeys().entrySet().iterator().next().getValue());
-            System.out.println(b);
-            System.out.println("end");
+            for(PrivateKey key : w.getKeys().keySet()) {
+                if(SignaturesVerification.verifyTransaction(signature, tr, w.getKeys().get(key))) {
+                	System.out.println("Verified");
+                }
+            }
+            System.out.println("End");
         } catch (Exception ex) {
             Logger.getLogger(TestWallet.class.getName()).log(Level.SEVERE, null, ex);
         }

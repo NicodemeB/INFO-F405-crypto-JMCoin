@@ -1,6 +1,7 @@
 package com.jmcoin.model;
 
 import java.io.Serializable;
+import java.security.PublicKey;
 import java.util.ArrayList;
 
 public class Transaction implements Serializable {
@@ -8,6 +9,9 @@ public class Transaction implements Serializable {
 	private static final long serialVersionUID = -1113345289965914322L;
 	private ArrayList<Input> inputs;
 	private ArrayList<Output> outputs;
+	private String hash;
+	private byte[] signature;
+	private PublicKey pubKey;
 	
 	public Transaction() {
 		//TODO do we need to set a max ?
@@ -15,6 +19,17 @@ public class Transaction implements Serializable {
 		outputs = new ArrayList<>();
 	}
 	
+	public PublicKey getPubKey() {
+		return pubKey;
+	}
+	public byte[] getSignature() {
+		return signature;
+	}
+	
+	
+	public String getHash() {
+		return hash;
+	}
 	
 	public ArrayList<Input> getInputs() {
 		return inputs;

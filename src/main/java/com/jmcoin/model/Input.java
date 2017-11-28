@@ -1,6 +1,7 @@
 package com.jmcoin.model;
 
 import java.io.Serializable;
+import java.security.PublicKey;
 
 /**
  * Class Input.
@@ -11,40 +12,43 @@ import java.io.Serializable;
 public class Input implements Serializable{
 	
 	private static final long serialVersionUID = -7496600791646424812L;
-	private String hashSha256, signature;
-	public int amount;
+	public static final int INDEX_REWARD = -1;
+	private String prevTransHash;
+	private int amount;
+	private int outputPrevTrans;
+	
+	/**
+	 * @{@link #INDEX_REWARD} is Reward
+	 */
+	
 	
 	public Input() {}
-
+	
+	public void setPrevTransHash(String prevTransHash) {
+		this.prevTransHash = prevTransHash;
+	}
+	
+	public int getOutputPrevTrans() {
+		return outputPrevTrans;
+	}
+	
+	public String getPrevTransHash() {
+		return prevTransHash;
+	}
     public int getAmount() {
         return amount;
     }
-	
-	public String getHashSha256() {
-		return hashSha256;
-	}
 
     public void setAmount(int amount) {
         this.amount = amount;
     }
-
-	public void setHashSha256(String hashSha256) {
-		this.hashSha256 = hashSha256;
-	}
-
-	public String getSignature() {
-		return signature;
-	}
-
-	public void setSignature(String signature) {
-		this.signature = signature;
-	}
 	
+	//TODO recompute this
 	public boolean equals(Input pInput) {
-		return this.amount == pInput.amount && this.signature.equals(pInput.signature)  && this.hashSha256.equals(pInput.hashSha256);
+		return this.amount == pInput.amount  && this.prevTransHash.equals(pInput.prevTransHash);
 	}
 	
 	public int getSize() {
-		return 4 + this.hashSha256.getBytes().length + this.signature.getBytes().length;
+		return 4 + this.prevTransHash.getBytes().length;
 	}
 }
