@@ -21,12 +21,10 @@ public class TestDBOperations {
         Transaction tr = new Transaction();
         Input in = new Input();
         in.setAmount(2);
-        in.setHashSha256("hashIn");
-        in.setSignature("signIn");
+        in.setPrevTransHash("hashIn");
         Output out = new Output();
         out.setAmount(2);
         out.setInputIndex(42);
-        out.setPublicKey("pub");
         addInputOutput(in, out, tr);
         t.add(tr);
         Reward r = new Reward("miner");

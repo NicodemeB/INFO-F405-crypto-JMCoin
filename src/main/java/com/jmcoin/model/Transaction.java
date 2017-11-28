@@ -4,6 +4,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.security.PublicKey;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Entity
@@ -33,6 +34,10 @@ public class Transaction implements Serializable {
 	
 	public String getHash() {
 		return hash;
+	}
+	
+	public ArrayList<Input> getInputs() {
+		return inputs;
 	}
 	
 	public List<Output> getOutputs() {
@@ -73,7 +78,7 @@ public class Transaction implements Serializable {
 		for(int i = 0; i < this.outputs.size(); i++) {
 			size += this.outputs.get(i).getSize();
 		}
-		return size;
+		return size + this.hash.getBytes().length + this.signature.length + this.pubKey.getEncoded().length;
 	}
 	
 	public boolean equals(Transaction transaction) {
@@ -84,6 +89,8 @@ public class Transaction implements Serializable {
 		for(int i = 0; i < this.outputs.size() && i < transaction.outputs.size(); i++) {
 			if(!this.outputs.get(i).equals(transaction.outputs.get(i))) return false;
 		}
-		return true;
+		return Arrays.equals(this.hash.getBytes(), transaction.hash.getBytes()) &&
+				Arrays.equals(this.signature, transaction.signature) &&
+				Arrays.equals(this.pubKey.getEncoded(), transaction.pubKey.getEncoded());
 	}
 }

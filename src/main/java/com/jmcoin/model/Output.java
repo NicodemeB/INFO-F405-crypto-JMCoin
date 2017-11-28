@@ -1,8 +1,8 @@
 package com.jmcoin.model;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.security.PublicKey;
+import java.util.Arrays;
 
 /**
  * Class Output.
@@ -10,21 +10,19 @@ import java.security.PublicKey;
  * @author enzo
  *
  */
-@Entity
 public class Output implements Serializable {
 	private static final long serialVersionUID = -1699190505094955025L;
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Basic(optional = false)
-	private Long id;
-	@Basic(optional = false)
 	private int amount;
-	@Basic(optional = false)
 	private int inputIndex;
 	private PublicKey pubKey;
+	private Long id;
 	
 	public int getInputIndex() {
 		return inputIndex;
+	}
+	
+	public void setPubKey(PublicKey pubKey) {
+		this.pubKey = pubKey;
 	}
 
 	public void setInputIndex(int inputIndex) {
@@ -46,7 +44,7 @@ public class Output implements Serializable {
 	public Output() {}
 	
 	public boolean equals(Output pOutput) {
-		return this.amount == pOutput.amount && this.inputIndex == pOutput.inputIndex;
+		return this.amount == pOutput.amount && this.inputIndex == pOutput.inputIndex && Arrays.equals(this.pubKey.getEncoded(), pOutput.getPubKey().getEncoded());
 	}
 	
 	public int getSize() {

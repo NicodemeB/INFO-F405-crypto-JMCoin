@@ -14,10 +14,8 @@ public class TestRelayNode {
 			Input in = new Input();
 			in.setAmount(i);
 			in.setPrevTransHash("H"+i);
-			in.setSignature("S"+i);
 			Output out = new Output();
 			out.setAmount(i+42);
-			out.setPublicKey("Pk"+i);
 			Transaction trans = new Transaction();
 			trans.addInputOutput(in, out);
 			impl.getPeer().getUnverifiedTransactions().add(trans);
