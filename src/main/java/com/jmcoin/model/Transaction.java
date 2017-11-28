@@ -1,9 +1,12 @@
 package com.jmcoin.model;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.security.PublicKey;
 import java.util.ArrayList;
+import java.util.List;
 
+@Entity
 public class Transaction implements Serializable {
 	
 	private static final long serialVersionUID = -1113345289965914322L;
@@ -12,6 +15,7 @@ public class Transaction implements Serializable {
 	private String hash;
 	private byte[] signature;
 	private PublicKey pubKey;
+	private Long id;
 	
 	public Transaction() {
 		//TODO do we need to set a max ?
@@ -31,10 +35,7 @@ public class Transaction implements Serializable {
 		return hash;
 	}
 	
-	public ArrayList<Input> getInputs() {
-		return inputs;
-	}
-	public ArrayList<Output> getOutputs() {
+	public List<Output> getOutputs() {
 		return outputs;
 	}
 	/**

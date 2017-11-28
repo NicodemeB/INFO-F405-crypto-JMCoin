@@ -3,6 +3,7 @@ package com.jmcoin.test;
 import com.jmcoin.network.Client;
 import com.jmcoin.network.JMProtocolImpl;
 import com.jmcoin.network.NetConst;
+import com.jmcoin.network.ReceiverThread;
 
 import java.io.IOException;
 
@@ -14,26 +15,25 @@ public class TestNetworkClient {
         try
         {
             Client cli = new Client(NetConst.RELAY_NODE_LISTEN_PORT, "localhost");
-            cli.sendMessage((Object)"client");
-            boolean loop = true;
-            do {
-                if (cli.iHaveSomethingToReceive()){
-                    System.out.println("Received " + cli.getMessage());
-                    cli.iHaveSomethingToSend();
-                } else if (cli.doIHaveSomethingToSend()){
-                    cli.sendMessage("something");
-                }
-                Thread.sleep(10);
+            cli.sendMessage("ConnectionRequest");
+            //**************************************
+            // Client server interaction
+            // TODO - PROTOCOL IMPLEMENTATION
+            // TODO - Implement abstract class and return a correct value
+            Thread t = new Thread(new ReceiverThread(cli, cli.in));
+            t.start();
+            Thread thread = new Thread(cli);
+            thread.start();
 
-            } while (loop);
-            cli.close();
-            System.out.println("close");
+            try {
+                Thread.sleep(4000);
+                cli.sendMessage("test");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
         }
         catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }

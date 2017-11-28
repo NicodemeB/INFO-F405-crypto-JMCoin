@@ -1,10 +1,13 @@
 package com.jmcoin.model;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gson.Gson;
+
+import javax.persistence.*;
 
 /**
  * Class bloc
@@ -12,15 +15,31 @@ import com.google.gson.Gson;
  * @author franckfadeur
  *
  */
-public class Block {
-	
+
+@Entity
+public class Block implements Serializable {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Basic(optional = false)
+	private Long id;
+
+	@Transient
 	public static final int MAX_BLOCK_SIZE = 1024; //TODO do we need to set this value ?
+
+	@OneToMany(cascade = CascadeType.ALL)
 	private List<Transaction> transactions;
+	@Basic(optional = false)
 	private int difficulty;
+	@Basic(optional = false)
 	private long timeCreation;
+	@Basic(optional = false)
 	private int size;
+	@Basic(optional = false)
 	private String finalHash;
+	@Basic(optional = false)
 	private String prevHash;
+	@Basic(optional = false)
 	private int nonce;
 	
 	public Block() {

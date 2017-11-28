@@ -1,5 +1,6 @@
 package com.jmcoin.model;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.security.PublicKey;
 
@@ -9,9 +10,16 @@ import java.security.PublicKey;
  * @author enzo
  *
  */
+@Entity
 public class Output implements Serializable {
 	private static final long serialVersionUID = -1699190505094955025L;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Basic(optional = false)
+	private Long id;
+	@Basic(optional = false)
 	private int amount;
+	@Basic(optional = false)
 	private int inputIndex;
 	private PublicKey pubKey;
 	

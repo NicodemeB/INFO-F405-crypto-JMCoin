@@ -6,15 +6,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-public class Client {
-    Socket requestSocket;
-    ObjectOutputStream out;
-    ObjectInputStream in;
-//    private boolean iHaveSomethingToReceive = false;
-//    private boolean iHaveSomethingToSend = false;
-    String buffer = null;
-    Object receivedMessage = "";
-    boolean sendFlag = false;
+public class Client implements  Runnable{
+    private Socket requestSocket;
+    private ObjectOutputStream out;
+    public ObjectInputStream in;
+    private boolean sendFlag = false;
+    private Object toSend;
 
     //Client
     public Client (int port, String host) throws IOException {
@@ -30,37 +27,52 @@ public class Client {
         requestSocket.close();
     }
 
-    public void sendMessage(Object msg) throws IOException {
+    public synchronized void sendMessage(Object msg) throws IOException {
         out.writeObject(msg);
         out.flush();
+        toSend = null;
+        sendFlag = false;
     }
 
     public Object readMessage() throws IOException, ClassNotFoundException {
         return  in.readObject();
     }
 
-    public Object getMessage() {
-        return receivedMessage;
+    public synchronized void setToSend(Object ts){
+        toSend = ts;
+        sendFlag = true;
     }
 
-    public boolean iHaveSomethingToReceive () throws ClassNotFoundException, IOException {
+    public synchronized Object getToSend(){
+        return toSend;
+    }
+
+    public void receiveAndTreatMessage() throws InterruptedException {
         try {
-            Object temp = readMessage();
-            receivedMessage = temp;
-            return true;
-        } catch (EOFException e){
-            receivedMessage = null;
-            return false;
+            do {
+                if (getToSend() != null) {
+                    System.out.println("to send : " + getToSend().toString());
+                    sendMessage(getToSend());
+                }
+                Thread.sleep(100);
+            } while (true);
+        } catch (IOException e) {
+            e.printStackTrace();
+            try {
+                close();
+                System.out.println("close");
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
         }
     }
-    public boolean doIHaveSomethingToSend (){
-        if (sendFlag == true ) {
-            sendFlag = false;
-            return true;
+
+    @Override
+    public void run() {
+        try {
+            receiveAndTreatMessage();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-        return false;
-    }
-    public void iHaveSomethingToSend (){
-        sendFlag = true;
     }
 }

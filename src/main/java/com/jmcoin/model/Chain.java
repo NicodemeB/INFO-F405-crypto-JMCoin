@@ -1,10 +1,26 @@
 package com.jmcoin.model;
 
+import javax.persistence.*;
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.*;
 
-public class Chain {
+@Entity
+@NamedQueries({
+        @NamedQuery(name = "Chain.findAll", query = "SELECT c FROM Chain c")
+})
+public class Chain implements Serializable {
 
+
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Basic(optional = false)
+    private Long id;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @MapKeyColumn(name="BLOCKS_KEY", table="CHAIN_BLOCK")
     private Map<String, Block> blocks;
 
     public Chain() {

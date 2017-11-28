@@ -15,10 +15,8 @@ public class WorkerRunnable implements Runnable{
     
     protected JMProtocolImpl<? extends Peer> jmProtocol;
 
-    Object receivedMessage = "";
-    boolean sendFlag = false;
     Object toSend;
-    boolean loop = true;
+    boolean sendFlag = false;
 
     public WorkerRunnable(Socket clientSocket, JMProtocolImpl<? extends Peer> protocol, String serverText) throws  IOException{
         this.clientSocket = clientSocket;
@@ -28,7 +26,7 @@ public class WorkerRunnable implements Runnable{
         jmProtocol = protocol;
     }
 
-    public void sendMessage(Object msg) throws IOException {
+    synchronized void sendMessage(Object msg) throws IOException {
         out.writeObject(msg);
         out.flush();
         toSend = null;
@@ -45,28 +43,14 @@ public class WorkerRunnable implements Runnable{
         clientSocket.close();
     }
 
-    public boolean iHaveSomethingToReceive () throws ClassNotFoundException, IOException {
-        try {
-            Object temp = readMessage();
-            receivedMessage = temp;
-            return true;
-        } catch (EOFException e){
-            receivedMessage = null;
-            return false;
-        }
-    }
-    public boolean doIHaveSomethingToSend (){
-        if (sendFlag == true ) {
-            sendFlag = false;
-            return true;
-        }
-        return false;
-    }
-    public void iHaveSomethingToSend (){
+
+    synchronized void setToSend(Object ts){
+        toSend = ts;
         sendFlag = true;
     }
-    public Object getMessage() {
-        return receivedMessage;
+
+    synchronized Object getToSend(){
+        return toSend;
     }
 
     public void run() {
@@ -75,22 +59,15 @@ public class WorkerRunnable implements Runnable{
             // Client server interaction
             // TODO - PROTOCOL IMPLEMENTATION
             // TODO - Implement abstract class and return a correct value
-            /*new Thread( new Reader(this, in)).start();
+            new Thread( new ReceiverThread(this, in)).start();
             boolean loop = true;
             do {
-                if (toSend != null){
+                if (getToSend() != null){
                     System.out.println("to send : " + toSend.toString());
                     sendMessage(toSend);
                 }
                 Thread.sleep(100);
             } while (loop);
-
-            System.out.println(readMessage());
-            sendMessage("TODO - Implement abstract class and return a correct value TEST8");*/
-        	sendMessage(this.jmProtocol.processInput(readMessage()));
-
-            close();
-
         } catch (IOException e) {
             e.printStackTrace();
             try {
@@ -98,7 +75,7 @@ public class WorkerRunnable implements Runnable{
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
-        } catch (ClassNotFoundException e) {
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }

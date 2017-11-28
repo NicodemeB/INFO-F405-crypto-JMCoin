@@ -1,5 +1,6 @@
 package com.jmcoin.model;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.security.PublicKey;
 
@@ -20,7 +21,9 @@ public class Input implements Serializable{
 	/**
 	 * @{@link #INDEX_REWARD} is Reward
 	 */
-	
+	private Long id;
+	private String hashSha256;
+	private String signature;
 	
 	public Input() {}
 	
