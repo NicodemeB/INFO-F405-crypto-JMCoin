@@ -16,11 +16,10 @@ public abstract class NetConst {
 	public static final char GIVE_ME_BLOCKCHAIN_COPY		= '0'; //from wallets
 	public static final char GIVE_ME_UNVERIFIED_TRANSACTIONS= '1'; //from miners
 	public static final char GIVE_ME_REWARD_AMOUNT			= '2'; //from miners
-	public static final char TAKE_MY_MINED_BLOCK			= '3'; //from miners
-	public static final char TAKE_MY_NEW_TRANSACTION		= '4'; //from wallets
-	public static final char TAKE_UPDATED_DIFFICULTY		= '5';
-	public static final char STOP_MINING					= '6';
-	public static final char GIVE_ME_DIFFICULTY				= '7';
+	public static final char TAKE_MY_MINED_BLOCK			= '3'; //from miners to master
+	public static final char TAKE_MY_NEW_TRANSACTION		= '4'; //from wallets to master (goes to pool of unverif. transaction
+	public static final char GIVE_ME_DIFFICULTY				= '5'; //from miners
+	public static final char STOP_MINING					= '6'; //from master to miners (broadcast)
 	public static final char DELIMITER						= '$';
 	public static final char END							= '#';
 	public static final String ERR_NOT_A_REQUEST			= "err_not_req";

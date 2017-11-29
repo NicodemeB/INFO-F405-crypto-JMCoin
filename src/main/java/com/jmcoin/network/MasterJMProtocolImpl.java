@@ -1,8 +1,12 @@
 package com.jmcoin.network;
 
+import java.util.List;
+
+import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.jmcoin.io.IOFileHandler;
 import com.jmcoin.model.Block;
+import com.jmcoin.model.Transaction;
 
 public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 
@@ -21,33 +25,46 @@ public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 	}
 
 	@Override
-	protected String giveMeUnverifiedTransactionsImpl() {return null;}
+	protected String giveMeUnverifiedTransactionsImpl() {
+		List<Transaction> transactions;
+		if(this.peer.getUnverifiedTransactions().size() > NetConst.MAX_SENT_TRANSACTIONS) {
+			transactions = this.peer.getUnverifiedTransactions().subList(0, NetConst.MAX_SENT_TRANSACTIONS);
+		}
+		else {
+			transactions = this.peer.getUnverifiedTransactions();
+		}
+		return new Gson().toJson(transactions);
+	}
 
 	@Override
 	protected boolean takeMyMinedBlockImpl(String payload) {
 		if (payload != null) {
 			try {
-				Block block = IOFileHandler.getFromJsonString(payload, Block.class);
-				peer.processBlock(block);
+				peer.processBlock(IOFileHandler.getFromJsonString(payload, Block.class));
+				return true;
 			}
 			catch(JsonSyntaxException jse) {
 				jse.printStackTrace();
-				return false;
 			}
-			return true;
-			
 		}
 		return false;
 	}
 
 	@Override
-	protected boolean takeMyNewTransactionImpl(String payload) {return false;}
+	protected boolean takeMyNewTransactionImpl(String payload) {
+		try {
+			Transaction transaction = IOFileHandler.getFromJsonString(payload, Transaction.class);
+			this.peer.getUnverifiedTransactions().add(transaction);
+			return true;
+		}
+		catch(JsonSyntaxException jse) {
+			jse.printStackTrace();
+		}
+		return false;
+	}
 
 	@Override
-	protected boolean takeUpdatedDifficultyImpl(String payload) {return false;}
-
-	@Override
-	protected int giveMeDifficulty() {
-		return 0;
+	protected String giveMeDifficulty() {
+		return Integer.toString(this.peer.getDifficulty());
 	}
 }

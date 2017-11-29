@@ -18,6 +18,7 @@ import javax.persistence.*;
 
 @Entity
 public class Block implements Serializable {
+	private static final long serialVersionUID = -6824837198082139469L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -70,11 +71,9 @@ public class Block implements Serializable {
 	public void setTimeCreation(long timeCreation) {
 		this.timeCreation = timeCreation;
 	}
+	//TODO recompute this
 	public int getSize() {
 		return size;
-	}
-	public void setSize(int size) {
-		this.size = size;
 	}
 	public String getFinalHash() {
 		return finalHash;

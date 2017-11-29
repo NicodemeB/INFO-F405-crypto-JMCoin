@@ -1,10 +1,7 @@
 package com.jmcoin.network;
 
-import java.util.LinkedList;
-
-import com.jmcoin.model.Input;
-import com.jmcoin.model.Output;
-import com.jmcoin.model.Transaction;
+import com.jmcoin.io.IOFileHandler;
+import com.jmcoin.model.Chain;
 
 /**
  * Class RelayNode
@@ -14,24 +11,19 @@ import com.jmcoin.model.Transaction;
 
 public class RelayNode extends Peer{
 
-	private LinkedList<Transaction> unverifiedTransactions;
-	private int difficulty;
+	private Chain localChainCopy;
 
 	public RelayNode() {
 		super();
-		this.difficulty = NetConst.DEFAULT_DIFFICULTY;
-		this.unverifiedTransactions = new LinkedList<>();
-	}	
-	
-	public LinkedList<Transaction> getUnverifiedTransactions() {
-		return unverifiedTransactions;
-	}
-
-	public int getDifficulty() {
-		return this.difficulty;
+		String localChainCopy = JMProtocolImpl.sendRequest(NetConst.MASTER_NODE_LISTEN_PORT, NetConst.MASTER_HOST_NAME, NetConst.GIVE_ME_BLOCKCHAIN_COPY, null);
+		this.localChainCopy = IOFileHandler.getFromJsonString(localChainCopy, Chain.class);
 	}
 	
-	public void setDifficulty(int difficulty) {
-		this.difficulty = difficulty;
+	public Chain getLocalChainCopy() {
+		return localChainCopy;
+	}
+	
+	public void updateBlockChain(String bc) {
+		this.localChainCopy = IOFileHandler.getFromJsonString(bc, Chain.class);
 	}
 }

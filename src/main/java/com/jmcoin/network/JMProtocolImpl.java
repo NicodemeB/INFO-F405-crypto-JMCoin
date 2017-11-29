@@ -57,11 +57,8 @@ public abstract class JMProtocolImpl<X extends Peer> {
 			case NetConst.TAKE_MY_NEW_TRANSACTION:
 				takeMyNewTransactionImpl(tokenizer.nextToken());
 				break;
-			case NetConst.TAKE_UPDATED_DIFFICULTY:
-				takeUpdatedDifficultyImpl(tokenizer.nextToken());
-				break;
 			case NetConst.GIVE_ME_DIFFICULTY:
-				return Integer.toString(giveMeDifficulty());
+				return giveMeDifficulty();
 			default:
 				return NetConst.ERR_NOT_A_REQUEST;
 			}
@@ -102,18 +99,9 @@ public abstract class JMProtocolImpl<X extends Peer> {
 	 * @param payload {@link Transaction} to parse
 	 * @return true if the {@link Transaction} has been received properly
 	 */
-	protected abstract boolean takeMyNewTransactionImpl(String payload);
+	protected abstract boolean takeMyNewTransactionImpl(String payload);	
 	
-	/**
-	 * Gets the new diffiulty from the master, computed according to the power of the network
-	 * (or arbitrarily set)
-	 * @param payload the difficulty, expessed as a number of bits
-	 * @return true if value has been received properly
-	 */
-	protected abstract boolean takeUpdatedDifficultyImpl(String payload);
-	
-	
-	protected abstract int giveMeDifficulty();
+	protected abstract String giveMeDifficulty();
 	/**
 	 * Builds a message to send over the network, compliant with the protocol
 	 * @param request {@link NetConst}.xxxxx

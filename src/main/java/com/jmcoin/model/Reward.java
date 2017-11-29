@@ -17,7 +17,6 @@ public class Reward extends Transaction implements Serializable{
 	@Basic(optional = false)
 	private int amount;
 
-
 	public Reward(String miner) {
 		this.miner = Objects.requireNonNull(miner);
 		this.amount = 0; //TODO remove this. Should ask via relay node MasterNode.getInstance().getRewardAmount();

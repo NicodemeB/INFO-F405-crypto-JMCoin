@@ -9,17 +9,6 @@ import com.jmcoin.network.RelayNodeJMProtocolImpl;
 
 public class TestRelayNode {
 	public static void main(String[] args) {
-		RelayNodeJMProtocolImpl impl = new RelayNodeJMProtocolImpl();
-		for(int i = 0 ;i < 5; i++) {
-			Input in = new Input();
-			in.setAmount(i);
-			in.setPrevTransHash("H"+i);
-			Output out = new Output();
-			out.setAmount(i+42);
-			Transaction trans = new Transaction();
-			trans.addInputOutput(in, out);
-			impl.getPeer().getUnverifiedTransactions().add(trans);
-		}
 		MultiThreadedServer server = new MultiThreadedServer(NetConst.RELAY_NODE_LISTEN_PORT, new RelayNodeJMProtocolImpl());
         new Thread(server).start();
         

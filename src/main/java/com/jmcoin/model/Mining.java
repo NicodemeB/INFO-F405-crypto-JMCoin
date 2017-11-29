@@ -28,8 +28,16 @@ public class Mining{
 		this.block = new Block();
 	}
 	
+	public Mining(Block block) {
+		this.block = block;
+	}
+	
 	public Block getBlock() {
 		return block;
+	}
+	
+	public void setBlock(Block block) {
+		this.block = block;
 	}
 	
 	public void buildBlock() throws IOException, ClassNotFoundException {
@@ -44,19 +52,16 @@ public class Mining{
 		}
 		if(difficulty == -1 || unvf == null) return;
 		Transaction trans[] = IOFileHandler.getFromJsonString(unvf, Transaction[].class);
-		int size = 0;
 		if(trans != null) {
 			for(int i = 0; i < trans.length; i++) {
 				//TODO verify transaction
 				block.getTransactions().add(trans[i]);
-				size += trans[i].getSize();
 			}
 		}
 		//TODO create reward
 		Reward reward = new Reward("hisnameisjohncena");
 		block.getTransactions().add(reward);
 		block.setTimeCreation(System.currentTimeMillis());
-		block.setSize(size);
 		block.setPrevHash("H0"); //TODO find prev hash in the blockchain
 		block.setDifficulty(difficulty);
 	}
@@ -90,6 +95,7 @@ public class Mining{
 			byte[] hash;
 			if(this.block.verifyHash((hash = calculateHash(nonce)))){
 		        this.block.setFinalHash(Hex.toHexString(hash));
+		        this.block.setNonce(nonce);
 				return true;
 		    }
 			return false;

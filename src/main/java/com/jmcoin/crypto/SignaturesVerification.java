@@ -10,7 +10,6 @@ import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
 
-import com.jmcoin.model.Input;
 import com.jmcoin.model.Transaction;
 import com.jmcoin.util.BytesUtil;
 
