@@ -17,7 +17,8 @@ public class TestRelayNode {
 			Output out = new Output();
 			out.setAmount(i+42);
 			Transaction trans = new Transaction();
-			trans.addInputOutput(in, out);
+			trans.addInput(in);
+			trans.setOutputOut(out);
 			impl.getPeer().getUnverifiedTransactions().add(trans);
 		}
 		MultiThreadedServer server = new MultiThreadedServer(NetConst.RELAY_NODE_LISTEN_PORT, new RelayNodeJMProtocolImpl());
