@@ -13,10 +13,12 @@ import java.security.SignatureException;
 import com.jmcoin.model.Input;
 import com.jmcoin.model.Transaction;
 import com.jmcoin.util.BytesUtil;
+import org.bouncycastle.crypto.digests.RIPEMD160Digest;
+import org.bouncycastle.util.encoders.Hex;
 
 public abstract class SignaturesVerification {
 	
-	public static boolean verifyTransaction(byte[] signature, Transaction tr, PublicKey pubKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, SignatureException
+    public static boolean verifyTransaction(byte[] signature, Transaction tr, PublicKey pubKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, SignatureException
     {
         boolean verifies = false;
         if(signature == null || tr == null || pubKey == null){
@@ -37,5 +39,15 @@ public abstract class SignaturesVerification {
         }
         return verifies; 
     }
-
+    
+    public static String DeriveJMAddressFromPubKey(PublicKey pubKey)
+    {
+        RIPEMD160Digest dgst = new RIPEMD160Digest();
+        byte[] key = pubKey.getEncoded();
+        dgst.update(key, 0, key.length);
+        byte[] bytes = new byte[dgst.getDigestSize()];
+        dgst.doFinal(bytes, 0);
+        return new String(Hex.encode(bytes));
+    }
+   
 }

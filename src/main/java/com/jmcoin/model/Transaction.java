@@ -10,7 +10,9 @@ import java.util.List;
 @Entity
 public class Transaction implements Serializable {
 	
+        
 	private static final long serialVersionUID = -1113345289965914322L;
+        @Id
 	private ArrayList<Input> inputs;
 	private ArrayList<Output> outputs;
 	private String hash;

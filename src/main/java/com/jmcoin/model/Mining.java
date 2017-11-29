@@ -24,7 +24,7 @@ public class Mining{
 	
 	private Block block;
 	
-	public Mining() {//TODO add a way to identify miner
+	public Mining() { //TODO add a way to identify miner
 		this.block = new Block();
 	}
 	
@@ -43,7 +43,7 @@ public class Mining{
 			nfe.printStackTrace();
 		}
 		if(difficulty == -1 || unvf == null) return;
-		Transaction trans[] = IOFileHandler.getFromJsonString(unvf, Transaction[].class);
+		Transaction trans[] = IOFileHandler.getFromJsonString(unvf, Transaction[].class);//cherche les transactions non vérifiées
 		int size = 0;
 		if(trans != null) {
 			for(int i = 0; i < trans.length; i++) {
@@ -52,21 +52,22 @@ public class Mining{
 				size += trans[i].getSize();
 			}
 		}
-		//TODO create reward
+                
+		/*//TODO create reward
 		Reward reward = new Reward("hisnameisjohncena");
 		block.getTransactions().add(reward);
 		block.setTimeCreation(System.currentTimeMillis());
 		block.setSize(size);
 		block.setPrevHash("H0"); //TODO find prev hash in the blockchain
-		block.setDifficulty(difficulty);
+		block.setDifficulty(difficulty);*/
 	}
 	
 	public String mine() throws NoSuchAlgorithmException, InterruptedException, ExecutionException {
-		 ExecutorService executor = Executors.newCachedThreadPool();
-         Callable<String> callable = new MiningThread(block);
-         Future<String> value = executor.submit(callable);
-         executor.shutdown();
-         return value.get();
+            ExecutorService executor = Executors.newCachedThreadPool();
+            Callable<String> callable = new MiningThread(block);
+            Future<String> value = executor.submit(callable);
+            executor.shutdown();
+            return value.get();
 	}
 	
 	private class MiningThread implements Callable<String> {
@@ -84,7 +85,7 @@ public class Mining{
 		   block.setNonce(nonce);
 		   this.digest.update(block.toString().getBytes());
 		   return this.digest.digest();
-	   }
+                }
 
 		private boolean verifyAndSetHash(int nonce) {
 			byte[] hash;
@@ -97,13 +98,13 @@ public class Mining{
 
 		@Override
 		public String call() throws Exception {
-			if(block.getSize() > Block.MAX_BLOCK_SIZE) return null;
-			int nonce = Integer.MIN_VALUE;
-			while(nonce < Integer.MAX_VALUE){
-				if (verifyAndSetHash(nonce++)) return block.getFinalHash();
-				}
-			if (verifyAndSetHash(nonce)) return block.getFinalHash();
-			return null;
+                    if(block.getSize() > Block.MAX_BLOCK_SIZE) return null;
+                    int nonce = Integer.MIN_VALUE;
+                    while(nonce < Integer.MAX_VALUE){
+                            if (verifyAndSetHash(nonce++)) return block.getFinalHash();
+                    }
+                    if (verifyAndSetHash(nonce)) return block.getFinalHash();
+                    return null;
 		}
 	}
 }

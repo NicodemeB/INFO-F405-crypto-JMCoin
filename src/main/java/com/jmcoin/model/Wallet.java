@@ -1,6 +1,7 @@
 
 package com.jmcoin.model;
 import com.jmcoin.crypto.AES;
+import com.jmcoin.crypto.SignaturesVerification;
 import com.jmcoin.util.*;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -82,19 +83,12 @@ public class Wallet {
     public void computeAddresses(HashMap<PrivateKey,PublicKey> keys) throws IOException
     {
         RIPEMD160Digest dgst = new RIPEMD160Digest();
-        for(PrivateKey privK : this.keys.keySet()){
-        	byte[] key = this.keys.get(privK).getEncoded();
-            dgst.update(key, 0, key.length);
-            byte[] bytes = new byte[dgst.getDigestSize()];
-            dgst.doFinal(bytes, 0);
-            getAddresses().add(new String(Hex.encode(bytes)));
+        for(PrivateKey privK : this.keys.keySet())
+        {
+            getAddresses().add(SignaturesVerification.DeriveJMAddressFromPubKey(this.keys.get(privK)));
         }
     }
     
-    public HashMap<PrivateKey,PublicKey> decryptPrivateKey(String password, HashMap<String,String> keysFromFile)
-    {
-        return new HashMap<PrivateKey,PublicKey>();
-    }
     public HashMap<PrivateKey,PublicKey> getWalletKeysFromFile(String password) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, AES.InvalidPasswordException, AES.InvalidAESStreamException, AES.StrongEncryptionNotAvailableException 
     {
         KeyFactory kf = KeyFactory.getInstance("DSA");
@@ -135,8 +129,7 @@ public class Wallet {
                         byte[] bytePubKey = keyGen.getFileInBytes(filePath.toString());
                         PublicKey pubKey = kf.generatePublic(new X509EncodedKeySpec(bytePubKey));
                         publicKeyList.add(pubKey);
-                    }
-                    
+                    } 
                 } 
                 catch (IOException ex) 
                 {
@@ -157,8 +150,14 @@ public class Wallet {
         return keyCouples;
     }
     //--------------------------------------------Transactions
-    public void createTransaction()
+    public void createTransaction(String fromAddress, String toAddress, double amount)
     {
+        //Recupérer la liste d'output pour cette adresse
+        //bouffe tous les output
+        // création des deux inputs (+adresses de destination)
+        //ajouter la pubKey
+        //Signer la transaction
+        
         addTransaction(new Transaction());
     }
     
