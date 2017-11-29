@@ -24,7 +24,6 @@ public class Transaction implements Serializable {
 	private Long id;
 	
 	public Transaction() {
-		//TODO do we need to set a max ?
 		inputs = new ArrayList<>();
 	}
 	
@@ -102,6 +101,7 @@ public class Transaction implements Serializable {
 				Arrays.equals(this.signature, transaction.signature) &&
 				Arrays.equals(this.pubKey.getEncoded(), transaction.pubKey.getEncoded());
 	}
+	
 	public boolean isValid() {
 		int total = 0;
 		for(Input i : inputs) {
