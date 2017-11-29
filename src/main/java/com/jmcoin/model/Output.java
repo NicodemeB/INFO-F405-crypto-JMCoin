@@ -12,6 +12,7 @@ import java.util.Arrays;
  */
 public class Output implements Serializable {
 	private static final long serialVersionUID = -1699190505094955025L;
+	private int address;
 	private int amount;
 	private int inputIndex;
 	private PublicKey pubKey;
@@ -49,5 +50,13 @@ public class Output implements Serializable {
 	
 	public int getSize() {
 		return 8 + this.pubKey.getEncoded().length;
+	}
+
+	public int getAddress() {
+		return address;
+	}
+
+	public void setAddress(int address) {
+		this.address = address;
 	}
 }

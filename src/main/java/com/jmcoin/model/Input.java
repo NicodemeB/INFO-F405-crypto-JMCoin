@@ -14,9 +14,9 @@ public class Input implements Serializable{
 	public static final int INDEX_REWARD = -1;
 	private String prevTransHash;
 	
-
-	private int amount;
-	private int outputPrevTrans;
+	
+	private int amount;	//to delete?? how do we know the value then?
+	private byte[] prevTransactionHash;
 	private Long id;
 	
 	public Input() {}
@@ -25,13 +25,6 @@ public class Input implements Serializable{
 		this.prevTransHash = prevTransHash;
 	}
 	
-	public void setOutputPrevTrans(int outputPrevTrans) {
-		this.outputPrevTrans = outputPrevTrans;
-	}
-	
-	public int getOutputPrevTrans() {
-		return outputPrevTrans;
-	}
 	
 	public String getPrevTransHash() {
 		return prevTransHash;
@@ -46,10 +39,18 @@ public class Input implements Serializable{
 	
 	//TODO recompute this
 	public boolean equals(Input pInput) {
-		return this.amount == pInput.amount  && this.prevTransHash.equals(pInput.prevTransHash) && this.outputPrevTrans == pInput.getOutputPrevTrans();
+		return this.amount == pInput.amount  && this.prevTransHash.equals(pInput.prevTransHash) && this.prevTransactionHash == pInput.prevTransactionHash;
 	}
 	
 	public int getSize() {
 		return 8 + this.prevTransHash.getBytes().length;
+	}
+
+	public byte[] getPrevTransactionHash() {
+		return prevTransactionHash;
+	}
+
+	public void setPrevTransactionHash(byte[] prevTransactionHash) {
+		this.prevTransactionHash = prevTransactionHash;
 	}
 }
