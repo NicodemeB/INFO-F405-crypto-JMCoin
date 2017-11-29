@@ -57,6 +57,8 @@ public abstract class JMProtocolImpl<X extends Peer> {
 			case NetConst.TAKE_MY_NEW_TRANSACTION:
 				takeMyNewTransactionImpl(tokenizer.nextToken());
 				break;
+			case NetConst.GIVE_ME_UNSPENT_OUTPUTS:
+				return giveMeUnspentOutputs();
 			case NetConst.GIVE_ME_DIFFICULTY:
 				return giveMeDifficulty();
 			default:
@@ -66,6 +68,8 @@ public abstract class JMProtocolImpl<X extends Peer> {
 		return NetConst.ERR_BAD_REQUEST;
 	}
 	
+	protected abstract String giveMeUnspentOutputs();
+
 	/**
 	 * Returns the last version of the blockchain
 	 * @return blockchain as a string

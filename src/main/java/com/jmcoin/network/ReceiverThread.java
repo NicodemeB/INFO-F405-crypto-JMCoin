@@ -1,8 +1,5 @@
 package com.jmcoin.network;
 
-import com.jmcoin.test.TestNetworkClientXServer;
-
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 

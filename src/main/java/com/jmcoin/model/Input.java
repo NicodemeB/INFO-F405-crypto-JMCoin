@@ -1,6 +1,7 @@
 package com.jmcoin.model;
 
 import java.io.Serializable;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 /**
@@ -33,7 +34,14 @@ public class Input implements Serializable{
 	}
 	
 	public int getSize() {
-		return  + this.prevTransactionHash.length;
+		return  4 + (this.prevTransactionHash == null ? 0 : this.prevTransactionHash.length);
+	}
+	
+	public byte[] getBytes() {
+		ByteBuffer bf = ByteBuffer.allocate(getSize());
+		bf.putInt(this.amount);
+		if(this.prevTransactionHash != null)bf.put(this.prevTransactionHash);
+		return bf.array();
 	}
 
 	public byte[] getPrevTransactionHash() {

@@ -67,4 +67,10 @@ public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 	protected String giveMeDifficulty() {
 		return Integer.toString(this.peer.getDifficulty());
 	}
+
+	@Override
+	protected String giveMeUnspentOutputs() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

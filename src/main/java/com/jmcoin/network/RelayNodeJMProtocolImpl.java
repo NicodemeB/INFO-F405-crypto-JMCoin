@@ -53,4 +53,10 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
 		return JMProtocolImpl.sendRequest(NetConst.MASTER_NODE_LISTEN_PORT, NetConst.MASTER_HOST_NAME, NetConst.GIVE_ME_DIFFICULTY, null);
 	}
 
+	@Override
+	protected String giveMeUnspentOutputs() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

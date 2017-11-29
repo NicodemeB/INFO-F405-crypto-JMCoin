@@ -2,6 +2,7 @@ package com.jmcoin.model;
 
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,8 +35,6 @@ public class Block implements Serializable {
 	private int difficulty;
 	@Basic(optional = false)
 	private long timeCreation;
-	@Basic(optional = false)
-	private int size;
 	@Basic(optional = false)
 	private String finalHash;
 	@Basic(optional = false)
@@ -71,10 +70,7 @@ public class Block implements Serializable {
 	public void setTimeCreation(long timeCreation) {
 		this.timeCreation = timeCreation;
 	}
-	//TODO recompute this
-	public int getSize() {
-		return size;
-	}
+	
 	public String getFinalHash() {
 		return finalHash;
 	}
@@ -90,6 +86,28 @@ public class Block implements Serializable {
 	
 	public boolean verifyHash(byte[] bytes) {
 		return new BigInteger(bytes).shiftRight(32*8 - difficulty).intValue() == 0;
+	}
+	
+	public int getSize() {
+		int size=0;
+		for(Transaction transaction : this.transactions)
+			size+=transaction.getSize();
+		size+=4+8+4;
+		size+=(this.finalHash == null ? 0 : this.finalHash.length());
+		size+=(this.prevHash == null ? 0 : this.prevHash.length());
+		return size;
+	}
+	
+	public byte[] getBytes() {
+		ByteBuffer bytes = ByteBuffer.allocate(getSize());
+		for(Transaction transaction : this.transactions)
+			bytes.put(transaction.getBytes());
+		bytes.putInt(this.difficulty);
+		bytes.putLong(this.timeCreation);
+		bytes.putInt(this.nonce);
+		if(this.finalHash != null)bytes.put(this.finalHash.getBytes());
+		if(this.prevHash != null)bytes.put(this.prevHash.getBytes());
+		return bytes.array();
 	}
 	
 	@Override

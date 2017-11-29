@@ -27,4 +27,10 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
 	protected boolean takeMyNewTransactionImpl(String payload) {return false;}
 	@Override
 	protected String giveMeDifficulty() {return null;}
+
+	@Override
+	protected String giveMeUnspentOutputs() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

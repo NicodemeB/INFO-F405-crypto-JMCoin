@@ -20,6 +20,7 @@ public abstract class NetConst {
 	public static final char TAKE_MY_NEW_TRANSACTION		= '4'; //from wallets to master (goes to pool of unverif. transaction
 	public static final char GIVE_ME_DIFFICULTY				= '5'; //from miners
 	public static final char STOP_MINING					= '6'; //from master to miners (broadcast)
+	public static final char GIVE_ME_UNSPENT_OUTPUTS 		= '7';
 	public static final char DELIMITER						= '$';
 	public static final char END							= '#';
 	public static final String ERR_NOT_A_REQUEST			= "err_not_req";
@@ -28,5 +29,6 @@ public abstract class NetConst {
 	public static final String ERR_BAD_REQUEST				= "bad_req";
 	public static final int MAX_SENT_TRANSACTIONS 			= 1000;
 	public static final int DEFAULT_DIFFICULTY 				= 16;
+	
 	
 }

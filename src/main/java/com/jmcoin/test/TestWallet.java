@@ -30,8 +30,10 @@ public class TestWallet {
             Output out = new Output();
             out.setAmount(10);
             Transaction tr = new Transaction();
-            tr.addInputOutput(in, out);
-            byte[] signature = w.signTransaction(tr, w.getKeys().entrySet().iterator().next().getKey());
+            tr.addInput(in);
+            tr.setOutputOut(out);
+            tr.setOutputBack(null);
+            byte[] signature = SignaturesVerification.signTransaction(tr, w.getKeys().entrySet().iterator().next().getKey());
             for(PrivateKey key : w.getKeys().keySet()) {
                 if(SignaturesVerification.verifyTransaction(signature, tr, w.getKeys().get(key))) {
                 	System.out.println("Verified");

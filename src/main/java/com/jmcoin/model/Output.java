@@ -1,8 +1,7 @@
 package com.jmcoin.model;
 
 import java.io.Serializable;
-import java.security.PublicKey;
-import java.util.Arrays;
+import java.nio.ByteBuffer;
 
 /**
  * Class Output.
@@ -12,23 +11,19 @@ import java.util.Arrays;
  */
 public class Output implements Serializable {
 	private static final long serialVersionUID = -1699190505094955025L;
-	private int address;
+	private String address;
 	private int amount;
-	private int inputIndex;
-	private PublicKey pubKey;
+//	private int inputIndex;
+//	private PublicKey pubKey;
 	private Long id;
-	
-	public int getInputIndex() {
+
+
+	/*public int getInputIndex() {
 		return inputIndex;
 	}
-	
-	public void setPubKey(PublicKey pubKey) {
-		this.pubKey = pubKey;
-	}
-
 	public void setInputIndex(int inputIndex) {
 		this.inputIndex = inputIndex;
-	}
+	}*/
 
 	public int getAmount() {
 		return amount;
@@ -37,26 +32,33 @@ public class Output implements Serializable {
 	public void setAmount(int amount) {
 		this.amount = amount;
 	}
-
-	public PublicKey getPubKey() {
-		return pubKey;
-	}
 	
 	public Output() {}
 	
 	public boolean equals(Output pOutput) {
-		return this.amount == pOutput.amount && this.inputIndex == pOutput.inputIndex && Arrays.equals(this.pubKey.getEncoded(), pOutput.getPubKey().getEncoded());
+		return this.amount == pOutput.amount && this.address.equals(pOutput.getAddress());
 	}
 	
 	public int getSize() {
-		return 8 + this.pubKey.getEncoded().length;
+		return 4 + (this.address == null ? 0 : this.address.length());
 	}
 
-	public int getAddress() {
+	public String getAddress() {
 		return address;
 	}
-
-	public void setAddress(int address) {
+	
+	public void setAddress(String address) {
 		this.address = address;
+	}
+	
+	/**
+	 * Returns obj an an array of bytes
+	 * @return array of bytes
+	 */
+	public byte[] getBytes() {
+		ByteBuffer bf = ByteBuffer.allocate(getSize());
+		bf.putInt(this.amount);
+		if(this.address!=null)bf.put(this.address.getBytes());
+		return bf.array();
 	}
 }
