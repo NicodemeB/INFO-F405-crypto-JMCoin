@@ -19,17 +19,24 @@ public class Transaction implements Serializable {
 	
         
 	private static final long serialVersionUID = -1113345289965914322L;
-    @Id
+        @Id
 	private ArrayList<Input> inputs;
 	private Output outputOut;
-	private Output outputBack;
+	private Output outputBack; 	//can be null
 	private byte[] hash;
 	private byte[] signature;
 	private PublicKey pubKey;
 	private Long id;
 	
-	public Transaction() {
-		inputs = new ArrayList<>();
+        public Transaction()
+        {
+            inputs = new ArrayList();
+        }
+	public Transaction(ArrayList<Input> inputs, Output oOut, Output oBack, PublicKey pubKey) {
+            this.inputs = inputs;
+            this.outputBack = oBack;
+            this.outputOut = oOut;
+            this.pubKey = pubKey;
 	}
 
 	public void setPubKey(PublicKey pubKey) {
@@ -81,7 +88,11 @@ public class Transaction implements Serializable {
 			inputs.add(i);
 		}
 	}
-	
+	public void setHash(byte[] hash)
+        {
+            this.hash = hash;
+        }
+        
 	public void setOutputOut(Output o) {
 		if(o == null) {
 			throw new IllegalArgumentException("Transaction.addOunput: Parameter cannot be null");
@@ -140,7 +151,7 @@ public class Transaction implements Serializable {
 	}
 	
 	
-	public byte[] getBytes() {
+	public byte[] getBytes() { // A vérifier ?
 		ByteBuffer buf = ByteBuffer.allocate(getSize());
 		for(Input input : this.inputs) {
 			buf.put(input.getBytes());

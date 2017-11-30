@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.jmcoin.io.IOFileHandler;
 import com.jmcoin.model.Block;
+import com.jmcoin.model.Output;
 import com.jmcoin.model.Transaction;
 
 public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
@@ -69,8 +70,8 @@ public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 	}
 
 	@Override
+	//TODO May be too big!
 	protected String giveMeUnspentOutputs() {
-		// TODO Auto-generated method stub
-		return null;
+		return new Gson().toJson(this.peer.getUnspentOutputs());
 	}
 }

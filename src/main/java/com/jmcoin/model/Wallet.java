@@ -2,18 +2,24 @@
 package com.jmcoin.model;
 import com.jmcoin.crypto.AES;
 import com.jmcoin.crypto.SignaturesVerification;
+import com.jmcoin.util.BytesUtil;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.InvalidKeyException;
 import java.security.KeyFactory;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -141,13 +147,53 @@ public class Wallet {
         return keyCouples;
     }
     //--------------------------------------------Transactions
-    public void createTransaction(String fromAddress, String toAddress, double amount)
+    public void createTransaction(String fromAddress, String toAddress, double amountToSend, PrivateKey privKey, PublicKey pubKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, FileNotFoundException, SignatureException
     {
-        //Recupérer la liste d'output pour cette adresse
-        //bouffe tous les output
-        // création des deux inputs (+adresses de destination)
-        //ajouter la pubKey
-        //Signer la transaction
+        //Recupérer la liste de transacction avec des outputs disponibles pour cette adresse TO DO from network
+        ArrayList<Transaction> addressTransactions = new ArrayList<Transaction>();
+        ArrayList<Input> addressInputs = new ArrayList<Input>();
+        double totalOutputAmount = 0;
+        
+        for(int i = 0 ; i < addressTransactions.size(); i++)
+        {
+            if(addressTransactions.get(i).getOutputBack().getAddress().equals(fromAddress))
+            {
+                totalOutputAmount+= addressTransactions.get(i).getOutputBack().getAmount();
+                addressInputs.add(new Input(fromAddress,addressTransactions.get(i).getOutputBack().getAmount(),addressTransactions.get(i).getHash()));
+                
+            }
+            else
+            {  
+                if((addressTransactions.get(i).getOutputOut().getAddress().equals(fromAddress)))
+                {
+                    totalOutputAmount+= addressTransactions.get(i).getOutputOut().getAmount();
+                    addressInputs.add(new Input(fromAddress,addressTransactions.get(i).getOutputOut().getAmount(),addressTransactions.get(i).getHash()));
+                }
+                else
+                {
+                    //bug aucune des output n'appartient à l'adresse utilisée
+                }
+            }
+            
+            if(amountToSend <= totalOutputAmount)
+            {
+                Output oOut = new Output(amountToSend, toAddress);
+                Output oBack = new Output(totalOutputAmount-amountToSend, fromAddress);
+                Transaction tr = new Transaction(addressInputs,oOut, oBack,pubKey);
+                tr.setSignature(SignaturesVerification.signTransaction(tr, privKey));
+                
+                //hasher et set le hash dans la transaction
+                MessageDigest digest = MessageDigest.getInstance("SHA-256");
+                tr.setHash(digest.digest(tr.getBytes()));
+                //ENVOYER LA TRANSACTION
+            }
+            else
+            {
+                // solde insufisant
+            }
+            
+            
+        }
         
         addTransaction(new Transaction());
     }
@@ -161,12 +207,40 @@ public class Wallet {
     // ------------------------------------------- Chain
     public double getAddressBalance(String address)
     {
-       return 0;
+       //Recupérer la liste de transacction avec des outputs disponibles pour cette adresse TO DO from network
+        ArrayList<Transaction> addressTransactions = new ArrayList<Transaction>();
+        ArrayList<Input> addressInputs = new ArrayList<Input>();
+        double totalOutputAmount = 0;
+        
+        for(int i = 0 ; i < addressTransactions.size(); i++)
+        {
+            if(addressTransactions.get(i).getOutputBack().getAddress().equals(address))
+            {
+                totalOutputAmount+= addressTransactions.get(i).getOutputBack().getAmount();
+            }
+            else
+            {  //Revérification qu'il y a bien une des deux outputs qui appartient à l'adresse, nécessaire ?
+                if((addressTransactions.get(i).getOutputOut().getAddress().equals(address)))
+                {
+                    totalOutputAmount+= addressTransactions.get(i).getOutputOut().getAmount();
+                }
+                else
+                {
+                    //bug aucune des output n'appartient à l'adresse utilisée
+                }
+            }
+        }
+        return totalOutputAmount;
     }
     
     public double getBalance(ArrayList<String> adresses)
     {
-       return 0;
+        double totalAmount = 0; 
+        for(String address : addresses)
+        {
+           totalAmount += getAddressBalance(address);
+        }
+        return totalAmount;
     }
     
     public Block getBlockByHash(String hash)

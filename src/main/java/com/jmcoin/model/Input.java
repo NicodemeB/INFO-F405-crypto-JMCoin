@@ -17,20 +17,25 @@ import com.jmcoin.network.NetConst;
  */
 public class Input implements Serializable{
 	
-	private static final long serialVersionUID = -7496600791646424812L;
-	public static final int INDEX_REWARD = -1;	
-	
-	private int amount;	//to delete?? how do we know the value then?
-	private byte[] prevTransactionHash;
-	private Long id;
-	
-	public Input() {}
-	
-    public int getAmount() {
+    private static final long serialVersionUID = -7496600791646424812L;
+    public static final int INDEX_REWARD = -1;	
+    public String address;
+    private double amount;	//to delete?? how do we know the value then?
+    private byte[] prevTransactionHash;
+    private Long id;
+    
+    public Input(){};
+    public Input(String adr, double amount, byte[] prevTrans)
+    {
+        this.address = adr;
+        this.amount = amount;
+        this.prevTransactionHash = prevTrans;
+    }
+    public double getAmount() {
         return amount;
     }
 
-    public void setAmount(int amount) {
+    public void setAmount(double amount) {
         this.amount = amount;
     }
 	
@@ -60,7 +65,7 @@ public class Input implements Serializable{
 	
 	public byte[] getBytes() {
 		ByteBuffer bf = ByteBuffer.allocate(getSize());
-		bf.putInt(this.amount);
+		bf.putDouble(this.amount);
 		if(this.prevTransactionHash != null)bf.put(this.prevTransactionHash);
 		return bf.array();
 	}
