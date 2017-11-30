@@ -2,6 +2,7 @@ package com.jmcoin.test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -12,8 +13,10 @@ import java.security.SignatureException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
+import com.google.gson.Gson;
 import com.jmcoin.crypto.AES;
 import com.jmcoin.crypto.AES.InvalidKeyLengthException;
 import com.jmcoin.crypto.AES.StrongEncryptionNotAvailableException;
@@ -66,10 +69,7 @@ public class TestBlockValidation {
 		PrivateKey keyConnard = keys.keySet().iterator().next();
 		PrivateKey keyConnasse = keys.keySet().iterator().next();
 		PrivateKey keyTest = keys.keySet().iterator().next();
-		
-		Chain chain = new Chain();
-		List<Block> blocks = new ArrayList<>();
-		
+				
 		//genesis
 		Block genesis = new Block();
 		List<Transaction> transGenesisList = new ArrayList<>();
@@ -89,11 +89,9 @@ public class TestBlockValidation {
 		transGenesis.setPubKey(keys.get(keyConnasse));
 		transGenesisList.add(transGenesis);
 		genesis.setTransactions(transGenesisList);
-		genesis.setPrevHash(null);
-		
-		blocks.add(genesis);
+		genesis.setPrevHash(null);		
 		try {
-			buildBlock(blocks);
+			buildBlock(genesis, new PrivateKey[] {keyConnard, keyConnasse, keyTest});
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 		}
@@ -104,16 +102,50 @@ public class TestBlockValidation {
 		System.out.println("It's alright");
 	}
 	
-	private static void buildBlock(List<Block> blocks) throws NoSuchAlgorithmException, InterruptedException, ExecutionException {
+	private static Chain buildBlock(Block genesis, PrivateKey[] privKeys) throws NoSuchAlgorithmException, InterruptedException, ExecutionException, InvalidKeyException, NoSuchProviderException, FileNotFoundException, SignatureException, IOException {
+		Random rand = new Random();
+		Chain chain = new Chain();
 		Mining mining = new Mining();
-		for(int i = 0; i < blocks.size(); i++) {
+		Block prevBlock = null;
+		for(int i = 0; i < 10; i++) {
+			Block block;
 			if(i != 0) {
-				blocks.get(i).setPrevHash(blocks.get(i-1).getFinalHash());
+				block = new Block();
+				block.setPrevHash(prevBlock.getFinalHash());
+				prevBlock = block;
+				List<Transaction> transactions = new ArrayList<>();
+				int limit = rand.nextInt(5);
+				PrivateKey privKey = privKeys[rand.nextInt(3)];
+				for(int j = 0; j < limit; j++) {
+					Transaction transaction = new Transaction();
+					for(int k = 0; k < limit; k++) {
+						Input in = new Input();
+						in.setAmount(rand.nextInt(20));
+//						in.setPrevTransactionHash(//prevTransactionHash);
+						transaction.getInputs().add(in);
+					}
+					Output outputOut = new Output();
+					Output outputBack = new Output();
+					transaction.setOutputOut(outputOut);
+					transaction.setOutputBack(outputBack);
+					transaction.setSignature(SignaturesVerification.signTransaction(transaction, privKey));
+					transaction.setPubKey(keys.get(privKey));
+					transactions.add(transaction);
+				}
+				block.setTransactions(transactions);				
 			}
-			mining.setBlock(blocks.get(i));
+			else {
+				block = genesis;
+				prevBlock = genesis;
+			}
+			block.setDifficulty(4);
+			mining.setBlock(block);
 			mining.mine();
-			blocks.get(i).setTimeCreation(System.currentTimeMillis());
+			block.setTimeCreation(System.currentTimeMillis());
+			chain.getBlocks().put(block.getFinalHash(), block);
+			System.out.println(new Gson().toJson(block));
 		}
+		return chain;
 	}
 	
 	 public static void createKeys(String password) throws IOException, AES.InvalidKeyLengthException, AES.StrongEncryptionNotAvailableException, NoSuchAlgorithmException, NoSuchProviderException{

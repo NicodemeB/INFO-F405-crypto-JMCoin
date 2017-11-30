@@ -23,11 +23,10 @@ public class Output implements Serializable {
 	public void setInputIndex(int inputIndex) {
 		this.inputIndex = inputIndex;
 	}*/
-        public Output(double amount, String address)
-        {
-            this.amount = amount;
-            this.address = address;
-        }
+    public Output(double amount, String address){
+        this.amount = amount;
+        this.address = address;
+    }
 	public double getAmount() {
 		return amount;
 	}

@@ -3,19 +3,16 @@ package com.jmcoin.network;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 
-public class ReceiverThread implements Runnable{
+public class ReceiverThread<X extends TemplateThread> implements Runnable{
 
-    ObjectInputStream input;
-    Object parent;
-    public ReceiverThread(WorkerRunnable workerRunnable, ObjectInputStream in) {
-        parent = workerRunnable;
-        input = in;
-    }
-    public ReceiverThread(Client workerRunnable, ObjectInputStream in) {
-        parent = workerRunnable;
-        input = in;
-    }
+    protected ObjectInputStream input;
+    protected JMProtocolImpl<? extends Peer> jmProtocol;
+    protected X runnable; 
 
+    public ReceiverThread(X workerRunnable) {
+        runnable = workerRunnable;
+        input = workerRunnable.getIn();
+    }
 
     @Override
     public void run() {
@@ -27,15 +24,13 @@ public class ReceiverThread implements Runnable{
                     System.out.println("read : " + read.toString());
                     // TODO - response about protocol - switch on netconst
                     switch (read.toString()) {
-                        case "Connected" :
-                            if (read.toString().contains("Connected")){
-                                if (parent.getClass().getSimpleName().equals("Client")) {
-                                }
+                        case NetConst.CONNECTED :
+                        	if (this.runnable.getClass().equals(Client.class)) {
                             }
                             break;
-                        case "ConnectionRequest":
-                            if (parent.getClass().getSimpleName().equals("WorkerRunnable")) {
-                                ((WorkerRunnable)parent).setToSend("Connected");
+                        case NetConst.CONNECTION_REQUEST:
+                            if (this.runnable.getClass().equals(WorkerRunnable.class)) {
+                                this.runnable.setToSend(NetConst.CONNECTED);
                             }
                             break;
                         default:
@@ -48,11 +43,7 @@ public class ReceiverThread implements Runnable{
             }while (loop);
         } catch (IOException e) {
             try {
-                if (parent.getClass().getSimpleName().equals("WorkerRunnable")) {
-                    ((WorkerRunnable)parent).close();
-                } else if (parent.getClass().getSimpleName().equals("Client")) {
-                    ((Client)parent).close();
-                }
+                this.runnable.close();
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
