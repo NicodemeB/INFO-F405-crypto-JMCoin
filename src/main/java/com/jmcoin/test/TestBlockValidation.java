@@ -56,7 +56,7 @@ public class TestBlockValidation {
 	 * @throws InvalidKeyException 
 	 */
 	private static boolean validateTrans(Chain chain, Transaction trans) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, IOException {
-		if(!SignaturesVerification.verifyTransaction(trans.getSignature(), trans, trans.getPubKey())) return false;
+		if(!SignaturesVerification.verifyTransaction(trans.getSignature(), trans.getBytes(false), trans.getPubKey())) return false;
 		//TODO Maxime does the job
 		return false;
 	}
@@ -128,7 +128,7 @@ public class TestBlockValidation {
 					Output outputBack = new Output();
 					transaction.setOutputOut(outputOut);
 					transaction.setOutputBack(outputBack);
-					transaction.setSignature(SignaturesVerification.signTransaction(transaction, privKey));
+					transaction.setSignature(SignaturesVerification.signTransaction(transaction.getBytes(false), privKey));
 					transaction.setPubKey(keys.get(privKey));
 					transactions.add(transaction);
 				}

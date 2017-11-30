@@ -7,8 +7,8 @@ import java.net.Socket;
 
 public class Client extends TemplateThread{
 	
-	public Client (int port, String host) throws IOException {
-		super();
+	public Client (int port, String host, JMProtocolImpl<? extends Peer> protocol) throws IOException {
+		super(protocol);
         socket = new Socket(host, port);
         out = new ObjectOutputStream(socket.getOutputStream());
         out.flush();
@@ -51,4 +51,19 @@ public class Client extends TemplateThread{
             e.printStackTrace();
         }
     }
+
+
+	@Override
+	protected void handleMessage(Object msg) {
+		switch (msg.toString()) {
+        case NetConst.CONNECTED :
+        	//TODO do something
+            break;
+        case NetConst.CONNECTION_REQUEST:
+            break;
+        default:
+            //System.out.println("Default case; case not defined; drop packet");
+            break;
+		}
+	}
 }

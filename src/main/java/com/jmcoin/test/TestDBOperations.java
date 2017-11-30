@@ -47,7 +47,7 @@ public class TestDBOperations {
   		transGenesis.setOutputOut(outGenesis);
   		transGenesis.addInput(inGenesis);
   		transGenesis.setPubKey((PublicKey) keys[1]);
-  		transGenesis.setSignature(SignaturesVerification.signTransaction(transGenesis, (PrivateKey) keys[0]));
+  		transGenesis.setSignature(SignaturesVerification.signTransaction(transGenesis.getBytes(false), (PrivateKey) keys[0]));
   		transGenesisList.add(transGenesis);
   		genesis.setTransactions(transGenesisList);
   		genesis.setPrevHash(null);
@@ -61,7 +61,7 @@ public class TestDBOperations {
         rewardOuputOut.setAmount(50);
         reward.setOutputOut(rewardOuputOut);
         reward.setPubKey((PublicKey) keys[1]);
-        reward.setSignature(SignaturesVerification.signTransaction(reward, (PrivateKey) keys[0]));
+        reward.setSignature(SignaturesVerification.signTransaction(reward.getBytes(false), (PrivateKey) keys[0]));
   		transGenesisList.add(reward);
         genesis.setTransactions(transGenesisList);
         addBlock(genesis, c);

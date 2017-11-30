@@ -36,7 +36,7 @@ public class MultiThreadedServer implements Runnable{
             }
             try {
                 new Thread(
-                        new WorkerRunnable(clientSocket)
+                        new WorkerRunnable(clientSocket, protocol)
                 ).start();
             } catch (IOException e) {
                 e.printStackTrace();

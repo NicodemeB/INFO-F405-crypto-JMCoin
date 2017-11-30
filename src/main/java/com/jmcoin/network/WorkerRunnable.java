@@ -8,8 +8,8 @@ import java.net.Socket;
  */
 public class WorkerRunnable extends TemplateThread{
 
-    public WorkerRunnable(Socket clientSocket) throws  IOException{
-    	super();
+    public WorkerRunnable(Socket clientSocket, JMProtocolImpl<? extends Peer> protocol) throws  IOException{
+    	super(protocol);
         this.socket = clientSocket;
         in  = new ObjectInputStream(socket.getInputStream());
         out = new ObjectOutputStream(socket.getOutputStream());
@@ -41,5 +41,19 @@ public class WorkerRunnable extends TemplateThread{
             e.printStackTrace();
         }
     }
+
+	@Override
+	protected void handleMessage(Object msg) {
+		switch (msg.toString()) {
+        case NetConst.CONNECTED :
+            break;
+        case NetConst.CONNECTION_REQUEST:
+        	setToSend(NetConst.CONNECTED);
+            break;
+        default:
+        	setToSend(this.protocol.processInput(msg));
+            break;
+    }
+	}
 }
 

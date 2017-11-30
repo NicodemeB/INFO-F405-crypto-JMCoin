@@ -11,6 +11,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
+import java.util.Arrays;
 
 import com.jmcoin.model.Transaction;
 import com.jmcoin.util.BytesUtil;
@@ -20,12 +21,11 @@ import org.bouncycastle.util.encoders.Hex;
 public abstract class SignaturesVerification {
 	
 	
-	public static byte[] signTransaction(Transaction tr, PrivateKey privKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, FileNotFoundException, IOException, SignatureException
+	public static byte[] signTransaction(byte[] bytes, PrivateKey privKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, FileNotFoundException, IOException, SignatureException
     {
         Signature dsa = Signature.getInstance("SHA1withDSA", "SUN"); 
         dsa.initSign(privKey);
-        byte[] bytesTr = BytesUtil.toByteArray(tr);
-        BufferedInputStream bufIn = new BufferedInputStream(new ByteArrayInputStream(bytesTr));
+        BufferedInputStream bufIn = new BufferedInputStream(new ByteArrayInputStream(bytes));
         byte[] buffer = new byte[1024];
         int len;
         while ((len = bufIn.read(buffer)) >= 0) {
@@ -35,17 +35,16 @@ public abstract class SignaturesVerification {
         return dsa.sign();
     }
 	
-    public static boolean verifyTransaction(byte[] signature, Transaction tr, PublicKey pubKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, SignatureException
+    public static boolean verifyTransaction(byte[] signature, byte[] transaction, PublicKey pubKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, SignatureException
     {
         boolean verifies = false;
-        if(signature == null || tr == null || pubKey == null){
+        if(signature == null || transaction == null || pubKey == null){
         	return false;
         }
         else{
             Signature sig = Signature.getInstance("SHA1withDSA", "SUN");
             sig.initVerify(pubKey);
-            byte[] bytesTr = BytesUtil.toByteArray(tr);
-            BufferedInputStream bufIn = new BufferedInputStream(new ByteArrayInputStream(bytesTr));
+            BufferedInputStream bufIn = new BufferedInputStream(new ByteArrayInputStream(transaction));
             byte[] buffer = new byte[1024];
             int len;
             while ((len = bufIn.read(buffer)) >= 0) {

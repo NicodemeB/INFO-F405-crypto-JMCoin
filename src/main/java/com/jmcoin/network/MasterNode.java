@@ -62,9 +62,8 @@ public class MasterNode extends Peer{
     public void processBlock(Block pBlock) {
 		for(final Transaction trans : pBlock.getTransactions()){
 			this.unverifiedTransactions.removeIf(trans::equals);
-			Output outputOut = trans.getOutputOut();
-			Output outputBack = trans.getOutputBack();
-			
+			/*Output outputOut = trans.getOutputOut();
+			Output outputBack = trans.getOutputBack();*/
 		}
     	if(chain.canBeAdded(pBlock))
     		chain.addBlock(pBlock);

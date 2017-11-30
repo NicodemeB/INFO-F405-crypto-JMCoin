@@ -19,8 +19,8 @@ import javax.persistence.*;
 
 @Entity
 public class Block implements Serializable {
+	
 	private static final long serialVersionUID = -6824837198082139469L;
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Basic(optional = false)
@@ -92,7 +92,7 @@ public class Block implements Serializable {
 		int size=0;
 		for(Transaction transaction : this.transactions)
 			size+=transaction.getSize();
-		size+=4+8+4;
+		size+=Long.BYTES + Integer.BYTES + Integer.BYTES;
 		size+=(this.finalHash == null ? 0 : this.finalHash.length());
 		size+=(this.prevHash == null ? 0 : this.prevHash.length());
 		return size;
@@ -101,7 +101,7 @@ public class Block implements Serializable {
 	public byte[] getBytes() {
 		ByteBuffer bytes = ByteBuffer.allocate(getSize());
 		for(Transaction transaction : this.transactions)
-			bytes.put(transaction.getBytes());
+			bytes.put(transaction.getBytes(true));
 		bytes.putInt(this.difficulty);
 		bytes.putLong(this.timeCreation);
 		bytes.putInt(this.nonce);

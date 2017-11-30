@@ -17,7 +17,7 @@ public class TestNetworkClientXServer {
         tn.run();
         try
         {
-            Client cli = new Client(NetConst.MASTER_NODE_LISTEN_PORT, NetConst.MASTER_HOST_NAME);
+            Client cli = new Client(NetConst.MASTER_NODE_LISTEN_PORT, NetConst.MASTER_HOST_NAME, new MasterJMProtocolImpl());
             cli.sendMessage(NetConst.CONNECTION_REQUEST);
             //**************************************
             // Client server interaction

@@ -21,18 +21,14 @@ public abstract class JMProtocolImpl<X extends Peer> {
 	public X getPeer() {
 		return peer;
 	}
-	
+	/**
+	 * Will assume that the payload is built as follows:
+	 * x$yyyyyyyyyyyyy$#
+	 * where x is the type
+	 * and y the payload itself (can be empty, like 0$$#)
+	 */
 	public String processInput(Object message) {
-		//FIXME the content of this method depends on the way we exchange data. Please update
-		//the following carefully.
-		//At this time, we will assume that $message is a String
 		String content = (String)message;
-		/**
-		 * Will assume that the payload is built as follows:
-		 * x$yyyyyyyyyyyyy$#
-		 * where x is the type
-		 * and y the payload itself (can be empty, like 0$$#)
-		 */
 		StringTokenizer tokenizer = new StringTokenizer(content, String.valueOf(NetConst.DELIMITER));
 		if(!tokenizer.hasMoreTokens()) return null;
 		String type = tokenizer.nextToken();
@@ -118,14 +114,12 @@ public abstract class JMProtocolImpl<X extends Peer> {
 	
 	public static String sendRequest(int port, String host, int req, String payload) {
 		try {
-			Client client = new Client(port, host);
+			RequestSender client = new RequestSender(port, host);
 			client.sendMessage(JMProtocolImpl.craftMessage(req, payload == null ? "" : payload));
 			String response = client.readMessage().toString();
 			client.close();
 			return response;
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
+		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 		return null;

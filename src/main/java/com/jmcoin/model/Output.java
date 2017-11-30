@@ -3,6 +3,8 @@ package com.jmcoin.model;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 
+import javax.persistence.Basic;
+
 /**
  * Class Output.
  * Represents an output in a {@link Transaction}
@@ -13,16 +15,9 @@ public class Output implements Serializable {
 	private static final long serialVersionUID = -1699190505094955025L;
 	private String address;
 	private double amount;
-//	private int inputIndex;
-//	private PublicKey pubKey;
+	@Basic(optional = false)
 	private Long id;
-        
-	/*public int getInputIndex() {
-		return inputIndex;
-	}
-	public void setInputIndex(int inputIndex) {
-		this.inputIndex = inputIndex;
-	}*/
+	
     public Output(double amount, String address){
         this.amount = amount;
         this.address = address;
@@ -42,7 +37,7 @@ public class Output implements Serializable {
 	}
 	
 	public int getSize() {
-		return 4 + (this.address == null ? 0 : this.address.length());
+		return Double.BYTES + (this.address == null ? 0 : this.address.length());
 	}
 
 	public String getAddress() {

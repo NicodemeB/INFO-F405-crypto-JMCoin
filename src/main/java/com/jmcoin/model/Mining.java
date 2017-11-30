@@ -81,7 +81,7 @@ public class Mining{
 		reward.setOutputOut(out);
 		reward.setOutputBack(new Output());
 		reward.setPubKey(pubKey);
-		reward.setSignature(SignaturesVerification.signTransaction(reward, privKey));
+		reward.setSignature(SignaturesVerification.signTransaction(reward.getBytes(false), privKey));
 	}
 	
 	public String mine() throws NoSuchAlgorithmException, InterruptedException, ExecutionException {

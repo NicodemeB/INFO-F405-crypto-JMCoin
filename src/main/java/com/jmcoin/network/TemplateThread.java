@@ -12,9 +12,14 @@ public abstract class TemplateThread implements Runnable{
     protected Socket socket;
     protected Object toSend;
     protected boolean sendFlag;
-
-    protected JMProtocolImpl<? extends Peer> jmprotocol;
-
+    protected JMProtocolImpl<? extends Peer> protocol;
+    
+    protected abstract void handleMessage(Object msg);
+    
+    public TemplateThread(JMProtocolImpl<? extends Peer> protocol) {
+    	this.protocol = protocol;
+	}
+    
     public void close () throws IOException {
         in.close();
         out.close();

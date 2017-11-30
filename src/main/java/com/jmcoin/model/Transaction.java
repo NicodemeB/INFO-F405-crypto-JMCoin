@@ -25,11 +25,11 @@ public class Transaction implements Serializable {
 	private byte[] hash;
 	private byte[] signature;
 	private PublicKey pubKey;
+	@Basic(optional = false)
 	private Long id;
 	
-        public Transaction()
-        {
-            inputs = new ArrayList();
+        public Transaction(){
+            inputs = new ArrayList<Input>();
         }
 	public Transaction(ArrayList<Input> inputs, Output oOut, Output oBack, PublicKey pubKey) {
             this.inputs = inputs;
@@ -45,11 +45,6 @@ public class Transaction implements Serializable {
 	public void setSignature(byte[] signature) {
 		this.signature = signature;
 	}
-	
-/*	public void setInputs(ArrayList<Input> inputs) {
-		this.inputs = inputs;
-	}
-*/
 	
 	public PublicKey getPubKey() {
 		return pubKey;
@@ -100,9 +95,10 @@ public class Transaction implements Serializable {
 	}
 	
 	public void setOutputBack(Output o) {
-		if(o == null) {
+		//can be null
+		/*if(o == null) {
 			throw new IllegalArgumentException("Transaction.addOutputBack: Parameter cannot be null");
-		}
+		}*/
 		this.outputBack = o;
 
 	}
@@ -149,18 +145,21 @@ public class Transaction implements Serializable {
 		return false;
 	}
 	
-	
-	public byte[] getBytes() { // A vérifier ?
-		ByteBuffer buf = ByteBuffer.allocate(getSize());
+	/**
+	 * 
+	 * @param withSign has to be false when this routine is called in order to compute the signature!
+	 * @return
+	 */
+	public byte[] getBytes(boolean withSign) {
+		ByteBuffer buf = ByteBuffer.allocate(getSize() - (withSign || this.signature == null ? 0 : this.signature.length));
 		for(Input input : this.inputs) {
 			buf.put(input.getBytes());
 		}
-		if(this.signature != null)buf.put(this.signature);
+		if(withSign && this.signature != null)buf.put(this.signature);
 		if(this.pubKey != null)buf.put(pubKey.getEncoded());
 		if(this.outputBack != null)buf.put(outputBack.getBytes());
 		if(this.outputOut != null)buf.put(outputOut.getBytes());
 		return buf.array();
-		
 	}
 	
 	/**
@@ -170,7 +169,7 @@ public class Transaction implements Serializable {
 	 */
 	public void computeHash() throws NoSuchAlgorithmException {
 		MessageDigest dig = MessageDigest.getInstance("SHA-256");
-        dig.update(getBytes());
+        dig.update(getBytes(true));
 		this.hash = dig.digest();
 	}
 }

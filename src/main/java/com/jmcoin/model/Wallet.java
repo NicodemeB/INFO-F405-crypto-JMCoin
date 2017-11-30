@@ -2,13 +2,11 @@
 package com.jmcoin.model;
 import com.jmcoin.crypto.AES;
 import com.jmcoin.crypto.SignaturesVerification;
-import com.jmcoin.util.BytesUtil;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,7 +27,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
-import org.bouncycastle.crypto.digests.RIPEMD160Digest;
 
 public class Wallet {
     
@@ -80,7 +77,7 @@ public class Wallet {
     
     public void computeAddresses(HashMap<PrivateKey,PublicKey> keys) throws IOException
     {
-        RIPEMD160Digest dgst = new RIPEMD160Digest();
+        //RIPEMD160Digest dgst = new RIPEMD160Digest();
         for(PrivateKey privK : this.keys.keySet()){
             getAddresses().add(SignaturesVerification.DeriveJMAddressFromPubKey(this.keys.get(privK)));
         }
@@ -180,11 +177,11 @@ public class Wallet {
                 Output oOut = new Output(amountToSend, toAddress);
                 Output oBack = new Output(totalOutputAmount-amountToSend, fromAddress);
                 Transaction tr = new Transaction(addressInputs,oOut, oBack,pubKey);
-                tr.setSignature(SignaturesVerification.signTransaction(tr, privKey));
+                tr.setSignature(SignaturesVerification.signTransaction(tr.getBytes(false), privKey));
                 
                 //hasher et set le hash dans la transaction
                 MessageDigest digest = MessageDigest.getInstance("SHA-256");
-                tr.setHash(digest.digest(tr.getBytes()));
+                tr.setHash(digest.digest(tr.getBytes(true)));
                 //ENVOYER LA TRANSACTION
             }
             else
@@ -209,7 +206,7 @@ public class Wallet {
     {
        //Recupérer la liste de transacction avec des outputs disponibles pour cette adresse TO DO from network
         ArrayList<Transaction> addressTransactions = new ArrayList<Transaction>();
-        ArrayList<Input> addressInputs = new ArrayList<Input>();
+        //ArrayList<Input> addressInputs = new ArrayList<Input>();
         double totalOutputAmount = 0;
         
         for(int i = 0 ; i < addressTransactions.size(); i++)
