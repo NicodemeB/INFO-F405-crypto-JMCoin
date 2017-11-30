@@ -8,6 +8,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
 
 import com.jmcoin.io.IOFileHandler;
 import com.jmcoin.network.JMProtocolImpl;

@@ -3,6 +3,11 @@ package com.jmcoin.model;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.Map;
+
+import com.jmcoin.io.IOFileHandler;
+import com.jmcoin.network.JMProtocolImpl;
+import com.jmcoin.network.NetConst;
 
 import javax.persistence.Basic;
 
@@ -43,6 +48,22 @@ public class Input implements Serializable{
 	
 	public int getSize() {
 		return  Double.BYTES + (this.prevTransactionHash == null ? 0 : this.prevTransactionHash.length);
+	}
+	
+	public Transaction getTransaction() {
+		String chainJson = JMProtocolImpl.sendRequest(NetConst.RELAY_NODE_LISTEN_PORT, NetConst.RELAY_DEBUG_HOST_NAME, NetConst.GIVE_ME_BLOCKCHAIN_COPY, null);
+		Chain chain = IOFileHandler.getFromJsonString(chainJson, Chain.class);
+		this.getPrevTransactionHash();
+		Map<String, Block> blocks = chain.getBlocks();
+		for(String key : blocks.keySet()) {
+			Block b = blocks.get(key);
+			for(Transaction t : b.getTransactions()) {
+				if(Arrays.equals(t.getHash(), this.getPrevTransactionHash())) {
+					return t;
+				}
+			}
+		}
+		return null;
 	}
 	
 	public byte[] getBytes() {

@@ -13,6 +13,12 @@ import java.security.SignatureException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+
+import org.bouncycastle.util.Arrays;
+
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
@@ -20,6 +26,7 @@ import com.google.gson.Gson;
 import com.jmcoin.crypto.AES;
 import com.jmcoin.crypto.AES.InvalidKeyLengthException;
 import com.jmcoin.crypto.AES.StrongEncryptionNotAvailableException;
+import com.jmcoin.io.IOFileHandler;
 import com.jmcoin.crypto.SignaturesVerification;
 import com.jmcoin.model.Block;
 import com.jmcoin.model.Chain;
@@ -28,6 +35,8 @@ import com.jmcoin.model.KeyGenerator;
 import com.jmcoin.model.Mining;
 import com.jmcoin.model.Output;
 import com.jmcoin.model.Transaction;
+import com.jmcoin.network.JMProtocolImpl;
+import com.jmcoin.network.NetConst;
 
 public class TestBlockValidation {
 	
@@ -56,9 +65,43 @@ public class TestBlockValidation {
 	 * @throws InvalidKeyException 
 	 */
 	private static boolean validateTrans(Chain chain, Transaction trans) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, IOException {
-		if(!SignaturesVerification.verifyTransaction(trans.getSignature(), trans.getBytes(false), trans.getPubKey())) return false;
+		//if(!SignaturesVerification.verifyTransaction(trans.getSignature(), trans, trans.getPubKey())) return false;
 		//TODO Maxime does the job
-		return false;
+		int total = 0;
+		for(Input i : trans.getInputs()) {
+			Transaction t  = i.getTransaction();
+			Output output = null;
+			if(t.getOutputOut().getAddress() == SignaturesVerification.DeriveJMAddressFromPubKey(trans.getPubKey()) && t.getOutputOut().getAmount() == i.getAmount()) {
+				output = t.getOutputOut();
+			}
+			else if(t.getOutputBack().getAddress() == SignaturesVerification.DeriveJMAddressFromPubKey(trans.getPubKey()) && t.getOutputBack().getAmount() == i.getAmount()) {
+				output = t.getOutputBack();
+			}
+			if(output == null) {
+				return false;
+			}
+			String unvf = JMProtocolImpl.sendRequest(NetConst.RELAY_NODE_LISTEN_PORT, NetConst.RELAY_DEBUG_HOST_NAME, NetConst.GIVE_ME_UNSPENT_OUTPUTS, null);
+			Output[] unspentOutputs = IOFileHandler.getFromJsonString(unvf, Output[].class);
+			boolean unspent = false;
+			for(Output uo : unspentOutputs) {
+				if(uo.equals(output)) {
+					unspent = true;
+				}
+			}
+			if(!unspent) {
+				return false;
+			}
+			//if i.output is not in unspent ouputs pool -> false
+			//if i.output.address is not this.outputs[0].address -> false
+			total += i.getAmount();
+		}
+		total -= trans.getOutputOut().getAmount();
+		total -= trans.getOutputBack().getAmount();
+		System.out.println("total = " + total);
+		if(total != 0)
+			return false;
+		
+		return true	;
 	}
 	
 	public static void main(String[] args) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, IOException, InvalidKeyLengthException, StrongEncryptionNotAvailableException {
@@ -69,6 +112,10 @@ public class TestBlockValidation {
 		PrivateKey keyConnard = keys.keySet().iterator().next();
 		PrivateKey keyConnasse = keys.keySet().iterator().next();
 		PrivateKey keyTest = keys.keySet().iterator().next();
+		
+		Chain chain = new Chain();
+		List<Block> blocks = new ArrayList<>();
+		
 				
 		//genesis
 		Block genesis = new Block();
@@ -88,17 +135,41 @@ public class TestBlockValidation {
 		transGenesis.addInput(inGenesis);
 		transGenesis.setPubKey(keys.get(keyConnasse));
 		transGenesisList.add(transGenesis);
+//		transGenesis.setSignature(SignaturesVerification.);
 		genesis.setTransactions(transGenesisList);
+		genesis.setPrevHash(null);
+
+		Input input1 = new Input();
+		input1.setAmount(45);
+		Input input2 = new Input();
+		input2.setAmount(50);
+		Output outputOut = new Output();
+		outputOut.setAmount(80);
+		Output outputBack = new Output();
+		outputBack.setAmount(15);
+		Transaction transactionToverify = new Transaction();
+		transactionToverify.addInput(input1);
+		transactionToverify.addInput(input2);
+		transactionToverify.setOutputOut(outputOut);
+		transactionToverify.setOutputBack(outputBack);
+		if(validateTrans(chain, transactionToverify)) {
+			System.out.println("Trans OK");
+		}else {
+			System.out.println("Trans KO");
+		}
+		
+		blocks.add(genesis);
 		genesis.setPrevHash(null);		
 		try {
 			buildBlock(genesis, new PrivateKey[] {keyConnard, keyConnasse, keyTest});
 		} catch (InterruptedException | ExecutionException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		/*for(Transaction transaction : block1.getTransactions()) {
-			if (!validateTrans(chain, transaction))return;
-		}*/
+//		for(Transaction transaction : block1.getTransactions()) {
+//			if (!validateTrans(chain, transaction))return;
+//		}
 		System.out.println("It's alright");
 	}
 	
@@ -128,7 +199,7 @@ public class TestBlockValidation {
 					Output outputBack = new Output();
 					transaction.setOutputOut(outputOut);
 					transaction.setOutputBack(outputBack);
-					transaction.setSignature(SignaturesVerification.signTransaction(transaction.getBytes(false), privKey));
+					transaction.setSignature(SignaturesVerification.signTransaction(transaction, privKey));
 					transaction.setPubKey(keys.get(privKey));
 					transactions.add(transaction);
 				}
