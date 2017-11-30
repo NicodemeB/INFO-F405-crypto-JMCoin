@@ -12,20 +12,23 @@ import java.nio.ByteBuffer;
 public class Output implements Serializable {
 	private static final long serialVersionUID = -1699190505094955025L;
 	private String address;
-	private int amount;
+	private double amount;
 //	private int inputIndex;
 //	private PublicKey pubKey;
 	private Long id;
-
-
+        
 	/*public int getInputIndex() {
 		return inputIndex;
 	}
 	public void setInputIndex(int inputIndex) {
 		this.inputIndex = inputIndex;
 	}*/
-
-	public int getAmount() {
+        public Output(double amount, String address)
+        {
+            this.amount = amount;
+            this.address = address;
+        }
+	public double getAmount() {
 		return amount;
 	}
 
@@ -57,7 +60,7 @@ public class Output implements Serializable {
 	 */
 	public byte[] getBytes() {
 		ByteBuffer bf = ByteBuffer.allocate(getSize());
-		bf.putInt(this.amount);
+		bf.putDouble(this.amount);
 		if(this.address!=null)bf.put(this.address.getBytes());
 		return bf.array();
 	}
