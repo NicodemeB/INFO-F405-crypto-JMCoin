@@ -13,18 +13,16 @@ import java.security.SignatureException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-<<<<<<< HEAD
+
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.bouncycastle.util.Arrays;
 
-=======
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
 import com.google.gson.Gson;
->>>>>>> 82fa7ea09a0710638063cbea56762715150432ef
 import com.jmcoin.crypto.AES;
 import com.jmcoin.crypto.AES.InvalidKeyLengthException;
 import com.jmcoin.crypto.AES.StrongEncryptionNotAvailableException;
