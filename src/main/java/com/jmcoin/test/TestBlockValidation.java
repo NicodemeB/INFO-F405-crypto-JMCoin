@@ -70,6 +70,7 @@ public class TestBlockValidation {
 		Chain chain = new Chain();
 		List<Block> blocks = new ArrayList<>();
 		
+		//genesis
 		Block genesis = new Block();
 		List<Transaction> transGenesisList = new ArrayList<>();
 		Input inGenesis = new Input();
@@ -87,20 +88,15 @@ public class TestBlockValidation {
 		transGenesis.addInput(inGenesis);
 		transGenesis.setPubKey(keys.get(keyConnasse));
 		transGenesisList.add(transGenesis);
-//		transGenesis.setSignature(SignaturesVerification.);
 		genesis.setTransactions(transGenesisList);
 		genesis.setPrevHash(null);
-		
 		
 		blocks.add(genesis);
 		try {
 			buildBlock(blocks);
 		} catch (InterruptedException | ExecutionException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
 		
 		/*for(Transaction transaction : block1.getTransactions()) {
 			if (!validateTrans(chain, transaction))return;

@@ -21,7 +21,7 @@ public class Transaction implements Serializable {
     @Id
 	private ArrayList<Input> inputs;
 	private Output outputOut;
-	private Output outputBack;
+	private Output outputBack; 	//can be null
 	private byte[] hash;
 	private byte[] signature;
 	private PublicKey pubKey;

@@ -45,9 +45,9 @@ public class Chain implements Serializable {
     	if(!pBlock.verifyHash(pBlock.getFinalHash().getBytes())) return false;
     	if (!doesPrevBlocKExists(pBlock)) return false;
     	if (pBlock.getSize() > Block.MAX_BLOCK_SIZE) return false;
-    	for(Transaction transaction : pBlock.getTransactions()) {
+    	/*for(Transaction transaction : pBlock.getTransactions()) {
     		
-    	}
+    	}*/
     	return true;
     }
     
