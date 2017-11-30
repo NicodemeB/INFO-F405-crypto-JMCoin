@@ -15,8 +15,6 @@ public class RelayNode extends Peer{
 
 	public RelayNode() {
 		super();
-		String localChainCopy = JMProtocolImpl.sendRequest(NetConst.MASTER_NODE_LISTEN_PORT, NetConst.MASTER_HOST_NAME, NetConst.GIVE_ME_BLOCKCHAIN_COPY, null);
-		this.localChainCopy = IOFileHandler.getFromJsonString(localChainCopy, Chain.class);
 	}
 	
 	public Chain getLocalChainCopy() {

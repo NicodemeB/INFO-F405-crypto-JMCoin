@@ -6,51 +6,13 @@ import java.net.Socket;
 /**
 
  */
-public class WorkerRunnable implements Runnable{
+public class WorkerRunnable extends TemplateThread{
 
-    protected Socket clientSocket = null;
-    protected String serverText   = null;
-    protected ObjectInputStream in;
-    protected ObjectOutputStream out;
-    
-    protected JMProtocolImpl<? extends Peer> jmProtocol;
-
-    Object toSend;
-    boolean sendFlag = false;
-
-    public WorkerRunnable(Socket clientSocket, JMProtocolImpl<? extends Peer> protocol, String serverText) throws  IOException{
-        this.clientSocket = clientSocket;
-        this.serverText   = serverText;
-        in  = new ObjectInputStream(clientSocket.getInputStream());
-        out = new ObjectOutputStream(clientSocket.getOutputStream());
-        jmProtocol = protocol;
-    }
-
-    synchronized void sendMessage(Object msg) throws IOException {
-        out.writeObject(msg);
-        out.flush();
-        toSend = null;
-        sendFlag = false;
-    }
-
-    public Object readMessage() throws IOException, ClassNotFoundException {
-        return  in.readObject();
-    }
-
-    public void close () throws IOException {
-        in.close();
-        out.close();
-        clientSocket.close();
-    }
-
-
-    synchronized void setToSend(Object ts){
-        toSend = ts;
-        sendFlag = true;
-    }
-
-    synchronized Object getToSend(){
-        return toSend;
+    public WorkerRunnable(Socket clientSocket) throws  IOException{
+    	super();
+        this.socket = clientSocket;
+        in  = new ObjectInputStream(socket.getInputStream());
+        out = new ObjectOutputStream(socket.getOutputStream());
     }
 
     public void run() {
@@ -59,7 +21,7 @@ public class WorkerRunnable implements Runnable{
             // Client server interaction
             // TODO - PROTOCOL IMPLEMENTATION
             // TODO - Implement abstract class and return a correct value
-            new Thread( new ReceiverThread(this, in)).start();
+            new Thread( new ReceiverThread<WorkerRunnable>(this)).start();
             boolean loop = true;
             do {
                 if (getToSend() != null){

@@ -6,7 +6,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.jmcoin.io.IOFileHandler;
 import com.jmcoin.model.Block;
-import com.jmcoin.model.Output;
 import com.jmcoin.model.Transaction;
 
 public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{

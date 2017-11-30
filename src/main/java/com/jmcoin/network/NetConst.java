@@ -27,8 +27,12 @@ public abstract class NetConst {
 	public static final String RES_OKAY						= "res_ok";
 	public static final String RES_NOK						= "res_nok";
 	public static final String ERR_BAD_REQUEST				= "bad_req";
+	public static final String CONNECTION_REQUEST 			= "ConnectionRequest";
+	public static final String CONNECTED 					= "Connected";
 	public static final int MAX_SENT_TRANSACTIONS 			= 1000;
 	public static final int DEFAULT_DIFFICULTY 				= 16;
+	
+	
 	
 	
 }
