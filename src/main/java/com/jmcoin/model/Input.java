@@ -38,8 +38,12 @@ public class Input implements Serializable{
         return amount;
     }
 
-    public void setAmount(double amount) {
-        this.amount = amount;
+    /**
+     * We don't want a number here, since this should always be equal to the amount of the output generating the input
+     * @param o
+     */
+    public void setAmount(Output o) {
+        this.amount = o.getAmount();
     }
 	
 	public boolean equals(Input pInput) {
@@ -53,12 +57,11 @@ public class Input implements Serializable{
 	public Transaction getTransaction() {
 		String chainJson = JMProtocolImpl.sendRequest(NetConst.RELAY_NODE_LISTEN_PORT, NetConst.RELAY_DEBUG_HOST_NAME, NetConst.GIVE_ME_BLOCKCHAIN_COPY, null);
 		Chain chain = IOFileHandler.getFromJsonString(chainJson, Chain.class);
-		this.getPrevTransactionHash();
 		Map<String, Block> blocks = chain.getBlocks();
 		for(String key : blocks.keySet()) {
 			Block b = blocks.get(key);
 			for(Transaction t : b.getTransactions()) {
-				if(Arrays.equals(t.getHash(), this.getPrevTransactionHash())) {
+				if(Arrays.equals(t.getHash(), this.prevTransactionHash)) {
 					return t;
 				}
 			}

@@ -18,10 +18,10 @@ public class Transaction implements Serializable {
 	
         
 	private static final long serialVersionUID = -1113345289965914322L;
-        @Id
+	@Id
 	private ArrayList<Input> inputs;
 	private Output outputOut;
-	private Output outputBack; 	//can be null
+	private Output outputBack;
 	private byte[] hash;
 	private byte[] signature;
 	private PublicKey pubKey;
@@ -82,10 +82,6 @@ public class Transaction implements Serializable {
 			inputs.add(i);
 		}
 	}
-	public void setHash(byte[] hash)
-        {
-            this.hash = hash;
-        }
         
 	public void setOutputOut(Output o) {
 		if(o == null) {
@@ -95,7 +91,8 @@ public class Transaction implements Serializable {
 	}
 	
 	public void setOutputBack(Output o) {
-		//can be null
+		//this Output can be null
+		
 		/*if(o == null) {
 			throw new IllegalArgumentException("Transaction.addOutputBack: Parameter cannot be null");
 		}*/

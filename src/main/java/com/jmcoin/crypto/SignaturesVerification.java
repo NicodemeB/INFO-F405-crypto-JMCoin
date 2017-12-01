@@ -18,7 +18,6 @@ public abstract class SignaturesVerification {
 	
 	public static final String SHA1_WITH_DSA  = "SHA1withDSA";
 	
-	
 	public static byte[] signTransaction(byte[] bytes, PrivateKey privKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, FileNotFoundException, IOException, SignatureException
     {
         Signature dsa = Signature.getInstance(SignaturesVerification.SHA1_WITH_DSA, "SUN"); 
@@ -32,6 +31,8 @@ public abstract class SignaturesVerification {
         bufIn.close();
         return dsa.sign();
     }
+	
+	
 	
     public static boolean verifyTransaction(byte[] signature, byte[] transaction, PublicKey pubKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, SignatureException
     {

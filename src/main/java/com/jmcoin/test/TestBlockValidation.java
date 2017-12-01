@@ -35,16 +35,6 @@ public class TestBlockValidation {
 	
 	private static HashMap<PrivateKey, PublicKey> keys = new HashMap<>();
 	
-	private static Transaction findInBlockChain(Chain chain, String hashTrans) {
-		for(String s : chain.getBlocks().keySet()) {
-			Block b = chain.getBlocks().get(s);
-			for(Transaction trans : b.getTransactions()) {
-				if(trans.getHash().equals(hashTrans))return trans;
-			}
-		}
-		return null;
-	}
-	
 	/**
 	 * Validates the {@link Transaction}
 	 * Iterates over {@link Input} and {@link Output} and validates
@@ -112,9 +102,7 @@ public class TestBlockValidation {
 				
 		//genesis
 		Block genesis = new Block();
-		List<Transaction> transGenesisList = new ArrayList<>();
 		Input inGenesis = new Input();
-		inGenesis.setAmount(0);
 		inGenesis.setPrevTransactionHash(null);
 		Output outGenesis = new Output();
 		outGenesis.setAmount(42);
@@ -127,15 +115,14 @@ public class TestBlockValidation {
 		transGenesis.setOutputOut(outGenesis);
 		transGenesis.addInput(inGenesis);
 		transGenesis.setPubKey(keys.get(keyConnasse));
-		transGenesisList.add(transGenesis);
+		genesis.getTransactions().add(transGenesis);
 //		transGenesis.setSignature(SignaturesVerification.);
-		genesis.setTransactions(transGenesisList);
 		genesis.setPrevHash(null);
 
 		Input input1 = new Input();
-		input1.setAmount(45);
+		input1.setAmount(outGenesis);
 		Input input2 = new Input();
-		input2.setAmount(50);
+		input2.setAmount(outGenesis);
 		Output outputOut = new Output();
 		outputOut.setAmount(80);
 		Output outputBack = new Output();
@@ -177,14 +164,13 @@ public class TestBlockValidation {
 				block = new Block();
 				block.setPrevHash(prevBlock.getFinalHash());
 				prevBlock = block;
-				List<Transaction> transactions = new ArrayList<>();
 				int limit = rand.nextInt(5);
 				PrivateKey privKey = privKeys[rand.nextInt(3)];
 				for(int j = 0; j < limit; j++) {
 					Transaction transaction = new Transaction();
 					for(int k = 0; k < limit; k++) {
 						Input in = new Input();
-						in.setAmount(rand.nextInt(20));
+						in.setAmount(prevBlock.getTransactions().get(0).getOutputOut()); //FIXME
 //						in.setPrevTransactionHash(//prevTransactionHash);
 						transaction.getInputs().add(in);
 					}
@@ -194,17 +180,15 @@ public class TestBlockValidation {
 					transaction.setOutputBack(outputBack);
 					transaction.setSignature(SignaturesVerification.signTransaction(transaction.getBytes(false), privKey));
 					transaction.setPubKey(keys.get(privKey));
-					transactions.add(transaction);
+					block.getTransactions().add(transaction);
 				}
-				block.setTransactions(transactions);				
 			}
 			else {
 				block = genesis;
 				prevBlock = genesis;
 			}
 			block.setDifficulty(4);
-			mining.setBlock(block);
-			mining.mine();
+			mining.mine(block);
 			block.setTimeCreation(System.currentTimeMillis());
 			chain.getBlocks().put(block.getFinalHash(), block);
 			System.out.println(new Gson().toJson(block));

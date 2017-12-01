@@ -12,7 +12,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
@@ -33,7 +32,7 @@ public class Wallet {
     private String email;
     private KeyGenerator keyGen = new KeyGenerator(1024);
     private HashMap<PrivateKey,PublicKey> keys;
-    public ArrayList<String> addresses;
+    private ArrayList<String> addresses;
     private List<Transaction> transactions;
     private double balance;
     
@@ -45,6 +44,7 @@ public class Wallet {
 
     public Wallet(String email, String password) throws NoSuchAlgorithmException, NoSuchProviderException, IOException, InvalidKeySpecException, AES.InvalidPasswordException, AES.InvalidAESStreamException, AES.StrongEncryptionNotAvailableException
     {
+    	this.addresses = new ArrayList<String>();
     	File file = new File(PRIV_KEYS);
     	if(!file.exists() || !file.isDirectory()) file.mkdir();
     	file = new File(PUB_KEYS);
@@ -52,7 +52,7 @@ public class Wallet {
         this.email = email;
         this.keys = getWalletKeysFromFile(password);
         this.balance = getBalance(addresses);
-        this.addresses = new ArrayList<String>();
+        
         
     }   
     // ------------------------------------------Keys
@@ -178,10 +178,7 @@ public class Wallet {
                 Output oBack = new Output(totalOutputAmount-amountToSend, fromAddress);
                 Transaction tr = new Transaction(addressInputs,oOut, oBack,pubKey);
                 tr.setSignature(SignaturesVerification.signTransaction(tr.getBytes(false), privKey));
-                
-                //hasher et set le hash dans la transaction
-                MessageDigest digest = MessageDigest.getInstance("SHA-256");
-                tr.setHash(digest.digest(tr.getBytes(true)));
+                tr.computeHash();
                 //ENVOYER LA TRANSACTION
             }
             else

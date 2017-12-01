@@ -48,11 +48,9 @@ public abstract class JMProtocolImpl<X extends Peer> {
 			case NetConst.GIVE_ME_UNVERIFIED_TRANSACTIONS:
 				return giveMeUnverifiedTransactionsImpl();
 			case NetConst.TAKE_MY_MINED_BLOCK:
-				takeMyMinedBlockImpl(tokenizer.nextToken());
-				break;
+				return takeMyMinedBlockImpl(tokenizer.nextToken()) ? NetConst.RES_OKAY : NetConst.RES_NOK;
 			case NetConst.TAKE_MY_NEW_TRANSACTION:
-				takeMyNewTransactionImpl(tokenizer.nextToken());
-				break;
+				return takeMyNewTransactionImpl(tokenizer.nextToken()) ? NetConst.RES_OKAY : NetConst.RES_NOK;
 			case NetConst.GIVE_ME_UNSPENT_OUTPUTS:
 				return giveMeUnspentOutputs();
 			case NetConst.GIVE_ME_DIFFICULTY:

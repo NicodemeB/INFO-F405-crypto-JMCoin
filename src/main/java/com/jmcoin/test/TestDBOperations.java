@@ -32,9 +32,7 @@ public class TestDBOperations {
         Key[] keys = createKeys("andhisnameJohnCena!");
         //genesis
   		Block genesis = new Block();
-  		List<Transaction> transGenesisList = new ArrayList<>();
   		Input inGenesis = new Input();
-  		inGenesis.setAmount(0);
   		inGenesis.setPrevTransactionHash(null);
   		Output outGenesis = new Output();
   		outGenesis.setAmount(42);
@@ -48,13 +46,7 @@ public class TestDBOperations {
   		transGenesis.addInput(inGenesis);
   		transGenesis.setPubKey((PublicKey) keys[1]);
   		transGenesis.setSignature(SignaturesVerification.signTransaction(transGenesis.getBytes(false), (PrivateKey) keys[0]));
-  		transGenesisList.add(transGenesis);
-  		genesis.setTransactions(transGenesisList);
-  		genesis.setPrevHash(null);
-  		addInput(inGenesis, transGenesis);
-  		addOutputs(outGenesis, outGenesisBack, transGenesis);
-  		addInput(inGenesis, transGenesis);
-        Reward reward= new Reward();
+  		Reward reward= new Reward();
         reward.setOutputBack(null);
         Output rewardOuputOut = new Output();
         rewardOuputOut.setAddress(SignaturesVerification.DeriveJMAddressFromPubKey((PublicKey) keys[1]));
@@ -62,8 +54,12 @@ public class TestDBOperations {
         reward.setOutputOut(rewardOuputOut);
         reward.setPubKey((PublicKey) keys[1]);
         reward.setSignature(SignaturesVerification.signTransaction(reward.getBytes(false), (PrivateKey) keys[0]));
-  		transGenesisList.add(reward);
-        genesis.setTransactions(transGenesisList);
+  		genesis.getTransactions().add(reward);
+  		genesis.getTransactions().add(transGenesis);
+  		genesis.setPrevHash(null);
+  		addInput(inGenesis, transGenesis);
+  		addOutputs(outGenesis, outGenesisBack, transGenesis);
+  		addInput(inGenesis, transGenesis);
         addBlock(genesis, c);
         DatabaseFacade.storeBlockChain(c);
         System.out.println(new Gson().toJson(DatabaseFacade.getStoredChain()));

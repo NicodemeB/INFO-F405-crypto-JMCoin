@@ -26,7 +26,6 @@ public class TestWallet {
             w.getAddresses();
             //w.createKeys("a");
             Input in = new Input();
-            in.setAmount(10);
             Output out = new Output();
             out.setAmount(10);
             Transaction tr = new Transaction();

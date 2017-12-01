@@ -42,7 +42,8 @@ public class Chain implements Serializable {
 
     //TODO check if block is valid and can be added
     public boolean canBeAdded(Block pBlock){
-    	if(!pBlock.verifyHash(pBlock.getFinalHash().getBytes())) return false;
+    	if(pBlock.getClass() == Genesis.class)return true;
+    	if(!isFinalHashRight(pBlock))return false;
     	if (!doesPrevBlocKExists(pBlock)) return false;
     	if (pBlock.getSize() > Block.MAX_BLOCK_SIZE) return false;
     	/*for(Transaction transaction : pBlock.getTransactions()) {
@@ -72,5 +73,15 @@ public class Chain implements Serializable {
     public int getSize(){
         return blocks.size();
     }
+    
+    public Transaction findInBlockChain(byte[] hashTrans) {
+		for(String s : this.blocks.keySet()) {
+			Block b = this.blocks.get(s);
+			for(Transaction trans : b.getTransactions()) {
+				if(Arrays.equals(trans.getHash(), hashTrans))return trans;
+			}
+		}
+		return null;
+	}
 
 }

@@ -27,7 +27,7 @@ public class Client extends TemplateThread{
         try {
             do {
                 if (getToSend() != null) {
-                    System.out.println("to send : " + getToSend().toString());
+                    System.out.println("Client - to send : " + getToSend().toString());
                     sendMessage(getToSend());
                 }
                 Thread.sleep(100);

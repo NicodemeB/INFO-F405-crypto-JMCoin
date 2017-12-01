@@ -25,7 +25,7 @@ public class WorkerRunnable extends TemplateThread{
             boolean loop = true;
             do {
                 if (getToSend() != null){
-                    System.out.println("to send : " + toSend.toString());
+                    System.out.println("WorkRunnable - to send : " + toSend.toString());
                     sendMessage(toSend);
                 }
                 Thread.sleep(100);
@@ -53,7 +53,7 @@ public class WorkerRunnable extends TemplateThread{
         default:
         	setToSend(this.protocol.processInput(msg));
             break;
-    }
+		}
 	}
 }
 

@@ -6,15 +6,14 @@ import java.io.IOException;
 
 public class TestNetworkClientXServer {
     
-	void run(){
+	public static void run(){
         MultiThreadedServer server = new MultiThreadedServer(NetConst.RELAY_NODE_LISTEN_PORT, new RelayNodeJMProtocolImpl());
         new Thread(server).start();
     }
     
     public static void main(String args[])
     {
-        TestNetworkClientXServer tn = new TestNetworkClientXServer();
-        tn.run();
+        run();
         try
         {
             Client cli = new Client(NetConst.MASTER_NODE_LISTEN_PORT, NetConst.MASTER_HOST_NAME, new MasterJMProtocolImpl());
