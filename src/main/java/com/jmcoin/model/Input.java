@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
-import javax.persistence.Basic;
+import javax.persistence.*;
 
 /**
  * Class Input.
@@ -12,15 +12,21 @@ import javax.persistence.Basic;
  * @author enzo
  *
  */
-public class Input implements Serializable{
-	
-    private static final long serialVersionUID = -7496600791646424812L;
-    public static final int INDEX_REWARD = -1;	
+@Entity
+public class Input implements Serializable {
+	private static final long serialVersionUID = -7496600791646424812L;
+	@Transient
+	public static final int INDEX_REWARD = -1;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Basic(optional = false)
+	private Long id;
+	@Basic(optional = false)
     public String address;
+	@Basic(optional = false)
     private double amount;
+    @Lob
     private byte[] prevTransactionHash;
-    @Basic(optional = false)
-    private Long id;
     
     public Input(){};
     public Input(String adr, double amount, byte[] prevTrans)

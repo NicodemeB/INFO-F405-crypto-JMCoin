@@ -19,4 +19,10 @@ public class DatabaseFacade {
         return chain;
     }
 
+    public static void removeBlockChain(Chain chain){
+        Connection.getTransaction().begin();
+        Connection.getManager().remove(chain);
+        Connection.getTransaction().commit();
+    }
+
 }

@@ -3,7 +3,7 @@ package com.jmcoin.model;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 
-import javax.persistence.Basic;
+import javax.persistence.*;
 
 /**
  * Class Output.
@@ -11,12 +11,17 @@ import javax.persistence.Basic;
  * @author enzo
  *
  */
+@Entity
 public class Output implements Serializable {
 	private static final long serialVersionUID = -1699190505094955025L;
-	private String address;
-	private double amount;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Basic(optional = false)
 	private Long id;
+	@Basic(optional = false)
+	private String address;
+	@Basic(optional = false)
+	private double amount;
 	
     public Output(double amount, String address){
         this.amount = amount;

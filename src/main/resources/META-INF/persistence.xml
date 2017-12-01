@@ -14,7 +14,7 @@
             <property name="javax.persistence.jdbc.user" value="user"/>
             <property name="javax.persistence.jdbc.password" value="password"/>
             <property name="javax.persistence.schema-generation.database.action" value="create"/>
-            <property name="eclipselink.logging.level" value="WARNING"/>
+            <property name="eclipselink.logging.level" value="FINE"/>
         </properties>
     </persistence-unit>
 
