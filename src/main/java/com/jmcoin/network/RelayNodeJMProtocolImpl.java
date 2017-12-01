@@ -1,5 +1,7 @@
 package com.jmcoin.network;
 
+import java.io.IOException;
+
 /**
  * Class RelayNodeJMProtocolImpl
  * Implementation on the J-M protocol from the the {@link RelayNode}'s POV
@@ -7,10 +9,17 @@ package com.jmcoin.network;
  *
  */
 public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
-
 	
-	public RelayNodeJMProtocolImpl() {
+	private BroadcastingClient broadcastingClient;
+	
+	public RelayNodeJMProtocolImpl() throws IOException {
 		super(new RelayNode());
+		new BroadcastingEchoServer(this).start();
+		try {
+			broadcastingClient = new BroadcastingClient(NetConst.DEFAULT_BROADCAST_SERVER_COUNT, NetConst.MINER_BROADCAST_PORT);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -58,4 +67,14 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
 		return JMProtocolImpl.sendRequest(NetConst.MASTER_NODE_LISTEN_PORT, NetConst.MASTER_HOST_NAME, NetConst.GIVE_ME_UNSPENT_OUTPUTS, null);
 	}
 
+	@Override
+	protected void receiveByBroadcast(String received) {
+		System.out.println("Relay node - received request type "+received+" by broadcast");
+		//FIXME cannot retransmit to miners
+		try {
+			broadcastingClient.discoverServers(JMProtocolImpl.craftMessage(NetConst.SEND_BROADCAST, received));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }

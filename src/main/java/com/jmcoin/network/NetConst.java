@@ -10,6 +10,8 @@ public abstract class NetConst {
 	public static final int RELAY_NODE_LISTEN_PORT 			= 33333;
 	public static final int MASTER_NODE_LISTEN_PORT			= 33334;
 	public static final int MINER_NODE_LISTEN_PORT			= 33335;
+	public static final int RELAY_BROADCAST_PORT 			= 4445;
+	public static final int MINER_BROADCAST_PORT 			= 4444;
 	public static final String MASTER_HOST_NAME				= "localhost"; //TODO remove this
 	public static final String RELAY_DEBUG_HOST_NAME		= "localhost"; //TODO remove this
 	//public static final String BROADCAST_HOST_NAME		= "255.255.255.255";
@@ -21,6 +23,7 @@ public abstract class NetConst {
 	public static final char GIVE_ME_DIFFICULTY				= '5'; //from miners
 	public static final char STOP_MINING					= '6'; //from master to miners (broadcast)
 	public static final char GIVE_ME_UNSPENT_OUTPUTS 		= '7';
+	public static final char SEND_BROADCAST					= '8';
 	public static final char DELIMITER						= '$';
 	public static final char END							= '#';
 	public static final String ERR_NOT_A_REQUEST			= "err_not_req";
@@ -31,8 +34,5 @@ public abstract class NetConst {
 	public static final String CONNECTED 					= "Connected";
 	public static final int MAX_SENT_TRANSACTIONS 			= 1000;
 	public static final int DEFAULT_DIFFICULTY 				= 16;
-	
-	
-	
-	
+	public static final int DEFAULT_BROADCAST_SERVER_COUNT 	= 1;//FIXME don't know if it's relevant	
 }

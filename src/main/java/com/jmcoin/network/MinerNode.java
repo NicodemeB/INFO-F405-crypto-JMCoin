@@ -29,7 +29,9 @@ public class MinerNode extends Peer{
 	
 	public MinerNode(String email, String password) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException, IOException, InvalidPasswordException, InvalidAESStreamException, StrongEncryptionNotAvailableException {
 		super();
-		wallet = new Wallet(email, password);
+		new MinerJMProtocolImpl(this);
+		this.wallet = new Wallet(email, password);
+		this.portBroadcast = NetConst.MINER_BROADCAST_PORT;
 	}
 	
 	public void mine(Block block) throws InvalidKeyException, ClassNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, IOException, InterruptedException, ExecutionException {
@@ -82,5 +84,9 @@ public class MinerNode extends Peer{
 		block.setTimeCreation(System.currentTimeMillis());
 		block.setPrevHash(null); //FIXME find prev block in the chain or let the master do the job
 		return block;
+	}
+
+	public void stopMining() {
+		System.out.println("-------------------Stop mining-------------------");
 	}
 }

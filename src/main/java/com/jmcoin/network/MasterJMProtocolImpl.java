@@ -73,4 +73,7 @@ public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 	protected String giveMeUnspentOutputs() {
 		return new Gson().toJson(this.peer.getUnspentOutputs());
 	}
+
+	@Override
+	protected void receiveByBroadcast(String received) {}
 }

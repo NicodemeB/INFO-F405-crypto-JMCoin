@@ -1,5 +1,7 @@
 package com.jmcoin.network;
 
+import java.io.IOException;
+
 import com.jmcoin.io.IOFileHandler;
 import com.jmcoin.model.Chain;
 
@@ -13,12 +15,13 @@ public class RelayNode extends Peer{
 
 	private Chain localChainCopy;
 
-	public RelayNode() {
+	public RelayNode() throws IOException {
 		super();
+		this.portBroadcast = NetConst.RELAY_BROADCAST_PORT;
 	}
 	
 	public Chain getLocalChainCopy() {
-		return localChainCopy;
+		return this.localChainCopy;
 	}
 	
 	public void updateBlockChain(String bc) {

@@ -52,7 +52,7 @@ public class TestBlockValidation {
 		//TODO Maxime does the job
 		int total = 0;
 		for(Input i : trans.getInputs()) {
-			Transaction t  = i.getTransaction();
+			Transaction t  = chain.findInBlockChain(i.getPrevTransactionHash());
 			Output output = null;
 			if(t.getOutputOut().getAddress() == SignaturesVerification.DeriveJMAddressFromPubKey(trans.getPubKey()) && t.getOutputOut().getAmount() == i.getAmount()) {
 				output = t.getOutputOut();

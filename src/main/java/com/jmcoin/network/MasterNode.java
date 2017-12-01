@@ -1,5 +1,6 @@
 package com.jmcoin.network;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -20,18 +21,22 @@ public class MasterNode extends Peer{
     private static MasterNode instance = new MasterNode();
     private LinkedList<Transaction> unverifiedTransactions;
     
-    //key = hash of the transaction containing the output
-    //value = output itself
-    private Map<String, Output> unspentOutputs;
+    private Map<String, Output> unspentOutputs; //key = hash of the transaction containing the output
     private Chain chain;
     
     private int difficulty = NetConst.DEFAULT_DIFFICULTY;
+    private BroadcastingClient broadcastingClient;
 
     private MasterNode(){
     	super();
     	chain = new Chain();
     	this.unverifiedTransactions = new LinkedList<>();
     	this.unspentOutputs = new HashMap<>();
+    	try {
+			this.broadcastingClient = new BroadcastingClient(NetConst.DEFAULT_BROADCAST_SERVER_COUNT, NetConst.RELAY_BROADCAST_PORT);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
     }
     
     public Map<String, Output> getUnspentOutputs() {
@@ -100,5 +105,12 @@ public class MasterNode extends Peer{
 			}
 		}
     	chain.addBlock(pBlock);
+    	try {
+			System.out.println("Master Node: Broadcast client");
+			this.broadcastingClient.discoverServers(JMProtocolImpl.craftMessage(NetConst.SEND_BROADCAST, NetConst.STOP_MINING));
+			this.broadcastingClient.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
     }
 }

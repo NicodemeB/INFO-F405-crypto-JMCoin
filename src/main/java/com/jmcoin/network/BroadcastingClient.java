@@ -13,27 +13,28 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class BroadcastingClient {
+	
     private DatagramSocket socket;
     private InetAddress address;
     private int expectedServerCount;
     private byte[] buf;
+    private int port;
 
-    public BroadcastingClient(int expectedServerCount) throws Exception {
+    public BroadcastingClient(int expectedServerCount, int port) throws Exception {
         this.expectedServerCount = expectedServerCount;
         this.address = InetAddress.getByName("255.255.255.255");
+        this.port = port;
     }
 
     public int discoverServers(String msg) throws IOException {
         initializeSocketForBroadcasting();
         copyMessageOnBuffer(msg);
-
         // When we want to broadcast not just to local network, call listAllBroadcastAddresses() and execute broadcastPacket for each value.
         broadcastPacket(address);
-
         return receivePackets();
     }
 
-    List<InetAddress> listAllBroadcastAddresses() throws SocketException {
+    private List<InetAddress> listAllBroadcastAddresses() throws SocketException {
         List<InetAddress> broadcastList = new ArrayList<>();
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
         while (interfaces.hasMoreElements()) {
@@ -62,7 +63,7 @@ public class BroadcastingClient {
     }
 
     private void broadcastPacket(InetAddress address) throws IOException {
-        DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 4445);
+        DatagramPacket packet = new DatagramPacket(buf, buf.length, address, port);
         socket.send(packet);
     }
 

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.StringTokenizer;
 
 import com.jmcoin.model.Block;
+import com.jmcoin.model.Output;
 import com.jmcoin.model.Transaction;
 
 /**
@@ -18,9 +19,10 @@ public abstract class JMProtocolImpl<X extends Peer> {
 		this.peer = peer;
 	}
 	
-	public X getPeer() {
-		return peer;
+	public int getPortBroadcast() {
+		return this.peer.getPortBroadcast();
 	}
+
 	/**
 	 * Will assume that the payload is built as follows:
 	 * x$yyyyyyyyyyyyy$#
@@ -55,6 +57,9 @@ public abstract class JMProtocolImpl<X extends Peer> {
 				return giveMeUnspentOutputs();
 			case NetConst.GIVE_ME_DIFFICULTY:
 				return giveMeDifficulty();
+			case NetConst.SEND_BROADCAST:
+				receiveByBroadcast(tokenizer.nextToken());
+				return NetConst.RES_OKAY; //FIXME do we need to check is something went wrong
 			default:
 				return NetConst.ERR_NOT_A_REQUEST;
 			}
@@ -62,6 +67,16 @@ public abstract class JMProtocolImpl<X extends Peer> {
 		return NetConst.ERR_BAD_REQUEST;
 	}
 	
+	/**
+	 * Called when a broadcast is received
+	 * @param received
+	 */
+	protected abstract void receiveByBroadcast(String received);
+	
+	/**
+	 * Returns unspent {@link Output} as a list
+	 * @return
+	 */
 	protected abstract String giveMeUnspentOutputs();
 
 	/**
@@ -99,6 +114,11 @@ public abstract class JMProtocolImpl<X extends Peer> {
 	 */
 	protected abstract boolean takeMyNewTransactionImpl(String payload);	
 	
+	/**
+	 * Returns difficulty on demand
+	 * @return
+	 */
+	
 	protected abstract String giveMeDifficulty();
 	/**
 	 * Builds a message to send over the network, compliant with the protocol
@@ -108,6 +128,10 @@ public abstract class JMProtocolImpl<X extends Peer> {
 	 */
 	public static String craftMessage(int request, String body) {
 		return request + "$" + body + "$#";
+	}
+	
+	public static String craftMessage(int request, char body) {
+		return request + "$" + body + "$#"+'\0';
 	}
 	
 	public static String sendRequest(int port, String host, int req, String payload) {

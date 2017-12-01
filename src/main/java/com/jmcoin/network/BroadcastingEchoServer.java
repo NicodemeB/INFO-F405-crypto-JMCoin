@@ -8,29 +8,29 @@ import java.net.InetSocketAddress;
 
 public class BroadcastingEchoServer extends Thread {
 
-    protected DatagramSocket socket = null;
-    protected boolean running;
-    protected byte[] buf = new byte[256];
-
-    public BroadcastingEchoServer() throws IOException {
+    private DatagramSocket socket = null;
+    private boolean running;
+    private byte[] buf = new byte[256];
+    private JMProtocolImpl<? extends Peer> protocol;
+    
+    public BroadcastingEchoServer(JMProtocolImpl<? extends Peer> protocol) throws IOException {
         socket = new DatagramSocket(null);
         socket.setReuseAddress(true);
-        socket.bind(new InetSocketAddress(4445));
+        socket.bind(new InetSocketAddress(protocol.getPortBroadcast()));
+        this.protocol = protocol;
     }
 
     public void run() {
         running = true;
-
         while (running) {
             try {
                 DatagramPacket packet = new DatagramPacket(buf, buf.length);
-
                 socket.receive(packet);
                 InetAddress address = packet.getAddress();
                 int port = packet.getPort();
                 packet = new DatagramPacket(buf, buf.length, address, port);
                 String received = new String(packet.getData(), 0, packet.getLength());
-                System.out.println(received);
+                this.protocol.processInput(received);
                 if (received.equals("end")) {
                     running = false;
                     continue;

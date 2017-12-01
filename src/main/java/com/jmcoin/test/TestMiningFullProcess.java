@@ -38,7 +38,11 @@ public class TestMiningFullProcess {
 			return;
 		}
 		TestMasterNode.runMaster();
-		TestNetworkClientXServer.run();
+		try {
+			TestNetworkClientXServer.run();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 		
         try{
             Client cli = new Client(NetConst.MASTER_NODE_LISTEN_PORT, NetConst.MASTER_HOST_NAME, new MasterJMProtocolImpl());
@@ -58,7 +62,6 @@ public class TestMiningFullProcess {
 				| SignatureException | IOException | InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 		}
-		
 	}
 
 }
