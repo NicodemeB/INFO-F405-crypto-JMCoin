@@ -11,19 +11,17 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
-import java.util.Arrays;
-
-import com.jmcoin.model.Transaction;
-import com.jmcoin.util.BytesUtil;
 import org.bouncycastle.crypto.digests.RIPEMD160Digest;
 import org.bouncycastle.util.encoders.Hex;
 
 public abstract class SignaturesVerification {
 	
+	public static final String SHA1_WITH_DSA  = "SHA1withDSA";
+	
 	
 	public static byte[] signTransaction(byte[] bytes, PrivateKey privKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, FileNotFoundException, IOException, SignatureException
     {
-        Signature dsa = Signature.getInstance("SHA1withDSA", "SUN"); 
+        Signature dsa = Signature.getInstance(SignaturesVerification.SHA1_WITH_DSA, "SUN"); 
         dsa.initSign(privKey);
         BufferedInputStream bufIn = new BufferedInputStream(new ByteArrayInputStream(bytes));
         byte[] buffer = new byte[1024];
@@ -42,7 +40,7 @@ public abstract class SignaturesVerification {
         	return false;
         }
         else{
-            Signature sig = Signature.getInstance("SHA1withDSA", "SUN");
+            Signature sig = Signature.getInstance(SignaturesVerification.SHA1_WITH_DSA, "SUN");
             sig.initVerify(pubKey);
             BufferedInputStream bufIn = new BufferedInputStream(new ByteArrayInputStream(transaction));
             byte[] buffer = new byte[1024];

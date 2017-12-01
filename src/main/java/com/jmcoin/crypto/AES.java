@@ -238,12 +238,16 @@ public class AES {
 	/**
 	 * Thrown if an attempt is made to decrypt a stream with an incorrect password.
 	 */
-	public static class InvalidPasswordException extends Exception { }
+	public static class InvalidPasswordException extends Exception {
+		private static final long serialVersionUID = -2689852971466700152L;
+		}
 	
 	/**
 	 * Thrown if an attempt is made to encrypt a stream with an invalid AES key length.
 	 */
 	public static class InvalidKeyLengthException extends Exception {
+		private static final long serialVersionUID = 5839427283188786207L;
+
 		InvalidKeyLengthException(int length) {
 			super("Invalid AES key length: " + length);
 		}
@@ -254,6 +258,11 @@ public class AES {
 	 * but not available on the particular Java platform.
 	 */
 	public static class StrongEncryptionNotAvailableException extends Exception {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -7215955290521308520L;
+
 		public StrongEncryptionNotAvailableException(int keySize) {
 			super(keySize + "-bit AES encryption is not available on this Java platform.");
 		}
@@ -263,6 +272,7 @@ public class AES {
 	 * Thrown if an attempt is made to decrypt an invalid AES stream.
 	 */
 	public static class InvalidAESStreamException extends Exception {
+		private static final long serialVersionUID = 5115318857188997042L;
 		public InvalidAESStreamException() { super(); };
 		public InvalidAESStreamException(Exception e) { super(e); }
 	}

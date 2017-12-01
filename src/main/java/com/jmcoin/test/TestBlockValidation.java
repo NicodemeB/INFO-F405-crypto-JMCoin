@@ -13,15 +13,8 @@ import java.security.SignatureException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
-
-import org.bouncycastle.util.Arrays;
-
 import java.util.Random;
-import java.util.concurrent.ExecutionException;
-
 import com.google.gson.Gson;
 import com.jmcoin.crypto.AES;
 import com.jmcoin.crypto.AES.InvalidKeyLengthException;
@@ -199,7 +192,7 @@ public class TestBlockValidation {
 					Output outputBack = new Output();
 					transaction.setOutputOut(outputOut);
 					transaction.setOutputBack(outputBack);
-					transaction.setSignature(SignaturesVerification.signTransaction(transaction, privKey));
+					transaction.setSignature(SignaturesVerification.signTransaction(transaction.getBytes(false), privKey));
 					transaction.setPubKey(keys.get(privKey));
 					transactions.add(transaction);
 				}
