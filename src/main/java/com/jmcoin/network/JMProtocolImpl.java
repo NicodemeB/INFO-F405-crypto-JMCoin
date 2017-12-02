@@ -1,6 +1,5 @@
 package com.jmcoin.network;
 
-import java.io.IOException;
 import java.util.StringTokenizer;
 
 import com.jmcoin.model.Block;
@@ -30,6 +29,7 @@ public abstract class JMProtocolImpl<X extends Peer> {
 	 * and y the payload itself (can be empty, like 0$$#)
 	 */
 	public String processInput(Object message) {
+	    System.out.println(message);
 		String content = (String)message;
 		StringTokenizer tokenizer = new StringTokenizer(content, String.valueOf(NetConst.DELIMITER));
 		if(!tokenizer.hasMoreTokens()) return null;
@@ -42,6 +42,7 @@ public abstract class JMProtocolImpl<X extends Peer> {
 			} catch (NumberFormatException e) {
 				e.printStackTrace();
 			}
+			System.out.println(code);
 			switch ((char)code) {
 			case NetConst.GIVE_ME_BLOCKCHAIN_COPY:
 				return giveMeBlockChainCopyImpl();
@@ -60,13 +61,30 @@ public abstract class JMProtocolImpl<X extends Peer> {
 			case NetConst.SEND_BROADCAST:
 				receiveByBroadcast(tokenizer.nextToken());
 				return NetConst.RES_OKAY; //FIXME do we need to check is something went wrong
+
+
+            case NetConst.SEND_BROADCAST_DEBUG :
+                System.out.println("INTO JMPROTO SEND_BROADCAST_DEBUG");
+                return SendBroacastDebug();
+
+            case NetConst.BROADCAST_DEBUG:
+                System.out.println("INTO JMPROTO BROADCAST_DEBUG");
+                return BroacastDebug();
+
+            case NetConst.STOP_MINING:
+                System.out.println("INTO JMPROTO STOP_MINING");
+                return StopMining();
+
 			default:
 				return NetConst.ERR_NOT_A_REQUEST;
 			}
 		}
 		return NetConst.ERR_BAD_REQUEST;
 	}
-	
+
+    protected abstract String BroacastDebug();
+    protected abstract String SendBroacastDebug();
+    protected abstract String StopMining();
 	/**
 	 * Called when a broadcast is received
 	 * @param received
@@ -133,18 +151,23 @@ public abstract class JMProtocolImpl<X extends Peer> {
 	public static String craftMessage(int request, char body) {
 		return request + "$" + body + "$#"+'\0';
 	}
-	
-	public static String sendRequest(int port, String host, int req, String payload) {
-		try {
-			RequestSender client = new RequestSender(port, host);
-			client.sendMessage(JMProtocolImpl.craftMessage(req, payload == null ? "" : payload));
-			String response = client.readMessage().toString();
-			client.close();
-			return response;
-		} catch (IOException | ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		return null;
-		
-	}
+
+    public static String sendRequest(int relayNodeListenPort, String relayDebugHostName, char takeMyMinedBlock, String s) {
+        //FIXME
+        return null;
+    }
+
+//	public static String sendRequest(int port, String host, int req, String payload) {
+//		try {
+//			RequestSender client = new RequestSender(port, host);
+//			client.sendMessage(JMProtocolImpl.craftMessage(req, payload == null ? "" : payload));
+//			String response = client.readMessage().toString();
+//			client.close();
+//			return response;
+//		} catch (IOException | ClassNotFoundException e) {
+//			e.printStackTrace();
+//		}
+//		return null;
+//
+//	}
 }

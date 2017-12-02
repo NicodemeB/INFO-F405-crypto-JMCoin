@@ -8,6 +8,8 @@ import java.net.Socket;
  */
 public class WorkerRunnable extends TemplateThread{
 
+    private BroadcastThread bt;
+
     public WorkerRunnable(Socket clientSocket, JMProtocolImpl<? extends Peer> protocol) throws  IOException{
     	super(protocol);
         this.socket = clientSocket;
@@ -17,16 +19,15 @@ public class WorkerRunnable extends TemplateThread{
 
     public void run() {
         try {
-            //**************************************
-            // Client server interaction
-            // TODO - PROTOCOL IMPLEMENTATION
-            // TODO - Implement abstract class and return a correct value
             new Thread( new ReceiverThread<WorkerRunnable>(this)).start();
+            bt = new BroadcastThread<WorkerRunnable>(this);
+            bt.start();
             boolean loop = true;
             do {
                 if (getToSend() != null){
-                    System.out.println("WorkRunnable - to send : " + toSend.toString());
+                    System.out.println("Thread #"+Thread.currentThread().getId() +" WorkRunnable - to send : " + toSend.toString());
                     sendMessage(toSend);
+
                 }
                 Thread.sleep(100);
             } while (loop);
@@ -55,5 +56,8 @@ public class WorkerRunnable extends TemplateThread{
             break;
 		}
 	}
+	synchronized protected void not(){
+        toSend = protocol.craftMessage(NetConst.STOP_MINING, null);
+    }
 }
 

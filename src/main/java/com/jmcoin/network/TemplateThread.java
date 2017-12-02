@@ -5,7 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-public abstract class TemplateThread implements Runnable{
+public abstract class TemplateThread extends Thread{
 	
 	protected ObjectOutputStream out;
     protected ObjectInputStream in;
@@ -26,9 +26,19 @@ public abstract class TemplateThread implements Runnable{
         socket.close();
     }
     
-    public Object readMessage() throws IOException, ClassNotFoundException {
+    public synchronized Object readMessage() throws IOException, ClassNotFoundException {
         return  in.readObject();
     }
+
+    public synchronized Object readMessageLock() throws IOException, ClassNotFoundException, InterruptedException {
+        Object ret = null;
+        do {
+            ret = in.readObject();
+            Thread.sleep(10);
+        } while (ret.toString().equals(null));
+        return ret;
+    }
+
     
     public ObjectInputStream getIn() {
 		return in;

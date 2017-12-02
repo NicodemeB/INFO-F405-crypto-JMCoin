@@ -6,6 +6,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 public class Client extends TemplateThread{
+
 	
 	public Client (int port, String host, JMProtocolImpl<? extends Peer> protocol) throws IOException {
 		super(protocol);
@@ -14,6 +15,17 @@ public class Client extends TemplateThread{
         out.flush();
         in = new ObjectInputStream(socket.getInputStream());
     }
+
+//    //RELAY CONSTRUCTOR
+//    public Client (int port, String host, JMProtocolImpl<? extends Peer> protocol, MultiThreadedServer srv) throws IOException {
+//        super(protocol);
+//        socket = new Socket(host, port);
+//        out = new ObjectOutputStream(socket.getOutputStream());
+//        out.flush();
+//        in = new ObjectInputStream(socket.getInputStream());
+//        server = srv;
+//    }
+
 
 
     public synchronized void sendMessage(Object msg) throws IOException {
@@ -27,7 +39,7 @@ public class Client extends TemplateThread{
         try {
             do {
                 if (getToSend() != null) {
-                    System.out.println("Client - to send : " + getToSend().toString());
+                    System.out.println("Thread #"+Thread.currentThread().getId() +" Client - to send : " + getToSend().toString());
                     sendMessage(getToSend());
                 }
                 Thread.sleep(100);
@@ -62,7 +74,7 @@ public class Client extends TemplateThread{
         case NetConst.CONNECTION_REQUEST:
             break;
         default:
-            //System.out.println("Default case; case not defined; drop packet");
+
             break;
 		}
 	}

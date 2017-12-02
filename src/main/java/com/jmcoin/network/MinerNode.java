@@ -39,7 +39,7 @@ public class MinerNode extends Peer{
 		mining.mine(block);
 		JMProtocolImpl.sendRequest(NetConst.RELAY_NODE_LISTEN_PORT, NetConst.RELAY_DEBUG_HOST_NAME, NetConst.TAKE_MY_MINED_BLOCK, new Gson().toJson(block));
 	}
-	
+
 	public Block buildBlock() throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException {
 		Block block = new Block();
 		String unvf = JMProtocolImpl.sendRequest(NetConst.RELAY_NODE_LISTEN_PORT, NetConst.RELAY_DEBUG_HOST_NAME, NetConst.GIVE_ME_UNVERIFIED_TRANSACTIONS, null);

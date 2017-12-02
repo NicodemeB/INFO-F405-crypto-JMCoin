@@ -12,11 +12,7 @@ import com.jmcoin.crypto.AES.InvalidAESStreamException;
 import com.jmcoin.crypto.AES.InvalidPasswordException;
 import com.jmcoin.crypto.AES.StrongEncryptionNotAvailableException;
 import com.jmcoin.model.Block;
-import com.jmcoin.network.Client;
-import com.jmcoin.network.MasterJMProtocolImpl;
 import com.jmcoin.network.MinerNode;
-import com.jmcoin.network.NetConst;
-import com.jmcoin.network.ReceiverThread;
 
 public class TestMiningFullProcess {
 	
@@ -39,22 +35,12 @@ public class TestMiningFullProcess {
 		}
 		TestMasterNode.runMaster();
 		try {
-			TestNetworkClientXServer.run();
+			TestRelay.run();
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
 		
-        try{
-            Client cli = new Client(NetConst.MASTER_NODE_LISTEN_PORT, NetConst.MASTER_HOST_NAME, new MasterJMProtocolImpl());
-            cli.sendMessage(NetConst.CONNECTION_REQUEST);
-            Thread t = new Thread(new ReceiverThread<Client>(cli));
-            t.start();
-            Thread thread = new Thread(cli);
-            thread.start();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
+        TestNetworkClient.run();
         try {
 			Block  block = miner.buildBlock();
 			miner.mine(block);

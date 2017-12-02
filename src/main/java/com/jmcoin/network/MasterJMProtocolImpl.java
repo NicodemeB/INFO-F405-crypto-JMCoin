@@ -1,6 +1,7 @@
 package com.jmcoin.network;
 
 import java.util.List;
+import java.util.StringTokenizer;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -12,6 +13,25 @@ public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 
 	public MasterJMProtocolImpl() {
 		super(MasterNode.getInstance());
+	}
+
+
+
+	@Override
+	protected String BroacastDebug(){
+		System.out.println("Thread #"+Thread.currentThread().getId() +" BROADCAST DEBUG MASTER NODE");
+		System.out.println("OK MASTER NODE KNOW THAT He need to say to everyone to stop mining");
+		return (craftMessage(NetConst.STOP_MINING, null));
+	}
+
+	@Override
+	protected String SendBroacastDebug() {
+		return null;
+	}
+
+	@Override
+	protected String StopMining (){
+		return "LAL SMB";
 	}
 
 	@Override

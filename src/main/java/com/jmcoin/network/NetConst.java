@@ -24,6 +24,8 @@ public abstract class NetConst {
 	public static final char STOP_MINING					= '6'; //from master to miners (broadcast)
 	public static final char GIVE_ME_UNSPENT_OUTPUTS 		= '7';
 	public static final char SEND_BROADCAST					= '8';
+	public static final char BROADCAST_DEBUG				= 'X';
+	public static final char SEND_BROADCAST_DEBUG			= 'Y';
 	public static final char DELIMITER						= '$';
 	public static final char END							= '#';
 	public static final String ERR_NOT_A_REQUEST			= "err_not_req";

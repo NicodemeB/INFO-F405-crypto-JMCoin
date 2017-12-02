@@ -1,16 +1,11 @@
 package com.jmcoin.network;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
 
-public class ReceiverThread<X extends TemplateThread> implements Runnable{
+public class ReceiverThreadSC extends ReceiverThread {
 
-    protected ObjectInputStream input;
-    protected X runnable; 
-
-    public ReceiverThread(X workerRunnable) {
-        runnable = workerRunnable;
-        input = workerRunnable.getIn();
+    public ReceiverThreadSC(TemplateThread workerRunnable) {
+        super(workerRunnable);
     }
 
     @Override

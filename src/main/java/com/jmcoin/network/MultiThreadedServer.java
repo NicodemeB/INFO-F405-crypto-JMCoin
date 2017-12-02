@@ -1,8 +1,10 @@
 package com.jmcoin.network;
 
+import java.lang.reflect.Array;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.io.IOException;
+import java.util.Vector;
 
 public class MultiThreadedServer implements Runnable{
 
@@ -11,10 +13,16 @@ public class MultiThreadedServer implements Runnable{
     protected boolean      isStopped    = false;
     protected Thread       runningThread= null;
     protected JMProtocolImpl<? extends Peer> protocol	= null;
+    protected Vector<WorkerRunnable> lThreads;
+
+
+
+    protected Client client;
 
     public MultiThreadedServer(int port, JMProtocolImpl<? extends Peer> protocol){
         this.serverPort = port;
         this.protocol = protocol;
+        lThreads = new Vector<WorkerRunnable>();
     }
 
     public void run(){
@@ -35,9 +43,8 @@ public class MultiThreadedServer implements Runnable{
                         "Error accepting client connection", e);
             }
             try {
-                new Thread(
-                        new WorkerRunnable(clientSocket, protocol)
-                ).start();
+                lThreads.add(new WorkerRunnable(clientSocket, protocol));
+                lThreads.lastElement().start();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -46,7 +53,7 @@ public class MultiThreadedServer implements Runnable{
     }
 
 
-    private synchronized boolean isStopped() {
+    protected synchronized boolean isStopped() {
         return this.isStopped;
     }
 
@@ -59,7 +66,13 @@ public class MultiThreadedServer implements Runnable{
         }
     }
 
-    private void openServerSocket() {
+    public synchronized void not(){
+        for (WorkerRunnable wr: lThreads) {
+            wr.not();
+        }
+    }
+
+    protected void openServerSocket() {
         try {
             System.out.println("Launching server on port : " + this.serverPort);
             this.serverSocket = new ServerSocket(this.serverPort);

@@ -17,6 +17,21 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
 	}
 
 	@Override
+	protected String BroacastDebug() {
+		return null;
+	}
+
+	@Override
+	protected String SendBroacastDebug() {
+		return null;
+	}
+
+	@Override
+	protected String StopMining() {
+		return null;
+	}
+
+	@Override
 	//unused
 	protected String giveMeBlockChainCopyImpl() {return null;}
 
@@ -48,5 +63,9 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
 		if(received.equals(Character.toString(NetConst.STOP_MINING))){
 			this.peer.stopMining();
 		}
+	}
+	public static String sendRequest(int relayNodeListenPort, String relayDebugHostName, char takeMyMinedBlock, String s) {
+		//FIXME
+		return null;
 	}
 }
