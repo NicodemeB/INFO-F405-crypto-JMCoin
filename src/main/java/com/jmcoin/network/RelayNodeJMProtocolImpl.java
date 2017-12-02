@@ -1,7 +1,6 @@
 package com.jmcoin.network;
 
 import java.io.IOException;
-import java.util.StringTokenizer;
 
 /**
  * Class RelayNodeJMProtocolImpl
@@ -13,15 +12,15 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
 	
 	private BroadcastingClient broadcastingClient;
 
-    public Client getClient() {
+    public ClientSC getClient() {
         return client;
     }
 
-    public void setClient(Client client) {
+    public void setClient(ClientSC client) {
         this.client = client;
     }
 
-    private Client client;
+    private ClientSC client;
 	
 	public RelayNodeJMProtocolImpl() throws IOException {
 		super(new RelayNode());
@@ -40,11 +39,6 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
 	    return null;
     }
 
-	@Override
-	protected String BroacastDebug(){
-		System.out.println("Thread #"+Thread.currentThread().getId() +" SEND STOP MINIG FROM RELAY TO MASTER");
-        return (String) sendRequestAndGetAnswer(NetConst.BROADCAST_DEBUG, null);
-	}
 
 	@Override
 	protected String StopMining(){
@@ -56,25 +50,25 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
 
 	@Override
 	protected String giveMeBlockChainCopyImpl() {
-		String blockchain = (String) sendRequestAndGetAnswer( NetConst.GIVE_ME_BLOCKCHAIN_COPY, null);
+		String blockchain = (String) sendRequestAndWaitForAnswer( NetConst.GIVE_ME_BLOCKCHAIN_COPY, null);
 		this.peer.updateBlockChain(blockchain);
 		return blockchain;
 	}
 
 	@Override
 	protected String giveMeRewardAmountImpl() {
-		return (String) sendRequestAndGetAnswer( NetConst.GIVE_ME_REWARD_AMOUNT, null);
+		return (String) sendRequestAndWaitForAnswer( NetConst.GIVE_ME_REWARD_AMOUNT, null);
 	}
 
 	@Override
 	protected String giveMeUnverifiedTransactionsImpl() {
-		return (String) sendRequestAndGetAnswer( NetConst.GIVE_ME_UNVERIFIED_TRANSACTIONS, null);
+		return (String) sendRequestAndWaitForAnswer( NetConst.GIVE_ME_UNVERIFIED_TRANSACTIONS, null);
 	}
 
 	@Override
 	protected boolean takeMyMinedBlockImpl(String payload) {
 		if(payload != null) {
-            sendRequestAndGetAnswer( NetConst.TAKE_MY_MINED_BLOCK, payload);
+            sendRequestAndWaitForAnswer( NetConst.TAKE_MY_MINED_BLOCK, payload);
 			return true;
 		}
 		return false;
@@ -83,7 +77,7 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
 	@Override
 	protected boolean takeMyNewTransactionImpl(String payload) {
 		if (payload != null) {
-            sendRequestAndGetAnswer( NetConst.TAKE_MY_NEW_TRANSACTION, payload);
+            sendRequestAndWaitForAnswer( NetConst.TAKE_MY_NEW_TRANSACTION, payload);
 			return true;
 		}
 		return false;
@@ -91,12 +85,12 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
 
 	@Override
 	protected String giveMeDifficulty() {
-		return (String) sendRequestAndGetAnswer( NetConst.GIVE_ME_DIFFICULTY, null);
+		return (String) sendRequestAndWaitForAnswer( NetConst.GIVE_ME_DIFFICULTY, null);
 	}
 
 	@Override
 	protected String giveMeUnspentOutputs() {
-		return (String) sendRequestAndGetAnswer( NetConst.GIVE_ME_UNSPENT_OUTPUTS, null);
+		return (String) sendRequestAndWaitForAnswer( NetConst.GIVE_ME_UNSPENT_OUTPUTS, null);
 	}
 
 	@Override
@@ -114,11 +108,13 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
         getClient().setToSend(JMProtocolImpl.craftMessage(req, payload == null ? "" : payload));
     }
 
-    public Object sendRequestAndGetAnswer(int req, String payload) {
+    public Object sendRequestAndWaitForAnswer(int req, String payload) {
 		try {
             getClient().setToSend(JMProtocolImpl.craftMessage(req, payload == null ? "" : payload));
             Thread.sleep(3000);
+            client.getT().suspend();
 			Object response = client.readMessageLock();
+            client.getT().resume();
 			return response;
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();

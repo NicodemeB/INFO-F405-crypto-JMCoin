@@ -6,6 +6,7 @@ import java.net.Socket;
 import java.util.Vector;
 
 public class MultiThreadedServerClient extends MultiThreadedServer{
+
     private Vector<WorkerRunnableSC> lThreadsSC;
     private ClientSC client;
 
@@ -22,6 +23,13 @@ public class MultiThreadedServerClient extends MultiThreadedServer{
         this.client = client;
     }
 
+    public Vector<WorkerRunnableSC> getlThreadsSC() {
+        return lThreadsSC;
+    }
+
+    public void setlThreadsSC(Vector<WorkerRunnableSC> lThreadsSC) {
+        this.lThreadsSC = lThreadsSC;
+    }
 
 
 

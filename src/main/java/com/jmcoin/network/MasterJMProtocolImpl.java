@@ -17,21 +17,21 @@ public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 
 
 
-	@Override
-	protected String BroacastDebug(){
-		System.out.println("Thread #"+Thread.currentThread().getId() +" BROADCAST DEBUG MASTER NODE");
-		System.out.println("OK MASTER NODE KNOW THAT He need to say to everyone to stop mining");
-		return (craftMessage(NetConst.STOP_MINING, null));
-	}
+//	@Override
+//	protected String BroacastDebug(){
+//		System.out.println("Thread #"+Thread.currentThread().getId() +" BROADCAST DEBUG MASTER NODE");
+//		System.out.println("OK MASTER NODE KNOW THAT He need to say to everyone to stop mining");
+//		return (craftMessage(NetConst.STOP_MINING, null));
+//	}
 
 	@Override
-	protected String SendBroacastDebug() {
-		return null;
-	}
+	protected String SendBroacastDebug() { return null; }
 
 	@Override
 	protected String StopMining (){
-		return "LAL SMB";
+		System.out.println("Thread #"+Thread.currentThread().getId() +" BROADCAST DEBUG MASTER NODE");
+		System.out.println("OK MASTER NODE KNOW THAT He need to say to everyone to stop mining");
+		return (craftMessage(NetConst.STOP_MINING, null));
 	}
 
 	@Override

@@ -4,7 +4,20 @@ import java.io.IOException;
 import java.net.Socket;
 
 public class WorkerRunnableSC extends WorkerRunnable {
-    public Client getClient() {
+
+    private ClientSC client;
+    private Thread rt;
+
+
+    public Thread getRt() {
+        return rt;
+    }
+
+    public void setRt(Thread rt) {
+        this.rt = rt;
+    }
+
+    public ClientSC getClient() {
         return client;
     }
 
@@ -12,7 +25,7 @@ public class WorkerRunnableSC extends WorkerRunnable {
         this.client = client;
     }
 
-    ClientSC client;
+
     public WorkerRunnableSC(Socket clientSocket, JMProtocolImpl<? extends Peer> protocol, ClientSC client) throws IOException {
         super(clientSocket, protocol);
         setClient(client);
@@ -22,13 +35,14 @@ public class WorkerRunnableSC extends WorkerRunnable {
     @Override
     public void run() {
         try {
-            new Thread( new ReceiverThread<WorkerRunnableSC>(this)).start();
+            rt = new Thread( new ReceiverThread<WorkerRunnableSC>(this));
+            rt.start();
+
 
             do {
                 if (getToSend() != null){
                     System.out.println("Thread #"+Thread.currentThread().getId() +" WorkRunnableSC - to send : " + toSend.toString());
                     sendMessage(toSend);
-
                 }
                 Thread.sleep(100);
             } while (true);
@@ -44,17 +58,5 @@ public class WorkerRunnableSC extends WorkerRunnable {
         }
     }
 
-//    protected void handleMessage(Object msg) {
-//		switch (msg.toString()) {
-//        case NetConst.CONNECTED :
-//            break;
-//        case NetConst.CONNECTION_REQUEST:
-//            setToSend(NetConst.CONNECTED);
-//            break;
-//        default:
-//            setToSend(this.protocol.processInput(msg));
-//            break;
-//    }
-//}
 
 }

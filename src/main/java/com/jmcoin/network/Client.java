@@ -16,17 +16,6 @@ public class Client extends TemplateThread{
         in = new ObjectInputStream(socket.getInputStream());
     }
 
-//    //RELAY CONSTRUCTOR
-//    public Client (int port, String host, JMProtocolImpl<? extends Peer> protocol, MultiThreadedServer srv) throws IOException {
-//        super(protocol);
-//        socket = new Socket(host, port);
-//        out = new ObjectOutputStream(socket.getOutputStream());
-//        out.flush();
-//        in = new ObjectInputStream(socket.getInputStream());
-//        server = srv;
-//    }
-
-
 
     public synchronized void sendMessage(Object msg) throws IOException {
         out.writeObject(msg);

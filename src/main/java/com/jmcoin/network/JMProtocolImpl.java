@@ -67,9 +67,9 @@ public abstract class JMProtocolImpl<X extends Peer> {
                 System.out.println("INTO JMPROTO SEND_BROADCAST_DEBUG");
                 return SendBroacastDebug();
 
-            case NetConst.BROADCAST_DEBUG:
-                System.out.println("INTO JMPROTO BROADCAST_DEBUG");
-                return BroacastDebug();
+//            case NetConst.BROADCAST_DEBUG:
+//                System.out.println("INTO JMPROTO BROADCAST_DEBUG");
+//                return BroacastDebug();
 
             case NetConst.STOP_MINING:
                 System.out.println("INTO JMPROTO STOP_MINING");
@@ -82,7 +82,7 @@ public abstract class JMProtocolImpl<X extends Peer> {
 		return NetConst.ERR_BAD_REQUEST;
 	}
 
-    protected abstract String BroacastDebug();
+//    protected abstract String BroacastDebug();
     protected abstract String SendBroacastDebug();
     protected abstract String StopMining();
 	/**

@@ -16,6 +16,6 @@ public class TestUnicastBroadcastLike {
         }
 
 //        TestNetworkClient.run();
-//        TestNetworkClient2.run();
+//        TestNetworkClientStopMining.run();
     }
 }
