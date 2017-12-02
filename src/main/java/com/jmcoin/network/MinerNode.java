@@ -27,10 +27,10 @@ public class MinerNode extends Peer{
 	
 	private Wallet wallet;
 	
-	public MinerNode(String email, String password) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException, IOException, InvalidPasswordException, InvalidAESStreamException, StrongEncryptionNotAvailableException {
+	public MinerNode(String email) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException, IOException, InvalidPasswordException, InvalidAESStreamException, StrongEncryptionNotAvailableException {
 		super();
 		new MinerJMProtocolImpl(this);
-		this.wallet = new Wallet(email, password);
+		this.wallet = new Wallet(email);
 		this.portBroadcast = NetConst.MINER_BROADCAST_PORT;
 	}
 	
