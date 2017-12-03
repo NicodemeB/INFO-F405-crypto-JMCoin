@@ -10,10 +10,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.jmcoin.io.IOFileHandler;
-import com.jmcoin.network.JMProtocolImpl;
-import com.jmcoin.network.NetConst;
-
 @Entity
 public class Transaction implements Serializable {
 
@@ -133,7 +129,8 @@ public class Transaction implements Serializable {
                 Arrays.equals(this.pubKey.getEncoded(), transaction.pubKey.getEncoded());
     }
 
-    public boolean isValid() {
+    /* FIXME should not be done here
+     * public boolean isValid() {
         int total = 0;
         for (Input i : inputs) {
             String unvf = JMProtocolImpl.sendRequest(NetConst.RELAY_NODE_LISTEN_PORT, NetConst.RELAY_DEBUG_HOST_NAME, NetConst.GIVE_ME_UNSPENT_OUTPUTS, null);
@@ -147,7 +144,7 @@ public class Transaction implements Serializable {
         if (total != 0) return false;
 
         return false;
-    }
+    }*/
 
     /**
      * @param withSign has to be false when this routine is called in order to compute the signature!

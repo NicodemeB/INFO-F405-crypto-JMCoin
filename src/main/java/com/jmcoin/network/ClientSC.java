@@ -2,7 +2,7 @@ package com.jmcoin.network;
 
 import java.io.IOException;
 
-public class ClientSC extends Client{
+public class ClientSC extends Client{	
     //INFO - THIS IS THE CLIENT SIDE OF THE RELAY BETWEEN THE RELAY AND MASTER NODE
 
     private MultiThreadedServerClient server;
@@ -24,9 +24,7 @@ public class ClientSC extends Client{
     public void setServer(MultiThreadedServerClient server) {
         this.server = server;
     }
-
-
-
+    
     public ClientSC(int port, String host, JMProtocolImpl<? extends Peer> protocol, MultiThreadedServerClient srv) throws IOException {
         super(port, host, protocol);
         setServer(srv);
@@ -41,7 +39,6 @@ public class ClientSC extends Client{
                 if (getToSend() != null) {
                     System.out.println("Thread #"+Thread.currentThread().getId() +" ClientSC - to send : " + getToSend().toString());
                     sendMessage(getToSend());
-
                 }
                 Thread.sleep(100);
             } while (true);
@@ -60,7 +57,6 @@ public class ClientSC extends Client{
     protected void handleMessage(Object msg) {
         switch (msg.toString()) {
             case NetConst.CONNECTED :
-                //TODO do something
                 break;
             case NetConst.CONNECTION_REQUEST:
                 break;
@@ -69,10 +65,12 @@ public class ClientSC extends Client{
                 System.out.println("server.not()");
                 server.not();
                 break;
-
             default:
                 //Send what RelayNodeJMProtocolImpl return to MASTER NODE
-                setToSend(this.protocol.processInput(msg));
+				/*String s;
+				System.out.println("-------------"+msg.toString()+"--------------");
+				System.out.println("-------------"+(s = this.protocol.processInput(msg))+"--------------");*/
+                setToSend(msg);
                 break;
         }
     }

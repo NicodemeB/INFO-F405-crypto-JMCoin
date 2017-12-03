@@ -28,8 +28,6 @@ import com.jmcoin.model.KeyGenerator;
 import com.jmcoin.model.Mining;
 import com.jmcoin.model.Output;
 import com.jmcoin.model.Transaction;
-import com.jmcoin.network.JMProtocolImpl;
-import com.jmcoin.network.NetConst;
 
 public class TestBlockValidation {
 	
@@ -63,7 +61,7 @@ public class TestBlockValidation {
 			if(output == null) {
 				return false;
 			}
-			String unvf = JMProtocolImpl.sendRequest(NetConst.RELAY_NODE_LISTEN_PORT, NetConst.RELAY_DEBUG_HOST_NAME, NetConst.GIVE_ME_UNSPENT_OUTPUTS, null);
+			String unvf = "";//JMProtocolImpl.sendRequest(NetConst.RELAY_NODE_LISTEN_PORT, NetConst.RELAY_DEBUG_HOST_NAME, NetConst.GIVE_ME_UNSPENT_OUTPUTS, null);
 			Output[] unspentOutputs = IOFileHandler.getFromJsonString(unvf, Output[].class);
 			boolean unspent = false;
 			for(Output uo : unspentOutputs) {
@@ -143,7 +141,6 @@ public class TestBlockValidation {
 		try {
 			buildBlock(genesis, new PrivateKey[] {keyConnard, keyConnasse, keyTest});
 		} catch (InterruptedException | ExecutionException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

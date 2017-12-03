@@ -2,16 +2,12 @@ package com.jmcoin.test;
 
 import com.google.gson.Gson;
 import com.jmcoin.crypto.AES;
-import com.jmcoin.crypto.AES.InvalidKeyLengthException;
-import com.jmcoin.crypto.AES.StrongEncryptionNotAvailableException;
 import com.jmcoin.crypto.SignaturesVerification;
-import com.jmcoin.database.Connection;
 import com.jmcoin.database.DatabaseFacade;
 import com.jmcoin.model.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.security.Key;

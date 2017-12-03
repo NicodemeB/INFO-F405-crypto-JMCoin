@@ -10,8 +10,6 @@ import java.io.IOException;
  */
 public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
 	
-	private BroadcastingClient broadcastingClient;
-
     public ClientSC getClient() {
         return client;
     }
@@ -27,15 +25,47 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
 
 	}
 
-
     @Override
     protected String AskDebug(Object payload) {
 //        return (String) sendRequestAndGetAnswer(NetConst.ASK_DEBUG, payload.toString());
-
         sendRequest(NetConst.ASK_DEBUG, payload.toString());
         return null;
-
     }
+    
+    private void receiveData(String payload) {
+        try {
+            getClient().getServer().getAwaitingAnswers().firstElement().sendMessage(payload);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        getClient().getServer().getAwaitingAnswers().remove(getClient().getServer().getAwaitingAnswers().firstElement());
+    }
+    
+    @Override
+	protected void receiveUnspentOutputs(String string) {
+		receiveData(string);
+	}
+    
+	@Override
+	protected void receiveUnverifiedTransactions(String string) {
+		receiveData(string);
+	}
+
+	@Override
+	protected void receiveRewardAmount(String string) {
+		receiveData(string);
+	}
+
+	@Override
+	protected void receiveDifficulty(String payload) {
+		receiveData(payload);
+	}
+	
+	@Override
+	protected void receiveBlockchainCopy(String string) {
+		this.peer.updateBlockChain(string);
+		receiveData(string);
+	}
 
     @Override
     protected String AnswerDebug(Object payload) {
@@ -61,13 +91,13 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
 		// TODO SEND TO ALL CLIENT STOP MINING
 		System.out.println("Thread #"+Thread.currentThread().getId() +"RECEIVE STOP MINING FROM MASTER -> SEND STOP MINING TO MINER");
 //		notifyAll();
-		return "LALA";
+		return JMProtocolImpl.craftMessage(NetConst.STOP_MINING, null);
 	}
 
 	@Override
 	protected String giveMeBlockChainCopyImpl() {
 		String blockchain = (String) sendRequestAndGetAnswer( NetConst.GIVE_ME_BLOCKCHAIN_COPY, null);
-		this.peer.updateBlockChain(blockchain);
+		//this.peer.updateBlockChain(blockchain); //updated in receiveBlockchain since sendRequestAndGetAnswer always returns always null
 		return blockchain;
 	}
 
@@ -82,12 +112,11 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
 	}
 
 	@Override
-	protected boolean takeMyMinedBlockImpl(String payload) {
+	protected String takeMyMinedBlockImpl(String payload) {
 		if(payload != null) {
-            sendRequestAndGetAnswer( NetConst.TAKE_MY_MINED_BLOCK, payload);
-			return true;
+            return (String)sendRequestAndGetAnswer( NetConst.TAKE_MY_MINED_BLOCK, payload);
 		}
-		return false;
+		return null;
 	}
 
 	@Override
@@ -109,17 +138,6 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
 		return (String) sendRequestAndGetAnswer( NetConst.GIVE_ME_UNSPENT_OUTPUTS, null);
 	}
 
-	@Override
-	protected void receiveByBroadcast(String received) {
-		System.out.println("Relay node - received request type "+received+" by broadcast");
-		//FIXME cannot retransmit to miners
-		try {
-			broadcastingClient.discoverServers(JMProtocolImpl.craftMessage(NetConst.SEND_BROADCAST, received));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
     public void sendRequest(int req, String payload) {
         getClient().setToSend(JMProtocolImpl.craftMessage(req, payload == null ? "" : payload));
     }
@@ -136,5 +154,5 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
 //			}
 		return null;
 
-	}
+    }
 }

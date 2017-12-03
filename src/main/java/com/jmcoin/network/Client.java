@@ -6,7 +6,14 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 public class Client extends TemplateThread{
-
+	
+	/*private String response;
+	
+	public String getResponse() {
+		String res = response;
+		this.response = null;
+		return res;
+	}*/
 	
 	public Client (int port, String host, JMProtocolImpl<? extends Peer> protocol) throws IOException {
 		super(protocol);
@@ -58,12 +65,11 @@ public class Client extends TemplateThread{
 	protected void handleMessage(Object msg) {
 		switch (msg.toString()) {
         case NetConst.CONNECTED :
-        	//TODO do something
             break;
         case NetConst.CONNECTION_REQUEST:
             break;
         default:
-
+        	this.protocol.processInput(msg);
             break;
 		}
 	}

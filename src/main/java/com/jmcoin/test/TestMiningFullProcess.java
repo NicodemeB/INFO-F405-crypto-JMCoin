@@ -24,6 +24,17 @@ public class TestMiningFullProcess {
 	 * @param args
 	 */
 	public static void main(String[] args){
+		try {
+			TestMasterNode.runMaster();
+		} catch (IOException e2) {
+			e2.printStackTrace();
+		}
+		try {
+			TestRelay.run();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		
 		MinerNode miner;
 		try {
 			miner = new MinerNode(args[0]);
@@ -33,16 +44,9 @@ public class TestMiningFullProcess {
 			System.out.println("TestMiningFullProcess: Cannot create Miner/Wallet");
 			return;
 		}
-		TestMasterNode.runMaster();
-		try {
-			TestRelay.run();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		
-        TestNetworkClient.run();
+        //TestNetworkClient.run();
         try {
-			Block  block = miner.buildBlock();
+			Block block = miner.buildBlock();
 			miner.mine(block);
 		} catch (InvalidKeyException | ClassNotFoundException | NoSuchAlgorithmException | NoSuchProviderException
 				| SignatureException | IOException | InterruptedException | ExecutionException e) {

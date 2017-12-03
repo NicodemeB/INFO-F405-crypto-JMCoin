@@ -3,8 +3,12 @@ package com.jmcoin.model;
 import com.google.gson.Gson;
 import com.jmcoin.crypto.AES;
 import com.jmcoin.crypto.SignaturesVerification;
+import com.jmcoin.network.Client;
 import com.jmcoin.network.JMProtocolImpl;
 import com.jmcoin.network.NetConst;
+import com.jmcoin.network.ReceiverThread;
+import com.jmcoin.network.RelayNodeJMProtocolImpl;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -45,6 +49,7 @@ public class Wallet {
     private final String PRIV_KEYS = REP + SEP + "Documents"+SEP+"PrivateKeys";
     private final String PUB_KEYS = REP + SEP + "Documents"+SEP+"PublicKeys";
     
+    private Client client;
 
     public Wallet(String email) throws NoSuchAlgorithmException, NoSuchProviderException, IOException, InvalidKeySpecException, AES.InvalidPasswordException, AES.InvalidAESStreamException, AES.StrongEncryptionNotAvailableException
     {
@@ -57,6 +62,9 @@ public class Wallet {
         this.email = email;
         this.keys = getWalletKeysFromFile(password);
         this.balance = getBalance(addresses);
+        this.client = new Client(NetConst.RELAY_NODE_LISTEN_PORT, NetConst.RELAY_DEBUG_HOST_NAME, new RelayNodeJMProtocolImpl());
+        new Thread(new ReceiverThread<Client>(this.client)).start();
+        new Thread(this.client).start();
     }   
     
     // ------------------------------------------Keys
@@ -191,12 +199,11 @@ public class Wallet {
         }
         //addTransaction(new Transaction());
     }
-    public void sendTransaction(Transaction tr)
-    {
-        JMProtocolImpl.sendRequest(NetConst.RELAY_NODE_LISTEN_PORT, NetConst.RELAY_DEBUG_HOST_NAME, NetConst.TAKE_MY_NEW_TRANSACTION, new Gson().toJson(tr));
+    public void sendTransaction(Transaction tr) throws IOException{
+        this.client.sendMessage(JMProtocolImpl.craftMessage(NetConst.TAKE_MY_NEW_TRANSACTION, new Gson().toJson(tr)));
     }
-    public void addTransaction(Transaction transaction)
-    {
+    
+    public void addTransaction(Transaction transaction){
         transactions.add(transaction);
     }
     
@@ -238,11 +245,12 @@ public class Wallet {
     }
     public String promptPassword()
     {
-    		Scanner scan = new Scanner(System.in);
+    	/*Scanner scan = new Scanner(System.in);
         System.out.print("Enter password to decrypt private keys : ");
         // Below Statement used for getting String including sentence
-        String s = scan.nextLine(); 
-        return s;
+        String s = scan.nextLine();*/
+    	//FIXME restore scanner
+        return "a";
     }
     public HashMap<PrivateKey,PublicKey> getKeys() 
     {

@@ -23,7 +23,6 @@ public abstract class NetConst {
 	public static final char GIVE_ME_DIFFICULTY				= '5'; //from miners
 	public static final char STOP_MINING					= '6'; //from master to miners (broadcast)
 	public static final char GIVE_ME_UNSPENT_OUTPUTS 		= '7';
-	public static final char SEND_BROADCAST					= '8';
 	public static final char ASK_DEBUG = 'X';
 	public static final char ANSWER_DEBUG = 'Z';
 	public static final char SEND_BROADCAST_DEBUG			= 'Y';
@@ -36,6 +35,12 @@ public abstract class NetConst {
 	public static final String CONNECTION_REQUEST 			= "ConnectionRequest";
 	public static final String CONNECTED 					= "Connected";
 	public static final int MAX_SENT_TRANSACTIONS 			= 1000;
-	public static final int DEFAULT_DIFFICULTY 				= 16;
+	public static final int DEFAULT_DIFFICULTY 				= 1; //FIXME change the difficulty
 	public static final int DEFAULT_BROADCAST_SERVER_COUNT 	= 1;//FIXME don't know if it's relevant	
+	
+	public static final char RECEIVE_DIFFICULTY 			= 'A';
+	public static final char RECEIVE_REWARD_AMOUNT 			= 'B';
+	public static final char RECEIVE_UNVERIFIED_TRANS 		= 'C';
+	public static final char RECEIVE_BLOCKCHAIN_COPY 		= 'D';
+	public static final char RECEIVE_UNSPENT_OUTPUTS		= 'E';
 }

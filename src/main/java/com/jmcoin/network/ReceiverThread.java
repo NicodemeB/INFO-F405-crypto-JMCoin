@@ -22,6 +22,7 @@ public class ReceiverThread<X extends TemplateThread> implements Runnable{
                 if (read != null) {
                     System.out.println("Thread #"+Thread.currentThread().getId() + " read : " + read.toString());
                     this.runnable.handleMessage(read);
+                    
                 }
                 Thread.sleep(10);
             }while (loop);

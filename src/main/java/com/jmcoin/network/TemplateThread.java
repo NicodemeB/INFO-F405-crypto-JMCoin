@@ -20,6 +20,10 @@ public abstract class TemplateThread extends Thread{
     	this.protocol = protocol;
 	}
     
+    public JMProtocolImpl<? extends Peer> getProtocol() {
+		return protocol;
+	}
+    
     public void close () throws IOException {
         in.close();
         out.close();

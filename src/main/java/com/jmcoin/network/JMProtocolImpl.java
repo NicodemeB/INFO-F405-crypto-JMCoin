@@ -1,5 +1,6 @@
 package com.jmcoin.network;
 
+import java.io.IOException;
 import java.util.StringTokenizer;
 
 import com.jmcoin.model.Block;
@@ -27,9 +28,10 @@ public abstract class JMProtocolImpl<X extends Peer> {
 	 * x$yyyyyyyyyyyyy$#
 	 * where x is the type
 	 * and y the payload itself (can be empty, like 0$$#)
+	 * @throws IOException 
 	 */
 	public String processInput(Object message) {
-	    //System.out.println(message);
+	    System.out.println("Process input: " +message.toString());
 		String content = (String)message;
 		StringTokenizer tokenizer = new StringTokenizer(content, String.valueOf(NetConst.DELIMITER));
 		if(!tokenizer.hasMoreTokens()) return null;
@@ -42,7 +44,6 @@ public abstract class JMProtocolImpl<X extends Peer> {
 			} catch (NumberFormatException e) {
 				e.printStackTrace();
 			}
-			//System.out.println(code);
 			switch ((char)code) {
 			case NetConst.GIVE_ME_BLOCKCHAIN_COPY:
 				return giveMeBlockChainCopyImpl();
@@ -51,34 +52,45 @@ public abstract class JMProtocolImpl<X extends Peer> {
 			case NetConst.GIVE_ME_UNVERIFIED_TRANSACTIONS:
 				return giveMeUnverifiedTransactionsImpl();
 			case NetConst.TAKE_MY_MINED_BLOCK:
-				return takeMyMinedBlockImpl(tokenizer.nextToken()) ? NetConst.RES_OKAY : NetConst.RES_NOK;
+				try {
+					return takeMyMinedBlockImpl(tokenizer.nextToken());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				return NetConst.RES_NOK;
 			case NetConst.TAKE_MY_NEW_TRANSACTION:
 				return takeMyNewTransactionImpl(tokenizer.nextToken()) ? NetConst.RES_OKAY : NetConst.RES_NOK;
 			case NetConst.GIVE_ME_UNSPENT_OUTPUTS:
 				return giveMeUnspentOutputs();
 			case NetConst.GIVE_ME_DIFFICULTY:
 				return giveMeDifficulty();
-			case NetConst.SEND_BROADCAST:
-				receiveByBroadcast(tokenizer.nextToken());
-				return NetConst.RES_OKAY; //FIXME do we need to check is something went wrong
-
-
             case NetConst.SEND_BROADCAST_DEBUG :
                 System.out.println("INTO JMPROTO SEND_BROADCAST_DEBUG");
                 return SendBroacastDebug();
-
+            case NetConst.RECEIVE_DIFFICULTY:
+            	receiveDifficulty(tokenizer.nextToken());
+            	return NetConst.RES_OKAY;
+            case NetConst.RECEIVE_REWARD_AMOUNT:
+            	receiveRewardAmount(tokenizer.nextToken());
+            	return NetConst.RES_OKAY;
+            case NetConst.RECEIVE_UNVERIFIED_TRANS:
+            	receiveUnverifiedTransactions(tokenizer.nextToken());
+            	return NetConst.RES_OKAY;
+            case NetConst.RECEIVE_BLOCKCHAIN_COPY:
+            	receiveBlockchainCopy(tokenizer.nextToken());
+            	return NetConst.RES_OKAY;
+            case NetConst.RECEIVE_UNSPENT_OUTPUTS:
+            	receiveUnspentOutputs(tokenizer.nextToken());
+            	return NetConst.RES_OKAY;
             case NetConst.ASK_DEBUG:
                 System.out.println("INTO JMPROTO ASK_DEBUG");
                 return AskDebug(tokenizer.nextToken());
-
             case NetConst.ANSWER_DEBUG:
                 System.out.println("INTO JMPROTO ANSWER_DEBUG");
                 return AnswerDebug(tokenizer.nextToken());
-
             case NetConst.STOP_MINING:
                 System.out.println("INTO JMPROTO STOP_MINING");
                 return StopMining();
-
 			default:
 				return NetConst.ERR_NOT_A_REQUEST;
 			}
@@ -86,15 +98,16 @@ public abstract class JMProtocolImpl<X extends Peer> {
 		return NetConst.ERR_BAD_REQUEST;
 	}
 
-    protected abstract String AskDebug(Object payload);
+    protected abstract void receiveUnspentOutputs(String string);
+	protected abstract void receiveBlockchainCopy(String nextToken);
+	protected abstract void receiveUnverifiedTransactions(String string);
+	protected abstract void receiveRewardAmount(String string);
+	protected abstract void receiveDifficulty(String string);
+
+	protected abstract String AskDebug(Object payload);
     protected abstract String AnswerDebug(Object payload);
     protected abstract String SendBroacastDebug();
     protected abstract String StopMining();
-	/**
-	 * Called when a broadcast is received
-	 * @param received
-	 */
-	protected abstract void receiveByBroadcast(String received);
 	
 	/**
 	 * Returns unspent {@link Output} as a list
@@ -126,8 +139,9 @@ public abstract class JMProtocolImpl<X extends Peer> {
 	 * Getting a "true" doesn't mean that the {@link Block} is valid regarding to the protocol
 	 * @param payload {@link Block} to parse
 	 * @return true if the {@link Block} has been received properly
+	 * @throws IOException 
 	 */
-	protected abstract boolean takeMyMinedBlockImpl(String payload);
+	protected abstract String takeMyMinedBlockImpl(String payload) throws IOException;
 	
 	/**
 	 * Gets a new {@link Transaction}, and returns false only if the body cannot be parsed
@@ -157,10 +171,10 @@ public abstract class JMProtocolImpl<X extends Peer> {
 		return request + "$" + body + "$#"+'\0';
 	}
 
-    public static String sendRequest(int relayNodeListenPort, String relayDebugHostName, char takeMyMinedBlock, String s) {
+    /*public static String sendRequest(int relayNodeListenPort, String relayDebugHostName, char takeMyMinedBlock, String s) {
         //FIXME
         return null;
-    }
+    }*/
 
 //	public static String sendRequest(int port, String host, int req, String payload) {
 //		try {

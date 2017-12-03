@@ -18,7 +18,36 @@ import org.bouncycastle.util.encoders.Hex;
  */
 public class Mining{
 	
+	private Integer difficulty;
+	private Integer rewardAmount;
+	private Transaction[] unverifiedTransaction;
+	
 	public Mining() {
+	}
+	
+	
+	public Transaction[] getUnverifiedTransaction() {
+		return unverifiedTransaction;
+	}
+
+	public void setUnverifiedTransaction(Transaction[] unverifiedTransaction) {
+		this.unverifiedTransaction = unverifiedTransaction;
+	}
+
+	public Integer getDifficulty() {
+		return difficulty;
+	}
+
+	public void setDifficulty(int difficulty) {
+		this.difficulty = difficulty;
+	}
+
+	public Integer getRewardAmount() {
+		return rewardAmount;
+	}
+
+	public void setRewardAmount(int rewardAmount) {
+		this.rewardAmount = rewardAmount;
 	}
 	
 	public String mine(Block block) throws NoSuchAlgorithmException, InterruptedException, ExecutionException {

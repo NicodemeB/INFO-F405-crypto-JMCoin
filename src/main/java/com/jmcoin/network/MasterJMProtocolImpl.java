@@ -1,5 +1,6 @@
 package com.jmcoin.network;
 
+import java.io.IOException;
 import java.util.List;
 
 import com.google.gson.Gson;
@@ -9,12 +10,10 @@ import com.jmcoin.model.Block;
 import com.jmcoin.model.Transaction;
 
 public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
-
-	public MasterJMProtocolImpl() {
+	
+	public MasterJMProtocolImpl() throws IOException {
 		super(MasterNode.getInstance());
 	}
-
-
 
 //	@Override
 //	protected String BroacastDebug(){
@@ -22,8 +21,6 @@ public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 //		System.out.println("OK MASTER NODE KNOW THAT He need to say to everyone to stop mining");
 //		return (craftMessage(NetConst.STOP_MINING, null));
 //	}
-
-
 
 	@Override
 	protected String AskDebug(Object payload) {
@@ -43,18 +40,8 @@ public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 	protected String StopMining (){
 		// TODO - extand answer to all RELAYS
 //		System.out.println("Thread #"+Thread.currentThread().getId() +" BROADCAST DEBUG MASTER NODE");
-//		System.out.println("OK MASTER NODE KNOW THAT He need to say to everyone to stop mining");
-		return (craftMessage(NetConst.STOP_MINING, null));
-	}
-
-	@Override
-	protected String giveMeBlockChainCopyImpl() {
-		return peer.getBlockChain();
-	}
-
-	@Override
-	protected String giveMeRewardAmountImpl() {
-		return Integer.toString(peer.getRewardAmount());
+//		System.out.println("OK MASTER NODE KNOWS THAT He needs to say to everyone to stop mining");
+		return craftMessage(NetConst.STOP_MINING, null);
 	}
 
 	@Override
@@ -66,21 +53,21 @@ public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 		else {
 			transactions = this.peer.getUnverifiedTransactions();
 		}
-		return new Gson().toJson(transactions);
+		return JMProtocolImpl.craftMessage(NetConst.RECEIVE_UNVERIFIED_TRANS, new Gson().toJson(transactions));
 	}
 
 	@Override
-	protected boolean takeMyMinedBlockImpl(String payload) {
+	protected String takeMyMinedBlockImpl(String payload) throws IOException {
 		if (payload != null) {
 			try {
 				peer.processBlock(IOFileHandler.getFromJsonString(payload, Block.class));
-				return true;
+				return NetConst.RES_OKAY;
 			}
 			catch(JsonSyntaxException jse) {
 				jse.printStackTrace();
 			}
 		}
-		return false;
+		return null;
 	}
 
 	@Override
@@ -98,7 +85,17 @@ public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 
 	@Override
 	protected String giveMeDifficulty() {
-		return Integer.toString(this.peer.getDifficulty());
+		return JMProtocolImpl.craftMessage(NetConst.RECEIVE_DIFFICULTY, Integer.toString(this.peer.getDifficulty()));
+	}
+	
+	@Override
+	protected String giveMeRewardAmountImpl() {
+		return JMProtocolImpl.craftMessage(NetConst.RECEIVE_REWARD_AMOUNT, Integer.toString(peer.getRewardAmount()));
+	}
+	
+	@Override
+	protected String giveMeBlockChainCopyImpl() {
+		return JMProtocolImpl.craftMessage(NetConst.RECEIVE_BLOCKCHAIN_COPY, peer.getBlockChain());
 	}
 
 	@Override
@@ -108,5 +105,20 @@ public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 	}
 
 	@Override
-	protected void receiveByBroadcast(String received) {}
+	protected void receiveDifficulty(String string) {}
+
+	@Override
+	protected void receiveUnverifiedTransactions(String string) {}
+
+	@Override
+	protected void receiveRewardAmount(String string) {}
+
+	@Override
+	protected void receiveBlockchainCopy(String nextToken) {}
+
+	@Override
+	protected void receiveUnspentOutputs(String string) {
+		// TODO Auto-generated method stub
+		
+	}
 }

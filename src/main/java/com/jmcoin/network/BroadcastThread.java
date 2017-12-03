@@ -17,13 +17,14 @@ public class BroadcastThread <X extends TemplateThread> extends Thread {
     public void run() {
         sendBroadcast();
     }
+    
     public synchronized void sendBroadcast(){
         do {
             try {
                 System.out.println("waiting to broadcast stop mining");
                 wait();
                 System.out.println("STOP MINING");
-                runnable.sendMessage(runnable.protocol.craftMessage(NetConst.STOP_MINING, null));
+                runnable.sendMessage(JMProtocolImpl.craftMessage(NetConst.STOP_MINING, null));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -31,6 +32,7 @@ public class BroadcastThread <X extends TemplateThread> extends Thread {
             }
         } while (true);
     }
+    
     public synchronized void not(){
         System.out.println("notifyAll()");
         notifyAll();

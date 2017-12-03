@@ -8,7 +8,7 @@ import java.net.Socket;
  */
 public class WorkerRunnable extends TemplateThread{
 
-    private BroadcastThread bt;
+    private BroadcastThread<WorkerRunnable> bt;
 
     public WorkerRunnable(Socket clientSocket, JMProtocolImpl<? extends Peer> protocol) throws  IOException{
     	super(protocol);
@@ -25,9 +25,8 @@ public class WorkerRunnable extends TemplateThread{
             boolean loop = true;
             do {
                 if (getToSend() != null){
-                    System.out.println("Thread #"+Thread.currentThread().getId() +" WorkRunnable - to send : " + toSend.toString());
+                    System.out.println(System.currentTimeMillis() + " Thread #"+Thread.currentThread().getId() +" WorkRunnable - to send : " + toSend.toString());
                     sendMessage(toSend);
-
                 }
                 Thread.sleep(100);
             } while (loop);
@@ -56,8 +55,9 @@ public class WorkerRunnable extends TemplateThread{
             break;
 		}
 	}
+	
 	synchronized protected void not(){
-        toSend = protocol.craftMessage(NetConst.STOP_MINING, null);
+        toSend = JMProtocolImpl.craftMessage(NetConst.STOP_MINING, null);
     }
 }
 

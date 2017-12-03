@@ -40,7 +40,7 @@ public class WorkerRunnableSC extends WorkerRunnable {
 //            ((ReceiverThread) rt).
             do {
                 if (getToSend() != null){
-                    System.out.println("Thread #"+Thread.currentThread().getId() +" WorkRunnableSC - to send : " + toSend.toString());
+                    System.out.println(System.currentTimeMillis() + " Thread #"+Thread.currentThread().getId() +" WorkRunnableSC - to send : " + toSend.toString());
                     sendMessage(toSend);
                 }
                 Thread.sleep(100);

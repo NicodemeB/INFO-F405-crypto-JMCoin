@@ -1,7 +1,6 @@
 package com.jmcoin.test;
 
 import com.jmcoin.network.Client;
-import com.jmcoin.network.JMProtocolImpl;
 import com.jmcoin.network.NetConst;
 import com.jmcoin.network.ReceiverThread;
 import com.jmcoin.network.RelayNodeJMProtocolImpl;
