@@ -8,11 +8,21 @@ import java.util.Vector;
 public class MultiThreadedServerClient extends MultiThreadedServer{
 
     private Vector<WorkerRunnableSC> lThreadsSC;
+    private Vector<WorkerRunnableSC> awaitingAnswers;
     private ClientSC client;
+
+    public Vector<WorkerRunnableSC> getAwaitingAnswers() {
+        return awaitingAnswers;
+    }
+
+    public void setAwaitingAnswers(Vector<WorkerRunnableSC> awaitingAnswers) {
+        this.awaitingAnswers = awaitingAnswers;
+    }
 
     public MultiThreadedServerClient(int port, JMProtocolImpl<? extends Peer> protocol){
         super(port, protocol);
         lThreadsSC = new Vector<WorkerRunnableSC>();
+        awaitingAnswers = new Vector<WorkerRunnableSC>();
     }
 
     public ClientSC getClient() {

@@ -29,7 +29,7 @@ public abstract class JMProtocolImpl<X extends Peer> {
 	 * and y the payload itself (can be empty, like 0$$#)
 	 */
 	public String processInput(Object message) {
-	    System.out.println(message);
+	    //System.out.println(message);
 		String content = (String)message;
 		StringTokenizer tokenizer = new StringTokenizer(content, String.valueOf(NetConst.DELIMITER));
 		if(!tokenizer.hasMoreTokens()) return null;
@@ -42,7 +42,7 @@ public abstract class JMProtocolImpl<X extends Peer> {
 			} catch (NumberFormatException e) {
 				e.printStackTrace();
 			}
-			System.out.println(code);
+			//System.out.println(code);
 			switch ((char)code) {
 			case NetConst.GIVE_ME_BLOCKCHAIN_COPY:
 				return giveMeBlockChainCopyImpl();
@@ -67,9 +67,13 @@ public abstract class JMProtocolImpl<X extends Peer> {
                 System.out.println("INTO JMPROTO SEND_BROADCAST_DEBUG");
                 return SendBroacastDebug();
 
-//            case NetConst.BROADCAST_DEBUG:
-//                System.out.println("INTO JMPROTO BROADCAST_DEBUG");
-//                return BroacastDebug();
+            case NetConst.ASK_DEBUG:
+                System.out.println("INTO JMPROTO ASK_DEBUG");
+                return AskDebug(tokenizer.nextToken());
+
+            case NetConst.ANSWER_DEBUG:
+                System.out.println("INTO JMPROTO ANSWER_DEBUG");
+                return AnswerDebug(tokenizer.nextToken());
 
             case NetConst.STOP_MINING:
                 System.out.println("INTO JMPROTO STOP_MINING");
@@ -82,7 +86,8 @@ public abstract class JMProtocolImpl<X extends Peer> {
 		return NetConst.ERR_BAD_REQUEST;
 	}
 
-//    protected abstract String BroacastDebug();
+    protected abstract String AskDebug(Object payload);
+    protected abstract String AnswerDebug(Object payload);
     protected abstract String SendBroacastDebug();
     protected abstract String StopMining();
 	/**

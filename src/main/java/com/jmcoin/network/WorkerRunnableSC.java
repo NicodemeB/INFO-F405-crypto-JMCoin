@@ -37,8 +37,7 @@ public class WorkerRunnableSC extends WorkerRunnable {
         try {
             rt = new Thread( new ReceiverThread<WorkerRunnableSC>(this));
             rt.start();
-
-
+//            ((ReceiverThread) rt).
             do {
                 if (getToSend() != null){
                     System.out.println("Thread #"+Thread.currentThread().getId() +" WorkRunnableSC - to send : " + toSend.toString());
@@ -58,5 +57,19 @@ public class WorkerRunnableSC extends WorkerRunnable {
         }
     }
 
+    @Override
+    protected void handleMessage(Object msg) {
+        switch (msg.toString()) {
+            case NetConst.CONNECTED :
+                break;
+            case NetConst.CONNECTION_REQUEST:
+                setToSend(NetConst.CONNECTED);
+                break;
+            default:
+                getClient().getServer().getAwaitingAnswers().add(this);
+                setToSend(this.protocol.processInput(msg));
+                break;
+        }
+    }
 
 }

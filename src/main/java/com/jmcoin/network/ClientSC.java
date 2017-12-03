@@ -3,7 +3,7 @@ package com.jmcoin.network;
 import java.io.IOException;
 
 public class ClientSC extends Client{
-    //INFO - THIS IS THE CLIENT PART OF THE RELAY
+    //INFO - THIS IS THE CLIENT SIDE OF THE RELAY BETWEEN THE RELAY AND MASTER NODE
 
     private MultiThreadedServerClient server;
 
@@ -58,7 +58,6 @@ public class ClientSC extends Client{
 
     @Override
     protected void handleMessage(Object msg) {
-        System.out.println("SUCE MA GROSSE QUEUE");
         switch (msg.toString()) {
             case NetConst.CONNECTED :
                 //TODO do something
@@ -66,11 +65,13 @@ public class ClientSC extends Client{
             case NetConst.CONNECTION_REQUEST:
                 break;
             case "54$null$#" :
+                //TODO - replace by a corrected build string
                 System.out.println("server.not()");
                 server.not();
                 break;
 
             default:
+                //Send what RelayNodeJMProtocolImpl return to MASTER NODE
                 setToSend(this.protocol.processInput(msg));
                 break;
         }

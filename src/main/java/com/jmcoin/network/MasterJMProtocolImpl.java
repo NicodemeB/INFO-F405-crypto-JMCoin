@@ -1,7 +1,6 @@
 package com.jmcoin.network;
 
 import java.util.List;
-import java.util.StringTokenizer;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -24,13 +23,27 @@ public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 //		return (craftMessage(NetConst.STOP_MINING, null));
 //	}
 
+
+
+	@Override
+	protected String AskDebug(Object payload) {
+		return craftMessage(NetConst.ANSWER_DEBUG, "PREJEN!");
+	}
+
+	@Override
+	protected String AnswerDebug(Object payload) {
+//		System.out.println("payload = "+ payload);
+		return null;
+	}
+
 	@Override
 	protected String SendBroacastDebug() { return null; }
 
 	@Override
 	protected String StopMining (){
-		System.out.println("Thread #"+Thread.currentThread().getId() +" BROADCAST DEBUG MASTER NODE");
-		System.out.println("OK MASTER NODE KNOW THAT He need to say to everyone to stop mining");
+		// TODO - extand answer to all RELAYS
+//		System.out.println("Thread #"+Thread.currentThread().getId() +" BROADCAST DEBUG MASTER NODE");
+//		System.out.println("OK MASTER NODE KNOW THAT He need to say to everyone to stop mining");
 		return (craftMessage(NetConst.STOP_MINING, null));
 	}
 

@@ -4,8 +4,7 @@ import com.jmcoin.network.*;
 
 import java.io.IOException;
 
-public class TestNetworkClientAnswerFromMasterNode {
-
+public class TestNetBoule2 {
     public static void run(){
         try
         {
@@ -15,11 +14,6 @@ public class TestNetworkClientAnswerFromMasterNode {
             Thread thread = new Thread(cli);
             thread.start();
 
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
 
             cli.sendMessage(JMProtocolImpl.craftMessage(NetConst.ASK_DEBUG, "BENJAM?"));
         }

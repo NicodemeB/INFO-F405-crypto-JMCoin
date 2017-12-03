@@ -24,16 +24,32 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
 	
 	public RelayNodeJMProtocolImpl() throws IOException {
 		super(new RelayNode());
-//		new BroadcastingEchoServer(this).start();
-//		try {
-//			broadcastingClient = new BroadcastingClient(NetConst.DEFAULT_BROADCAST_SERVER_COUNT, NetConst.MINER_BROADCAST_PORT);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
+
 	}
 
 
-	@Override
+    @Override
+    protected String AskDebug(Object payload) {
+//        return (String) sendRequestAndGetAnswer(NetConst.ASK_DEBUG, payload.toString());
+
+        sendRequest(NetConst.ASK_DEBUG, payload.toString());
+        return null;
+
+    }
+
+    @Override
+    protected String AnswerDebug(Object payload) {
+        System.out.println("payload = " + payload);
+        try {
+            getClient().getServer().getAwaitingAnswers().firstElement().sendMessage(payload);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        getClient().getServer().getAwaitingAnswers().remove(getClient().getServer().getAwaitingAnswers().firstElement());
+		return null;
+    }
+
+    @Override
     protected String SendBroacastDebug(){
 	    sendRequest(NetConst.STOP_MINING,null);
 	    return null;
@@ -50,25 +66,25 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
 
 	@Override
 	protected String giveMeBlockChainCopyImpl() {
-		String blockchain = (String) sendRequestAndWaitForAnswer( NetConst.GIVE_ME_BLOCKCHAIN_COPY, null);
+		String blockchain = (String) sendRequestAndGetAnswer( NetConst.GIVE_ME_BLOCKCHAIN_COPY, null);
 		this.peer.updateBlockChain(blockchain);
 		return blockchain;
 	}
 
 	@Override
 	protected String giveMeRewardAmountImpl() {
-		return (String) sendRequestAndWaitForAnswer( NetConst.GIVE_ME_REWARD_AMOUNT, null);
+		return (String) sendRequestAndGetAnswer( NetConst.GIVE_ME_REWARD_AMOUNT, null);
 	}
 
 	@Override
 	protected String giveMeUnverifiedTransactionsImpl() {
-		return (String) sendRequestAndWaitForAnswer( NetConst.GIVE_ME_UNVERIFIED_TRANSACTIONS, null);
+		return (String) sendRequestAndGetAnswer( NetConst.GIVE_ME_UNVERIFIED_TRANSACTIONS, null);
 	}
 
 	@Override
 	protected boolean takeMyMinedBlockImpl(String payload) {
 		if(payload != null) {
-            sendRequestAndWaitForAnswer( NetConst.TAKE_MY_MINED_BLOCK, payload);
+            sendRequestAndGetAnswer( NetConst.TAKE_MY_MINED_BLOCK, payload);
 			return true;
 		}
 		return false;
@@ -77,7 +93,7 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
 	@Override
 	protected boolean takeMyNewTransactionImpl(String payload) {
 		if (payload != null) {
-            sendRequestAndWaitForAnswer( NetConst.TAKE_MY_NEW_TRANSACTION, payload);
+            sendRequestAndGetAnswer( NetConst.TAKE_MY_NEW_TRANSACTION, payload);
 			return true;
 		}
 		return false;
@@ -85,12 +101,12 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
 
 	@Override
 	protected String giveMeDifficulty() {
-		return (String) sendRequestAndWaitForAnswer( NetConst.GIVE_ME_DIFFICULTY, null);
+		return (String) sendRequestAndGetAnswer( NetConst.GIVE_ME_DIFFICULTY, null);
 	}
 
 	@Override
 	protected String giveMeUnspentOutputs() {
-		return (String) sendRequestAndWaitForAnswer( NetConst.GIVE_ME_UNSPENT_OUTPUTS, null);
+		return (String) sendRequestAndGetAnswer( NetConst.GIVE_ME_UNSPENT_OUTPUTS, null);
 	}
 
 	@Override
@@ -108,20 +124,17 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
         getClient().setToSend(JMProtocolImpl.craftMessage(req, payload == null ? "" : payload));
     }
 
-    public Object sendRequestAndWaitForAnswer(int req, String payload) {
-		try {
-            getClient().setToSend(JMProtocolImpl.craftMessage(req, payload == null ? "" : payload));
-            Thread.sleep(3000);
-            client.getT().suspend();
-			Object response = client.readMessageLock();
-            client.getT().resume();
-			return response;
-		} catch (IOException | ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public synchronized Object sendRequestAndGetAnswer(int req, String payload) {
+	    // FIXME - DO NOT USE : BULLSHIT
+		    getClient().setToSend(JMProtocolImpl.craftMessage(req, payload == null ? "" : payload));
+//			try {
+//				getClient().getServer().getAwaitingAnswers().firstElement().sendMessage("TEST");
+//				getClient().getServer().getAwaitingAnswers().remove(getClient().getServer().getAwaitingAnswers().firstElement());
+//
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+		return null;
 
 	}
 }

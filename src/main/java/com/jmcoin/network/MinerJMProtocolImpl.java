@@ -16,6 +16,18 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
 		}
 	}
 
+	@Override
+	protected String AskDebug(Object payload) {
+		return null;
+	}
+
+	@Override
+	protected String AnswerDebug(Object payload) {
+		return null;
+	}
+
+
+
 //	@Override
 //	protected String BroacastDebug() {
 //		return null;
