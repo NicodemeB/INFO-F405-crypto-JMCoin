@@ -26,7 +26,7 @@ public class TestMiningFullProcess {
 	public static void main(String[] args){
 		MinerNode miner;
 		try {
-			miner = new MinerNode(args[0], args[1]);
+			miner = new MinerNode(args[0]);
 		} catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException | IOException
 				| InvalidPasswordException | InvalidAESStreamException | StrongEncryptionNotAvailableException e1) {
 			e1.printStackTrace();
