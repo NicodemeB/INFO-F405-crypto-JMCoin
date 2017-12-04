@@ -31,7 +31,7 @@ public abstract class TemplateThread extends Thread{
     }
     
     public synchronized Object readMessage() throws IOException, ClassNotFoundException {
-        return  in.readObject();
+        return in.readObject();
     }
 
     public synchronized Object readMessageLock() throws IOException, ClassNotFoundException, InterruptedException {

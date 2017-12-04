@@ -34,20 +34,37 @@ public class TestMiningFullProcess {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		
-		MinerNode miner;
+		MinerNode minerHard;
 		try {
-			miner = new MinerNode(args[0]);
+			minerHard = new MinerNode(args[0]);
+			System.out.println("Minerhard mining "+minerHard.getMining());
 		} catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException | IOException
 				| InvalidPasswordException | InvalidAESStreamException | StrongEncryptionNotAvailableException e1) {
 			e1.printStackTrace();
 			System.out.println("TestMiningFullProcess: Cannot create Miner/Wallet");
 			return;
 		}
-        //TestNetworkClient.run();
+        try {
+			Block block = minerHard.buildBlock();
+			block.setDifficulty(32);
+			minerHard.getMining().mine(block);
+		} catch (InvalidKeyException | ClassNotFoundException | NoSuchAlgorithmException | NoSuchProviderException
+				| SignatureException | IOException | InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
+		MinerNode miner;
+		try {
+			miner = new MinerNode(args[0]);
+			System.out.println("Miner mining "+miner.getMining());
+		} catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException | IOException
+				| InvalidPasswordException | InvalidAESStreamException | StrongEncryptionNotAvailableException e1) {
+			e1.printStackTrace();
+			System.out.println("TestMiningFullProcess: Cannot create Miner/Wallet");
+			return;
+		}
         try {
 			Block block = miner.buildBlock();
-			miner.mine(block);
+			miner.getMining().mine(block);
 		} catch (InvalidKeyException | ClassNotFoundException | NoSuchAlgorithmException | NoSuchProviderException
 				| SignatureException | IOException | InterruptedException | ExecutionException e) {
 			e.printStackTrace();

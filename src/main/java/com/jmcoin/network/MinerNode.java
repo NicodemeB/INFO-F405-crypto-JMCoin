@@ -8,9 +8,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.concurrent.ExecutionException;
 
-import com.google.gson.Gson;
 import com.jmcoin.crypto.SignaturesVerification;
 import com.jmcoin.crypto.AES.InvalidAESStreamException;
 import com.jmcoin.crypto.AES.InvalidPasswordException;
@@ -31,19 +29,13 @@ public class MinerNode extends Peer{
 	public MinerNode(String email) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException, IOException, InvalidPasswordException, InvalidAESStreamException, StrongEncryptionNotAvailableException {
 		super();
 		this.protocol = new MinerJMProtocolImpl(this);
+		this.mining = new Mining(this.protocol);
 		this.wallet = new Wallet(email);
 		this.portBroadcast = NetConst.MINER_BROADCAST_PORT;
-		this.mining = new Mining();
 	}
 	
 	public Mining getMining() {
-		return mining;
-	}
-	
-	public void mine(Block block) throws InvalidKeyException, ClassNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, IOException, InterruptedException, ExecutionException {
-		mining.mine(block);
-		this.protocol.getClient().sendMessage(JMProtocolImpl.craftMessage(NetConst.TAKE_MY_MINED_BLOCK, new Gson().toJson(block)));
-//		JMProtocolImpl.sendRequest(NetConst.RELAY_NODE_LISTEN_PORT, NetConst.RELAY_DEBUG_HOST_NAME, NetConst.TAKE_MY_MINED_BLOCK, new Gson().toJson(block));
+		return this.mining;
 	}
 
 	public Block buildBlock() throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException {
@@ -72,7 +64,6 @@ public class MinerNode extends Peer{
 				e.printStackTrace();
 			}
 		}
-		System.out.println("--------------------");
 		int difficulty = this.mining.getDifficulty();
 		Transaction trans[] = this.mining.getUnverifiedTransaction();
 		if(trans != null) {
@@ -99,9 +90,5 @@ public class MinerNode extends Peer{
 		block.setTimeCreation(System.currentTimeMillis());
 		block.setPrevHash(null); //FIXME find prev block in the chain or let the master do the job*/
 		return block;
-	}
-
-	public void stopMining() {
-		System.out.println("-------------------Stop mining-------------------");
 	}
 }

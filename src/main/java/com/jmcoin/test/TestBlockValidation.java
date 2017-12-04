@@ -10,6 +10,7 @@ import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SignatureException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,7 +18,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.Random;
 import com.google.gson.Gson;
 import com.jmcoin.crypto.AES;
+import com.jmcoin.crypto.AES.InvalidAESStreamException;
 import com.jmcoin.crypto.AES.InvalidKeyLengthException;
+import com.jmcoin.crypto.AES.InvalidPasswordException;
 import com.jmcoin.crypto.AES.StrongEncryptionNotAvailableException;
 import com.jmcoin.io.IOFileHandler;
 import com.jmcoin.crypto.SignaturesVerification;
@@ -28,6 +31,8 @@ import com.jmcoin.model.KeyGenerator;
 import com.jmcoin.model.Mining;
 import com.jmcoin.model.Output;
 import com.jmcoin.model.Transaction;
+import com.jmcoin.network.MinerJMProtocolImpl;
+import com.jmcoin.network.MinerNode;
 
 public class TestBlockValidation {
 	
@@ -140,7 +145,7 @@ public class TestBlockValidation {
 		genesis.setPrevHash(null);		
 		try {
 			buildBlock(genesis, new PrivateKey[] {keyConnard, keyConnasse, keyTest});
-		} catch (InterruptedException | ExecutionException e) {
+		} catch (InterruptedException | ExecutionException | InvalidKeySpecException | InvalidPasswordException | InvalidAESStreamException e) {
 			e.printStackTrace();
 		}
 		
@@ -150,10 +155,11 @@ public class TestBlockValidation {
 		System.out.println("It's alright");
 	}
 	
-	private static Chain buildBlock(Block genesis, PrivateKey[] privKeys) throws NoSuchAlgorithmException, InterruptedException, ExecutionException, InvalidKeyException, NoSuchProviderException, FileNotFoundException, SignatureException, IOException {
+	private static Chain buildBlock(Block genesis, PrivateKey[] privKeys) throws NoSuchAlgorithmException, InterruptedException, ExecutionException, InvalidKeyException, NoSuchProviderException, FileNotFoundException, SignatureException, IOException, InvalidKeySpecException, InvalidPasswordException, InvalidAESStreamException, StrongEncryptionNotAvailableException {
 		Random rand = new Random();
 		Chain chain = new Chain();
-		Mining mining = new Mining();
+		MinerNode minerNode = new MinerNode("a");
+		Mining mining = new Mining(new MinerJMProtocolImpl(minerNode));
 		Block prevBlock = null;
 		for(int i = 0; i < 10; i++) {
 			Block block;

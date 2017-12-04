@@ -62,6 +62,7 @@ public class Wallet {
         this.email = email;
         this.keys = getWalletKeysFromFile(password);
         this.balance = getBalance(addresses);
+        //FIXME needs to be changed ?
         this.client = new Client(NetConst.RELAY_NODE_LISTEN_PORT, NetConst.RELAY_DEBUG_HOST_NAME, new RelayNodeJMProtocolImpl());
         new Thread(new ReceiverThread<Client>(this.client)).start();
         new Thread(this.client).start();

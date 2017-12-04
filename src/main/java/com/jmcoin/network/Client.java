@@ -22,8 +22,7 @@ public class Client extends TemplateThread{
         out.flush();
         in = new ObjectInputStream(socket.getInputStream());
     }
-
-
+	
     public synchronized void sendMessage(Object msg) throws IOException {
         out.writeObject(msg);
         out.flush();
@@ -69,7 +68,9 @@ public class Client extends TemplateThread{
         case NetConst.CONNECTION_REQUEST:
             break;
         default:
-        	this.protocol.processInput(msg);
+        	System.out.println("------Data returned to client-------");
+        	System.out.println(this.protocol.processInput(msg));
+        	System.out.println("------------------------------------");
             break;
 		}
 	}

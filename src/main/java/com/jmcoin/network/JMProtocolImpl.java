@@ -19,6 +19,10 @@ public abstract class JMProtocolImpl<X extends Peer> {
 		this.peer = peer;
 	}
 	
+	public X getPeer() {
+		return peer;
+	}
+	
 	public int getPortBroadcast() {
 		return this.peer.getPortBroadcast();
 	}
@@ -31,7 +35,7 @@ public abstract class JMProtocolImpl<X extends Peer> {
 	 * @throws IOException 
 	 */
 	public String processInput(Object message) {
-	    System.out.println("Process input: " +message.toString());
+	    System.out.println(this.peer.getClass().getSimpleName() + " is processing input: " +message.toString());
 		String content = (String)message;
 		StringTokenizer tokenizer = new StringTokenizer(content, String.valueOf(NetConst.DELIMITER));
 		if(!tokenizer.hasMoreTokens()) return null;
@@ -64,9 +68,9 @@ public abstract class JMProtocolImpl<X extends Peer> {
 				return giveMeUnspentOutputs();
 			case NetConst.GIVE_ME_DIFFICULTY:
 				return giveMeDifficulty();
-            case NetConst.SEND_BROADCAST_DEBUG :
+            /*case NetConst.SEND_BROADCAST_DEBUG :
                 System.out.println("INTO JMPROTO SEND_BROADCAST_DEBUG");
-                return SendBroacastDebug();
+                return SendBroacastDebug();*/
             case NetConst.RECEIVE_DIFFICULTY:
             	receiveDifficulty(tokenizer.nextToken());
             	return NetConst.RES_OKAY;
@@ -82,14 +86,11 @@ public abstract class JMProtocolImpl<X extends Peer> {
             case NetConst.RECEIVE_UNSPENT_OUTPUTS:
             	receiveUnspentOutputs(tokenizer.nextToken());
             	return NetConst.RES_OKAY;
-            case NetConst.ASK_DEBUG:
-                System.out.println("INTO JMPROTO ASK_DEBUG");
+            /*case NetConst.ASK_DEBUG:
                 return AskDebug(tokenizer.nextToken());
             case NetConst.ANSWER_DEBUG:
-                System.out.println("INTO JMPROTO ANSWER_DEBUG");
-                return AnswerDebug(tokenizer.nextToken());
+                return AnswerDebug(tokenizer.nextToken());*/
             case NetConst.STOP_MINING:
-                System.out.println("INTO JMPROTO STOP_MINING");
                 return StopMining();
 			default:
 				return NetConst.ERR_NOT_A_REQUEST;
@@ -104,9 +105,9 @@ public abstract class JMProtocolImpl<X extends Peer> {
 	protected abstract void receiveRewardAmount(String string);
 	protected abstract void receiveDifficulty(String string);
 
-	protected abstract String AskDebug(Object payload);
+	/*protected abstract String AskDebug(Object payload);
     protected abstract String AnswerDebug(Object payload);
-    protected abstract String SendBroacastDebug();
+    protected abstract String SendBroacastDebug();*/
     protected abstract String StopMining();
 	
 	/**

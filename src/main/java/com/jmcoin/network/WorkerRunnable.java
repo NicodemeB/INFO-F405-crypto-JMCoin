@@ -25,7 +25,7 @@ public class WorkerRunnable extends TemplateThread{
             boolean loop = true;
             do {
                 if (getToSend() != null){
-                    System.out.println(System.currentTimeMillis() + " Thread #"+Thread.currentThread().getId() +" WorkRunnable - to send : " + toSend.toString());
+                    System.out.println("Thread #"+Thread.currentThread().getId() +this.protocol.getClass().getSimpleName()+" WorkRunnable - to send : " + toSend.toString());
                     sendMessage(toSend);
                 }
                 Thread.sleep(100);

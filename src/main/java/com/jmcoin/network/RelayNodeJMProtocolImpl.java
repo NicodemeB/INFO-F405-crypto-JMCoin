@@ -25,14 +25,15 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
 
 	}
 
-    @Override
+    /*@Override
     protected String AskDebug(Object payload) {
 //        return (String) sendRequestAndGetAnswer(NetConst.ASK_DEBUG, payload.toString());
         sendRequest(NetConst.ASK_DEBUG, payload.toString());
         return null;
-    }
+    }*/
     
     private void receiveData(String payload) {
+    	System.out.println("Receive data "+ payload);
         try {
             getClient().getServer().getAwaitingAnswers().firstElement().sendMessage(payload);
         } catch (IOException e) {
@@ -67,7 +68,7 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
 		receiveData(string);
 	}
 
-    @Override
+    /*@Override
     protected String AnswerDebug(Object payload) {
         System.out.println("payload = " + payload);
         try {
@@ -83,7 +84,7 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
     protected String SendBroacastDebug(){
 	    sendRequest(NetConst.STOP_MINING,null);
 	    return null;
-    }
+    }*/
 
 
 	@Override

@@ -22,7 +22,7 @@ public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 //		return (craftMessage(NetConst.STOP_MINING, null));
 //	}
 
-	@Override
+	/*@Override
 	protected String AskDebug(Object payload) {
 		return craftMessage(NetConst.ANSWER_DEBUG, "PREJEN!");
 	}
@@ -34,7 +34,7 @@ public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 	}
 
 	@Override
-	protected String SendBroacastDebug() { return null; }
+	protected String SendBroacastDebug() { return null; }*/
 
 	@Override
 	protected String StopMining (){
@@ -61,7 +61,7 @@ public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 		if (payload != null) {
 			try {
 				peer.processBlock(IOFileHandler.getFromJsonString(payload, Block.class));
-				return NetConst.RES_OKAY;
+				return StopMining();
 			}
 			catch(JsonSyntaxException jse) {
 				jse.printStackTrace();

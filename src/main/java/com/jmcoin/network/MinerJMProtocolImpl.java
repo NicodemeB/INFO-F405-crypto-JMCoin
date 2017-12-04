@@ -11,7 +11,7 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
 	
 	public MinerJMProtocolImpl(MinerNode peer) throws IOException {
 		super(peer);
-		this.client = new Client(NetConst.RELAY_NODE_LISTEN_PORT, NetConst.RELAY_DEBUG_HOST_NAME, new RelayNodeJMProtocolImpl());
+		this.client = new Client(NetConst.RELAY_NODE_LISTEN_PORT, NetConst.RELAY_DEBUG_HOST_NAME, this);
         new Thread(new ReceiverThread<Client>(this.client)).start();
         new Thread(this.client).start();
         try {
@@ -25,7 +25,7 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
 		return client;
 	}
 
-	@Override
+	/*@Override
 	protected String AskDebug(Object payload) {
 		return null;
 	}
@@ -46,11 +46,12 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
 	@Override
 	protected String SendBroacastDebug() {
 		return null;
-	}
+	}*/
 
 	@Override
 	protected String StopMining() {
-		return null;
+		this.peer.getMining().stopMining();
+		return NetConst.RES_OKAY;
 	}
 
 	@Override
@@ -86,7 +87,6 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
 
 	@Override
 	protected void receiveDifficulty(String string) {
-		System.out.println("5uc3");
 		try{
 			this.peer.getMining().setDifficulty(Integer.parseInt(string));
 		}
@@ -97,13 +97,11 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
 
 	@Override
 	protected void receiveUnverifiedTransactions(String string) {
-		System.out.println("3mm4570n3");
 		this.peer.getMining().setUnverifiedTransaction(IOFileHandler.getFromJsonString(string, Transaction[].class));
 	}
 
 	@Override
 	protected void receiveRewardAmount(String string) {
-		System.out.println("I<3p0n3y5");
 		try{
 			this.peer.getMining().setRewardAmount(Integer.parseInt(string));
 		}

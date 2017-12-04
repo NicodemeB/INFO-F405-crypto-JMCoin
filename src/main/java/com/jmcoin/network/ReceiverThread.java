@@ -20,9 +20,9 @@ public class ReceiverThread<X extends TemplateThread> implements Runnable{
             do {
                 Object read = input.readObject();
                 if (read != null) {
-                    System.out.println("Thread #"+Thread.currentThread().getId() + " read : " + read.toString());
+                    System.out.println("Receiver Thread "+" #"+Thread.currentThread().getId() +" "+ this.runnable.getProtocol().getClass().getSimpleName()+" read : " + read.toString());
+                    System.out.println("Class: "+this.runnable.getClass().getSimpleName());
                     this.runnable.handleMessage(read);
-                    
                 }
                 Thread.sleep(10);
             }while (loop);
@@ -32,9 +32,7 @@ public class ReceiverThread<X extends TemplateThread> implements Runnable{
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (ClassNotFoundException|InterruptedException e) {
             e.printStackTrace();
         }
 

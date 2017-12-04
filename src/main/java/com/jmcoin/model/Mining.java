@@ -1,16 +1,15 @@
 package com.jmcoin.model;
 
+import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
 import org.bouncycastle.util.encoders.Hex;
 
-
+import com.google.gson.Gson;
+import com.jmcoin.network.JMProtocolImpl;
+import com.jmcoin.network.MinerJMProtocolImpl;
+import com.jmcoin.network.NetConst;
 /**
  * @author Trifi Mohamed Nabil
  * @author Arbib Mohamed
@@ -21,10 +20,11 @@ public class Mining{
 	private Integer difficulty;
 	private Integer rewardAmount;
 	private Transaction[] unverifiedTransaction;
+	private MiningThread miningThread;
 	
-	public Mining() {
+	public Mining(MinerJMProtocolImpl protocol) throws NoSuchAlgorithmException {
+		this.miningThread = new MiningThread(protocol);
 	}
-	
 	
 	public Transaction[] getUnverifiedTransaction() {
 		return unverifiedTransaction;
@@ -50,23 +50,35 @@ public class Mining{
 		this.rewardAmount = rewardAmount;
 	}
 	
-	public String mine(Block block) throws NoSuchAlgorithmException, InterruptedException, ExecutionException {
-        ExecutorService executor = Executors.newCachedThreadPool();
-        Callable<String> callable = new MiningThread(block);
-        Future<String> value = executor.submit(callable);
-        executor.shutdown();
-        return value.get();
+	public void stopMining() {
+		System.out.println("**************** !! STOP !! ****************");
+		this.miningThread.setRunning(false);
 	}
 	
-	private class MiningThread implements Callable<String> {
+	public void mine(Block block) throws NoSuchAlgorithmException, InterruptedException, ExecutionException {
+        this.miningThread.setBlock(block);
+        this.miningThread.setRunning(true);
+        this.miningThread.start();
+	}
+	
+	private class MiningThread extends Thread{
 	
 		private Block block;
 		private MessageDigest digest;
+		private boolean running;
+		private MinerJMProtocolImpl protocol;
 		
-		
-		public MiningThread(Block block) throws NoSuchAlgorithmException {
-			this.block = block;
+		public MiningThread(MinerJMProtocolImpl protocolImpl) throws NoSuchAlgorithmException {
 			this.digest = MessageDigest.getInstance("SHA-256");
+			this.protocol = protocolImpl;
+		}
+		
+		public void setRunning(boolean running) {
+			this.running = running;
+		}
+		
+		public void setBlock(Block block) {
+			this.block = block;
 		}
 		
 		private byte[] calculateHash(int nonce) {
@@ -83,16 +95,28 @@ public class Mining{
 		    }
 			return false;
 		}
-
+		
 		@Override
-		public String call() throws Exception {
-			if(block.getSize() > Block.MAX_BLOCK_SIZE) return null;
-            int nonce = Integer.MIN_VALUE;
-            while(nonce < Integer.MAX_VALUE){
-            	if (verifyAndSetHash(nonce++)) return block.getFinalHash();
-            }
-            if (verifyAndSetHash(nonce)) return block.getFinalHash();
-            return null;
+		public void run() {
+        	if(this.block.getSize() > Block.MAX_BLOCK_SIZE) {
+        		this.running = false;
+        	}
+        	int nonce = Integer.MIN_VALUE;
+            try {
+            	while(this.running && nonce < Integer.MAX_VALUE){
+                   	if (verifyAndSetHash(nonce++)) {
+                   		this.protocol.getClient().sendMessage(JMProtocolImpl.craftMessage(NetConst.TAKE_MY_MINED_BLOCK, new Gson().toJson(block)));
+                   		this.running = false;
+                   	}
+        			Thread.sleep(100);
+        		}
+            	if(this.running)verifyAndSetHash(nonce);
+            	this.running = false;
+			}
+            catch (InterruptedException|IOException e) {
+				e.printStackTrace();
+			}
+            System.err.println("Miner STOP: "+this.protocol.getPeer());
 		}
 	}
 }

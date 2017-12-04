@@ -67,10 +67,10 @@ public class ClientSC extends Client{
                 break;
             default:
                 //Send what RelayNodeJMProtocolImpl return to MASTER NODE
-				/*String s;
-				System.out.println("-------------"+msg.toString()+"--------------");
-				System.out.println("-------------"+(s = this.protocol.processInput(msg))+"--------------");*/
-                setToSend(msg);
+                //setToSend(msg);
+            	System.out.println("------- ClientSC -> WorkRunnableSC ----------");
+            	this.server.getAwaitingAnswers().firstElement().setToSend(msg);
+            	this.server.getAwaitingAnswers().remove(this.server.getAwaitingAnswers().firstElement());
                 break;
         }
     }

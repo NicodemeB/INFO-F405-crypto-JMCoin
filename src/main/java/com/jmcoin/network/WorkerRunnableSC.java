@@ -35,12 +35,12 @@ public class WorkerRunnableSC extends WorkerRunnable {
     @Override
     public void run() {
         try {
-            rt = new Thread( new ReceiverThread<WorkerRunnableSC>(this));
+            rt = new Thread(new ReceiverThread<WorkerRunnableSC>(this));
             rt.start();
 //            ((ReceiverThread) rt).
             do {
                 if (getToSend() != null){
-                    System.out.println(System.currentTimeMillis() + " Thread #"+Thread.currentThread().getId() +" WorkRunnableSC - to send : " + toSend.toString());
+                    System.out.println("WorkRunnable Thread #"+Thread.currentThread().getId() +" WorkRunnableSC - to send : " + toSend.toString());
                     sendMessage(toSend);
                 }
                 Thread.sleep(100);
