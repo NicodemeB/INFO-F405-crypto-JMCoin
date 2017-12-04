@@ -12,7 +12,7 @@ public abstract class NetConst {
 	public static final int MINER_NODE_LISTEN_PORT			= 33335;
 	public static final int RELAY_BROADCAST_PORT 			= 4445;
 	public static final int MINER_BROADCAST_PORT 			= 4444;
-	public static final String MASTER_HOST_NAME				= "localhost"; //TODO remove this
+	public static final String MASTER_HOST_NAME				= "crypto-win.nicode.me"; //TODO remove this
 	public static final String RELAY_DEBUG_HOST_NAME		= "localhost"; //TODO remove this
 	//public static final String BROADCAST_HOST_NAME		= "255.255.255.255";
 	public static final char GIVE_ME_BLOCKCHAIN_COPY		= '0'; //from wallets

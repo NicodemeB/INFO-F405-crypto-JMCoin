@@ -39,8 +39,7 @@ public class MultiThreadedServer<X extends JMProtocolImpl<? extends Peer>> imple
                         "Error accepting client connection", e);
             }
             try {
-                lThreads.add(new WorkerRunnable(clientSocket, protocol));
-                lThreads.lastElement().start();
+                lThreads.add(new WorkerRunnable(clientSocket, protocol, this));
             } catch (IOException e) {
                 e.printStackTrace();
             }

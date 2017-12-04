@@ -7,11 +7,31 @@ public class WorkerRunnable extends TemplateThread{
 
     private BroadcastThread<WorkerRunnable> broadcastThread;
 
+    private MultiThreadedServer server;
+
+    public MultiThreadedServer getServer() {
+        return server;
+    }
+
+    public void setServer(MultiThreadedServer server) {
+        this.server = server;
+    }
+
+    // To KEEP FOR THE USAGE OF WORKERRUNNABLESC
     public WorkerRunnable(Socket clientSocket, JMProtocolImpl<? extends Peer> protocol) throws  IOException{
+        super(protocol);
+        this.socket = clientSocket;
+        in  = new ObjectInputStream(socket.getInputStream());
+        out = new ObjectOutputStream(socket.getOutputStream());
+
+    }
+
+    public WorkerRunnable(Socket clientSocket, JMProtocolImpl<? extends Peer> protocol, MultiThreadedServer srv) throws  IOException{
     	super(protocol);
         this.socket = clientSocket;
         in  = new ObjectInputStream(socket.getInputStream());
         out = new ObjectOutputStream(socket.getOutputStream());
+        setServer(srv);
     }
 
     public void run() {
@@ -46,6 +66,11 @@ public class WorkerRunnable extends TemplateThread{
             break;
         case NetConst.CONNECTION_REQUEST:
         	setToSend(NetConst.CONNECTED);
+            break;
+        case "54$null$#" :
+            //TODO - replace by a corrected build string
+            System.out.println("server.not()");
+            server.not();
             break;
         default:
         	setToSend(this.protocol.processInput(msg));
