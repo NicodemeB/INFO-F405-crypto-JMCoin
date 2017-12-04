@@ -7,14 +7,6 @@ import java.net.Socket;
 
 public class Client extends TemplateThread{
 	
-	/*private String response;
-	
-	public String getResponse() {
-		String res = response;
-		this.response = null;
-		return res;
-	}*/
-	
 	public Client (int port, String host, JMProtocolImpl<? extends Peer> protocol) throws IOException {
 		super(protocol);
         socket = new Socket(host, port);
@@ -30,7 +22,7 @@ public class Client extends TemplateThread{
         sendFlag = false;
     }
 
-    public void receiveAndTreatMessage() throws InterruptedException {
+    public void receiveAndHandleMessage() throws InterruptedException {
         try {
             do {
                 if (getToSend() != null) {
@@ -53,7 +45,7 @@ public class Client extends TemplateThread{
     @Override
     public void run() {
         try {
-            receiveAndTreatMessage();
+            receiveAndHandleMessage();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -68,9 +60,7 @@ public class Client extends TemplateThread{
         case NetConst.CONNECTION_REQUEST:
             break;
         default:
-        	System.out.println("------Data returned to client-------");
         	System.out.println(this.protocol.processInput(msg));
-        	System.out.println("------------------------------------");
             break;
 		}
 	}

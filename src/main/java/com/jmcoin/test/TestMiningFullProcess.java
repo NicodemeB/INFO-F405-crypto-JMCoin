@@ -37,7 +37,6 @@ public class TestMiningFullProcess {
 		MinerNode minerHard;
 		try {
 			minerHard = new MinerNode(args[0]);
-			System.out.println("Minerhard mining "+minerHard.getMining());
 		} catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException | IOException
 				| InvalidPasswordException | InvalidAESStreamException | StrongEncryptionNotAvailableException e1) {
 			e1.printStackTrace();
@@ -55,7 +54,6 @@ public class TestMiningFullProcess {
 		MinerNode miner;
 		try {
 			miner = new MinerNode(args[0]);
-			System.out.println("Miner mining "+miner.getMining());
 		} catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException | IOException
 				| InvalidPasswordException | InvalidAESStreamException | StrongEncryptionNotAvailableException e1) {
 			e1.printStackTrace();

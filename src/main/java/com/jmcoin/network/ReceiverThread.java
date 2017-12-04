@@ -20,8 +20,6 @@ public class ReceiverThread<X extends TemplateThread> implements Runnable{
             do {
                 Object read = input.readObject();
                 if (read != null) {
-                    System.out.println("Receiver Thread "+" #"+Thread.currentThread().getId() +" "+ this.runnable.getProtocol().getClass().getSimpleName()+" read : " + read.toString());
-                    System.out.println("Class: "+this.runnable.getClass().getSimpleName());
                     this.runnable.handleMessage(read);
                 }
                 Thread.sleep(10);

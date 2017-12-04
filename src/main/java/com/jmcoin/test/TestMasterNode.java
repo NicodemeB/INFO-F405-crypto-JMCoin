@@ -9,7 +9,7 @@ import com.jmcoin.network.NetConst;
 public class TestMasterNode {
 	
 	public static void runMaster() throws IOException {
-		MultiThreadedServer server = new MultiThreadedServer(NetConst.MASTER_NODE_LISTEN_PORT, new MasterJMProtocolImpl());
+		MultiThreadedServer<MasterJMProtocolImpl> server = new MultiThreadedServer<MasterJMProtocolImpl>(NetConst.MASTER_NODE_LISTEN_PORT, new MasterJMProtocolImpl());
 		new Thread(server).start();
 	}
 	

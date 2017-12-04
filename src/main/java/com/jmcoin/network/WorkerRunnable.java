@@ -3,12 +3,9 @@ package com.jmcoin.network;
 import java.io.*;
 import java.net.Socket;
 
-/**
-
- */
 public class WorkerRunnable extends TemplateThread{
 
-    private BroadcastThread<WorkerRunnable> bt;
+    private BroadcastThread<WorkerRunnable> broadcastThread;
 
     public WorkerRunnable(Socket clientSocket, JMProtocolImpl<? extends Peer> protocol) throws  IOException{
     	super(protocol);
@@ -20,8 +17,8 @@ public class WorkerRunnable extends TemplateThread{
     public void run() {
         try {
             new Thread( new ReceiverThread<WorkerRunnable>(this)).start();
-            bt = new BroadcastThread<WorkerRunnable>(this);
-            bt.start();
+            broadcastThread = new BroadcastThread<WorkerRunnable>(this);
+            broadcastThread.start();
             boolean loop = true;
             do {
                 if (getToSend() != null){

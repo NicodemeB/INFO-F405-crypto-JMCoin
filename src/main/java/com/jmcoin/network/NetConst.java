@@ -23,9 +23,6 @@ public abstract class NetConst {
 	public static final char GIVE_ME_DIFFICULTY				= '5'; //from miners
 	public static final char STOP_MINING					= '6'; //from master to miners (broadcast)
 	public static final char GIVE_ME_UNSPENT_OUTPUTS 		= '7';
-	//public static final char ASK_DEBUG = 'X';
-	//public static final char ANSWER_DEBUG = 'Z';
-	//public static final char SEND_BROADCAST_DEBUG			= 'Y';
 	public static final char DELIMITER						= '$';
 	public static final char END							= '#';
 	public static final String ERR_NOT_A_REQUEST			= "err_not_req";
@@ -43,4 +40,5 @@ public abstract class NetConst {
 	public static final char RECEIVE_UNVERIFIED_TRANS 		= 'C';
 	public static final char RECEIVE_BLOCKCHAIN_COPY 		= 'D';
 	public static final char RECEIVE_UNSPENT_OUTPUTS		= 'E';
+	public static final String STOP_MINING_REQ 				= "54$null$#";
 }

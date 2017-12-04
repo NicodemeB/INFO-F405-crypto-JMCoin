@@ -25,9 +25,7 @@ public class BroadcastThread <X extends TemplateThread> extends Thread {
                 wait();
                 System.out.println("STOP MINING");
                 runnable.sendMessage(JMProtocolImpl.craftMessage(NetConst.STOP_MINING, null));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
+            } catch (InterruptedException|IOException e) {
                 e.printStackTrace();
             }
         } while (true);

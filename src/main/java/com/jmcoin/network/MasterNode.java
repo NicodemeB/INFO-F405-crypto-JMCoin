@@ -48,13 +48,9 @@ public class MasterNode extends Peer{
 		return difficulty;
 	}
     
-    /**
-     * TODO read blockchain in the file and send it in JSON format
-     * @return the blockchain data in JSON
-     */
-    public String getBlockChain() {
-        return IOFileHandler.toJson(chain);
-    }
+    public Chain getChain() {
+		return chain;
+	}
     
     //TODO compute this reward according to the the size of the transaction
     //almost empty -> low reward

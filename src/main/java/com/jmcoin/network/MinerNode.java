@@ -29,41 +29,13 @@ public class MinerNode extends Peer{
 	public MinerNode(String email) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException, IOException, InvalidPasswordException, InvalidAESStreamException, StrongEncryptionNotAvailableException {
 		super();
 		this.protocol = new MinerJMProtocolImpl(this);
-		this.mining = new Mining(this.protocol);
 		this.wallet = new Wallet(email);
-		this.portBroadcast = NetConst.MINER_BROADCAST_PORT;
-	}
-	
-	public Mining getMining() {
-		return this.mining;
+		this.mining = new Mining(this.protocol);
 	}
 
 	public Block buildBlock() throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException {
 		Block block = new Block();
-		this.protocol.getClient().sendMessage(JMProtocolImpl.craftMessage(NetConst.GIVE_ME_DIFFICULTY, null));
-		while(this.mining.getDifficulty()== null) {
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		this.protocol.getClient().sendMessage(JMProtocolImpl.craftMessage(NetConst.GIVE_ME_REWARD_AMOUNT, null));
-		while(this.mining.getRewardAmount() == null) {
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		this.protocol.getClient().sendMessage(JMProtocolImpl.craftMessage(NetConst.GIVE_ME_UNVERIFIED_TRANSACTIONS, null));
-		while(this.mining.getUnverifiedTransaction() == null) {
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
+		this.protocol.getMiningInfos();
 		int difficulty = this.mining.getDifficulty();
 		Transaction trans[] = this.mining.getUnverifiedTransaction();
 		if(trans != null) {
@@ -88,7 +60,11 @@ public class MinerNode extends Peer{
 
 		block.setDifficulty(difficulty);
 		block.setTimeCreation(System.currentTimeMillis());
-		block.setPrevHash(null); //FIXME find prev block in the chain or let the master do the job*/
+		block.setPrevHash(null); //FIXME find prev block in the chain or let the master do the job
 		return block;
+	}
+
+	public Mining getMining() {
+		return this.mining;
 	}
 }

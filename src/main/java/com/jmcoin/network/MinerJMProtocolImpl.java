@@ -1,9 +1,11 @@
 package com.jmcoin.network;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 
 import com.jmcoin.crypto.SignaturesVerification;
 import com.jmcoin.io.IOFileHandler;
+import com.jmcoin.model.Block;
 import com.jmcoin.model.Chain;
 import com.jmcoin.model.Input;
 import com.jmcoin.model.Output;
@@ -13,7 +15,7 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
 
 	private Client client;
 	
-	public MinerJMProtocolImpl(MinerNode peer) throws IOException {
+	public MinerJMProtocolImpl(MinerNode peer) throws IOException, NoSuchAlgorithmException {
 		super(peer);
 		this.client = new Client(NetConst.RELAY_NODE_LISTEN_PORT, NetConst.RELAY_DEBUG_HOST_NAME, this);
         new Thread(new ReceiverThread<Client>(this.client)).start();
@@ -23,37 +25,42 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
 	}
 	
-	public Client getClient() {
-		return client;
-	}
-
-	/*@Override
-	protected String AskDebug(Object payload) {
-		return null;
+	public void sendMinedBlock(Block block) throws IOException {
+		this.client.sendMessage(JMProtocolImpl.craftMessage(NetConst.TAKE_MY_MINED_BLOCK, IOFileHandler.toJson(block)));
 	}
 	
-
-	@Override
-	protected String AnswerDebug(Object payload) {
-		return null;
+	public void getMiningInfos() throws IOException {
+		this.client.sendMessage(JMProtocolImpl.craftMessage(NetConst.GIVE_ME_DIFFICULTY, null));
+		while(this.peer.getMining().getDifficulty()== null) {
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		this.client.sendMessage(JMProtocolImpl.craftMessage(NetConst.GIVE_ME_REWARD_AMOUNT, null));
+		while(this.peer.getMining().getRewardAmount() == null) {
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		this.client.sendMessage(JMProtocolImpl.craftMessage(NetConst.GIVE_ME_UNVERIFIED_TRANSACTIONS, null));
+		while(this.peer.getMining().getUnverifiedTransaction() == null) {
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
-
-
-//	@Override
-//	protected String BroacastDebug() {
-//		return null;
-//	}
-
 	@Override
-	protected String SendBroacastDebug() {
-		return null;
-	}*/
-
-	@Override
-	protected String StopMining() {
+	protected String stopMining() {
 		this.peer.getMining().stopMining();
 		return NetConst.RES_OKAY;
 	}

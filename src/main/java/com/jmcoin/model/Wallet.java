@@ -244,14 +244,13 @@ public class Wallet {
         }
         return totalAmount;
     }
-    public String promptPassword()
-    {
+    public String promptPassword(){
     	/*Scanner scan = new Scanner(System.in);
         System.out.print("Enter password to decrypt private keys : ");
         // Below Statement used for getting String including sentence
-        String s = scan.nextLine();*/
-    	//FIXME restore scanner
-        return "a";
+        String s = scan.nextLine();
+        //scan.close();*/
+        return "a" //FIXME using a scanner it not the right way to do this
     }
     public HashMap<PrivateKey,PublicKey> getKeys() 
     {

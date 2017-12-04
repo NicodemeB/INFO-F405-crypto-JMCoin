@@ -36,7 +36,7 @@ public class TestDBOperations {
         Transaction transGenesis = new Transaction();
         transGenesis.setOutputBack(outGenesisBack);
         transGenesis.setOutputOut(outGenesis);
-        transGenesis.addInput(inGenesis);
+        addInput(inGenesis, transGenesis);
         transGenesis.setPubKey((PublicKey) keys[1]);
         transGenesis.setSignature(SignaturesVerification.signTransaction(transGenesis.getBytes(false), (PrivateKey) keys[0]));
         Reward reward = new Reward();
@@ -73,7 +73,8 @@ public class TestDBOperations {
     private static void addBlock(Block b, Chain chain) throws NoSuchFieldException, IllegalAccessException {
         Field f = Chain.class.getDeclaredField("blocks");
         f.setAccessible(true);
-        Map<String, Block> blocks = (Map<String, Block>) f.get(chain);
+        @SuppressWarnings("unchecked")
+		Map<String, Block> blocks = (Map<String, Block>) f.get(chain);
         blocks.put(b.getFinalHash() + b.getTimeCreation(), b);
     }
 
@@ -89,7 +90,8 @@ public class TestDBOperations {
     private static void addInput(Input in, Transaction t) throws NoSuchFieldException, IllegalAccessException {
         Field inputs = Transaction.class.getDeclaredField("inputs");
         inputs.setAccessible(true);
-        List<Input> input = (List<Input>) inputs.get(t);
+        @SuppressWarnings("unchecked")
+		List<Input> input = (List<Input>) inputs.get(t);
         input.add(in);
     }
 
@@ -97,7 +99,8 @@ public class TestDBOperations {
     private static void showMeTheObjectTypeOfEachChildrenBlockInTheGivenChain(Chain c) throws NoSuchFieldException, IllegalAccessException {
         Field f = Chain.class.getDeclaredField("blocks");
         f.setAccessible(true);
-        Map<String, Block> blocks = (Map<String, Block>) f.get(c);
+        @SuppressWarnings("unchecked")
+		Map<String, Block> blocks = (Map<String, Block>) f.get(c);
         blocks.entrySet().forEach(entry -> {
             for (Transaction tr : entry.getValue().getTransactions()) {
                 System.out.println(tr.getClass());

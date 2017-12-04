@@ -75,7 +75,6 @@ public class Mining{
 		return chain;
 	}
 
-
 	public void setChain(Chain chain) {
 		this.chain = chain;
 	}
@@ -124,7 +123,7 @@ public class Mining{
             try {
             	while(this.running && nonce < Integer.MAX_VALUE){
                    	if (verifyAndSetHash(nonce++)) {
-                   		this.protocol.getClient().sendMessage(JMProtocolImpl.craftMessage(NetConst.TAKE_MY_MINED_BLOCK, new Gson().toJson(block)));
+                   		this.protocol.sendMinedBlock(block);
                    		this.running = false;
                    	}
         			Thread.sleep(100);
@@ -135,7 +134,6 @@ public class Mining{
             catch (InterruptedException|IOException e) {
 				e.printStackTrace();
 			}
-            System.err.println("Miner STOP: "+this.protocol.getPeer());
 		}
 	}
 

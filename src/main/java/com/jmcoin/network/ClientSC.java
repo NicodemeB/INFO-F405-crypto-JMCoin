@@ -7,33 +7,18 @@ public class ClientSC extends Client{
 
     private MultiThreadedServerClient server;
 
-    private Thread t;
-
-    public Thread getT() {
-        return t;
-    }
-
-    public void setT(Thread t) {
-        this.t = t;
-    }
-
     public MultiThreadedServerClient getServer() {
         return server;
-    }
-
-    public void setServer(MultiThreadedServerClient server) {
-        this.server = server;
     }
     
     public ClientSC(int port, String host, JMProtocolImpl<? extends Peer> protocol, MultiThreadedServerClient srv) throws IOException {
         super(port, host, protocol);
-        setServer(srv);
-        t = new Thread(new ReceiverThread<ClientSC>(this));
-        t.start();
+        this.server = srv;
+        new Thread(new ReceiverThread<ClientSC>(this)).start();
     }
 
     @Override
-    public void receiveAndTreatMessage() throws InterruptedException {
+    public void receiveAndHandleMessage() throws InterruptedException {
         try {
             do {
                 if (getToSend() != null) {
@@ -60,15 +45,12 @@ public class ClientSC extends Client{
                 break;
             case NetConst.CONNECTION_REQUEST:
                 break;
-            case "54$null$#" :
-                //TODO - replace by a corrected build string
+            case NetConst.STOP_MINING_REQ :
                 System.out.println("server.not()");
                 server.not();
                 break;
             default:
                 //Send what RelayNodeJMProtocolImpl return to MASTER NODE
-                //setToSend(msg);
-            	System.out.println("------- ClientSC -> WorkRunnableSC ----------");
             	this.server.getAwaitingAnswers().firstElement().setToSend(msg);
             	this.server.getAwaitingAnswers().remove(this.server.getAwaitingAnswers().firstElement());
                 break;

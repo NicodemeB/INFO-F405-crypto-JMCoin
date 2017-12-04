@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.Vector;
 
-public class MultiThreadedServerClient extends MultiThreadedServer{
+public class MultiThreadedServerClient extends MultiThreadedServer<RelayNodeJMProtocolImpl>{
 
     private Vector<WorkerRunnableSC> lThreadsSC;
     private Vector<WorkerRunnableSC> awaitingAnswers;
@@ -14,18 +14,10 @@ public class MultiThreadedServerClient extends MultiThreadedServer{
         return awaitingAnswers;
     }
 
-    public void setAwaitingAnswers(Vector<WorkerRunnableSC> awaitingAnswers) {
-        this.awaitingAnswers = awaitingAnswers;
-    }
-
-    public MultiThreadedServerClient(int port, JMProtocolImpl<? extends Peer> protocol){
+    public MultiThreadedServerClient(int port, RelayNodeJMProtocolImpl protocol){
         super(port, protocol);
         lThreadsSC = new Vector<WorkerRunnableSC>();
         awaitingAnswers = new Vector<WorkerRunnableSC>();
-    }
-
-    public ClientSC getClient() {
-        return client;
     }
 
     public void setClient(ClientSC client) {
@@ -35,12 +27,6 @@ public class MultiThreadedServerClient extends MultiThreadedServer{
     public Vector<WorkerRunnableSC> getlThreadsSC() {
         return lThreadsSC;
     }
-
-    public void setlThreadsSC(Vector<WorkerRunnableSC> lThreadsSC) {
-        this.lThreadsSC = lThreadsSC;
-    }
-
-
 
     @Override
     public void run() {
@@ -61,7 +47,7 @@ public class MultiThreadedServerClient extends MultiThreadedServer{
                         "Error accepting client connection", e);
             }
             try {
-                lThreadsSC.add(new WorkerRunnableSC(clientSocket, protocol, getClient()));
+                lThreadsSC.add(new WorkerRunnableSC(clientSocket, protocol, this.client));
                 lThreadsSC.lastElement().start();
             } catch (IOException e) {
                 e.printStackTrace();

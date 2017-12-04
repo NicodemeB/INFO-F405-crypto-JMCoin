@@ -18,14 +18,6 @@ public abstract class JMProtocolImpl<X extends Peer> {
 	public JMProtocolImpl(X peer) {
 		this.peer = peer;
 	}
-	
-	public X getPeer() {
-		return peer;
-	}
-	
-	public int getPortBroadcast() {
-		return this.peer.getPortBroadcast();
-	}
 
 	/**
 	 * Will assume that the payload is built as follows:
@@ -35,7 +27,6 @@ public abstract class JMProtocolImpl<X extends Peer> {
 	 * @throws IOException 
 	 */
 	public String processInput(Object message) {
-	    System.out.println(this.peer.getClass().getSimpleName() + " is processing input: " +message.toString());
 		String content = (String)message;
 		StringTokenizer tokenizer = new StringTokenizer(content, String.valueOf(NetConst.DELIMITER));
 		if(!tokenizer.hasMoreTokens()) return null;
@@ -68,9 +59,6 @@ public abstract class JMProtocolImpl<X extends Peer> {
 				return giveMeUnspentOutputs();
 			case NetConst.GIVE_ME_DIFFICULTY:
 				return giveMeDifficulty();
-            /*case NetConst.SEND_BROADCAST_DEBUG :
-                System.out.println("INTO JMPROTO SEND_BROADCAST_DEBUG");
-                return SendBroacastDebug();*/
             case NetConst.RECEIVE_DIFFICULTY:
             	receiveDifficulty(tokenizer.nextToken());
             	return NetConst.RES_OKAY;
@@ -86,12 +74,8 @@ public abstract class JMProtocolImpl<X extends Peer> {
             case NetConst.RECEIVE_UNSPENT_OUTPUTS:
             	receiveUnspentOutputs(tokenizer.nextToken());
             	return NetConst.RES_OKAY;
-            /*case NetConst.ASK_DEBUG:
-                return AskDebug(tokenizer.nextToken());
-            case NetConst.ANSWER_DEBUG:
-                return AnswerDebug(tokenizer.nextToken());*/
             case NetConst.STOP_MINING:
-                return StopMining();
+                return stopMining();
 			default:
 				return NetConst.ERR_NOT_A_REQUEST;
 			}
@@ -104,11 +88,7 @@ public abstract class JMProtocolImpl<X extends Peer> {
 	protected abstract void receiveUnverifiedTransactions(String string);
 	protected abstract void receiveRewardAmount(String string);
 	protected abstract void receiveDifficulty(String string);
-
-	/*protected abstract String AskDebug(Object payload);
-    protected abstract String AnswerDebug(Object payload);
-    protected abstract String SendBroacastDebug();*/
-    protected abstract String StopMining();
+    protected abstract String stopMining();
 	
 	/**
 	 * Returns unspent {@link Output} as a list
@@ -156,7 +136,6 @@ public abstract class JMProtocolImpl<X extends Peer> {
 	 * Returns difficulty on demand
 	 * @return
 	 */
-	
 	protected abstract String giveMeDifficulty();
 	/**
 	 * Builds a message to send over the network, compliant with the protocol
@@ -167,27 +146,4 @@ public abstract class JMProtocolImpl<X extends Peer> {
 	public static String craftMessage(int request, String body) {
 		return request + "$" + body + "$#";
 	}
-	
-	public static String craftMessage(int request, char body) {
-		return request + "$" + body + "$#"+'\0';
-	}
-
-    /*public static String sendRequest(int relayNodeListenPort, String relayDebugHostName, char takeMyMinedBlock, String s) {
-        //FIXME
-        return null;
-    }*/
-
-//	public static String sendRequest(int port, String host, int req, String payload) {
-//		try {
-//			RequestSender client = new RequestSender(port, host);
-//			client.sendMessage(JMProtocolImpl.craftMessage(req, payload == null ? "" : payload));
-//			String response = client.readMessage().toString();
-//			client.close();
-//			return response;
-//		} catch (IOException | ClassNotFoundException e) {
-//			e.printStackTrace();
-//		}
-//		return null;
-//
-//	}
 }

@@ -17,7 +17,6 @@ public class RelayNode extends Peer{
 
 	public RelayNode() throws IOException {
 		super();
-		this.portBroadcast = NetConst.RELAY_BROADCAST_PORT;
 	}
 	
 	public Chain getLocalChainCopy() {

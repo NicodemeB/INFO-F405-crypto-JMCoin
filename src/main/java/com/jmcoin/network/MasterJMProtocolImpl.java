@@ -2,8 +2,6 @@ package com.jmcoin.network;
 
 import java.io.IOException;
 import java.util.List;
-
-import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.jmcoin.io.IOFileHandler;
 import com.jmcoin.model.Block;
@@ -15,45 +13,17 @@ public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 		super(MasterNode.getInstance());
 	}
 
-//	@Override
-//	protected String BroacastDebug(){
-//		System.out.println("Thread #"+Thread.currentThread().getId() +" BROADCAST DEBUG MASTER NODE");
-//		System.out.println("OK MASTER NODE KNOW THAT He need to say to everyone to stop mining");
-//		return (craftMessage(NetConst.STOP_MINING, null));
-//	}
-
-	/*@Override
-	protected String AskDebug(Object payload) {
-		return craftMessage(NetConst.ANSWER_DEBUG, "PREJEN!");
-	}
-
 	@Override
-	protected String AnswerDebug(Object payload) {
-//		System.out.println("payload = "+ payload);
-		return null;
-	}
-
-	@Override
-	protected String SendBroacastDebug() { return null; }*/
-
-	@Override
-	protected String StopMining (){
-		// TODO - extand answer to all RELAYS
-//		System.out.println("Thread #"+Thread.currentThread().getId() +" BROADCAST DEBUG MASTER NODE");
-//		System.out.println("OK MASTER NODE KNOWS THAT He needs to say to everyone to stop mining");
+	protected String stopMining (){
 		return craftMessage(NetConst.STOP_MINING, null);
 	}
 
 	@Override
 	protected String giveMeUnverifiedTransactionsImpl() {
-		List<Transaction> transactions;
-		if(this.peer.getUnverifiedTransactions().size() > NetConst.MAX_SENT_TRANSACTIONS) {
-			transactions = this.peer.getUnverifiedTransactions().subList(0, NetConst.MAX_SENT_TRANSACTIONS);
-		}
-		else {
-			transactions = this.peer.getUnverifiedTransactions();
-		}
-		return JMProtocolImpl.craftMessage(NetConst.RECEIVE_UNVERIFIED_TRANS, new Gson().toJson(transactions));
+		List<Transaction> transactions = this.peer.getUnverifiedTransactions().size() > NetConst.MAX_SENT_TRANSACTIONS ?
+				this.peer.getUnverifiedTransactions().subList(0, NetConst.MAX_SENT_TRANSACTIONS):
+					this.peer.getUnverifiedTransactions();
+		return JMProtocolImpl.craftMessage(NetConst.RECEIVE_UNVERIFIED_TRANS, IOFileHandler.toJson(transactions));
 	}
 
 	@Override
@@ -61,7 +31,7 @@ public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 		if (payload != null) {
 			try {
 				peer.processBlock(IOFileHandler.getFromJsonString(payload, Block.class));
-				return StopMining();
+				return stopMining();
 			}
 			catch(JsonSyntaxException jse) {
 				jse.printStackTrace();
@@ -73,8 +43,7 @@ public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 	@Override
 	protected boolean takeMyNewTransactionImpl(String payload) {
 		try {
-			Transaction transaction = IOFileHandler.getFromJsonString(payload, Transaction.class);
-			this.peer.getUnverifiedTransactions().add(transaction);
+			this.peer.getUnverifiedTransactions().add(IOFileHandler.getFromJsonString(payload, Transaction.class));
 			return true;
 		}
 		catch(JsonSyntaxException jse) {
@@ -95,13 +64,13 @@ public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 	
 	@Override
 	protected String giveMeBlockChainCopyImpl() {
-		return JMProtocolImpl.craftMessage(NetConst.RECEIVE_BLOCKCHAIN_COPY, peer.getBlockChain());
+		return JMProtocolImpl.craftMessage(NetConst.RECEIVE_BLOCKCHAIN_COPY, IOFileHandler.toJson(peer.getChain()));
 	}
 
 	@Override
-	//TODO May be too big!
+	//FIXME May be too big!
 	protected String giveMeUnspentOutputs() {
-		return new Gson().toJson(this.peer.getUnspentOutputs());
+		return JMProtocolImpl.craftMessage(NetConst.RECEIVE_UNSPENT_OUTPUTS, IOFileHandler.toJson(this.peer.getUnspentOutputs()));
 	}
 
 	@Override
@@ -117,8 +86,5 @@ public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 	protected void receiveBlockchainCopy(String nextToken) {}
 
 	@Override
-	protected void receiveUnspentOutputs(String string) {
-		// TODO Auto-generated method stub
-		
-	}
+	protected void receiveUnspentOutputs(String string) {}
 }

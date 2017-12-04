@@ -5,20 +5,17 @@ import java.net.Socket;
 import java.io.IOException;
 import java.util.Vector;
 
-public class MultiThreadedServer implements Runnable{
+public class MultiThreadedServer<X extends JMProtocolImpl<? extends Peer>> implements Runnable{
 
     protected int          serverPort   = -1;
     protected ServerSocket serverSocket = null;
     protected boolean      isStopped    = false;
     protected Thread       runningThread= null;
-    protected JMProtocolImpl<? extends Peer> protocol	= null;
+    protected X protocol	= null;
     protected Vector<WorkerRunnable> lThreads;
-
-
-
     protected Client client;
 
-    public MultiThreadedServer(int port, JMProtocolImpl<? extends Peer> protocol){
+    public MultiThreadedServer(int port, X protocol){
         this.serverPort = port;
         this.protocol = protocol;
         lThreads = new Vector<WorkerRunnable>();

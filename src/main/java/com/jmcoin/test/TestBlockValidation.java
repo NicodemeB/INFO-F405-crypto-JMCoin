@@ -22,7 +22,6 @@ import com.jmcoin.crypto.AES.InvalidAESStreamException;
 import com.jmcoin.crypto.AES.InvalidKeyLengthException;
 import com.jmcoin.crypto.AES.InvalidPasswordException;
 import com.jmcoin.crypto.AES.StrongEncryptionNotAvailableException;
-import com.jmcoin.io.IOFileHandler;
 import com.jmcoin.crypto.SignaturesVerification;
 import com.jmcoin.model.Block;
 import com.jmcoin.model.Chain;
@@ -64,7 +63,7 @@ public class TestBlockValidation {
 		PrivateKey keyConnasse = keys.keySet().iterator().next();
 		PrivateKey keyTest = keys.keySet().iterator().next();
 		
-		Chain chain = new Chain();
+		//Chain chain = new Chain();
 		List<Block> blocks = new ArrayList<>();
 		
 				
