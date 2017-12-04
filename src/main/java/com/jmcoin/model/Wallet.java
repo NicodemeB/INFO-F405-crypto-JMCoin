@@ -250,7 +250,7 @@ public class Wallet {
         // Below Statement used for getting String including sentence
         String s = scan.nextLine();
         //scan.close();*/
-        return "a" //FIXME using a scanner it not the right way to do this
+        return "a";//FIXME using a scanner it not the right way to do this
     }
     public HashMap<PrivateKey,PublicKey> getKeys() 
     {
