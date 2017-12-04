@@ -5,7 +5,7 @@ import java.net.Socket;
 
 public class WorkerRunnable extends TemplateThread{
 
-    private BroadcastThread<WorkerRunnable> broadcastThread;
+    private BroadcastThread<WorkerRunnable> bt;
 
     private MultiThreadedServer server;
 
@@ -27,7 +27,7 @@ public class WorkerRunnable extends TemplateThread{
     }
 
     public WorkerRunnable(Socket clientSocket, JMProtocolImpl<? extends Peer> protocol, MultiThreadedServer srv) throws  IOException{
-    	super(protocol);
+        super(protocol);
         this.socket = clientSocket;
         in  = new ObjectInputStream(socket.getInputStream());
         out = new ObjectOutputStream(socket.getOutputStream());
@@ -37,13 +37,14 @@ public class WorkerRunnable extends TemplateThread{
     public void run() {
         try {
             new Thread( new ReceiverThread<WorkerRunnable>(this)).start();
-            broadcastThread = new BroadcastThread<WorkerRunnable>(this);
-            broadcastThread.start();
             boolean loop = true;
             do {
                 if (getToSend() != null){
                     System.out.println("Thread #"+Thread.currentThread().getId() +this.protocol.getClass().getSimpleName()+" WorkRunnable - to send : " + toSend.toString());
-                    sendMessage(toSend);
+                    if (toSend.toString().equals("54$null$#"))
+                        server.not();
+                    else
+                        sendMessage(toSend);
                 }
                 Thread.sleep(100);
             } while (loop);
@@ -59,27 +60,28 @@ public class WorkerRunnable extends TemplateThread{
         }
     }
 
-	@Override
-	protected void handleMessage(Object msg) {
-		switch (msg.toString()) {
-        case NetConst.CONNECTED :
-            break;
-        case NetConst.CONNECTION_REQUEST:
-        	setToSend(NetConst.CONNECTED);
-            break;
-        case "54$null$#" :
-            //TODO - replace by a corrected build string
-            System.out.println("server.not()");
-            server.not();
-            break;
-        default:
-        	setToSend(this.protocol.processInput(msg));
-            break;
-		}
-	}
-	
-	synchronized protected void not(){
-        toSend = JMProtocolImpl.craftMessage(NetConst.STOP_MINING, null);
+    @Override
+    protected void handleMessage(Object msg) {
+
+        switch (msg.toString()) {
+            case NetConst.CONNECTED :
+                break;
+            case NetConst.CONNECTION_REQUEST:
+                setToSend(NetConst.CONNECTED);
+                break;
+            default:
+                setToSend(this.protocol.processInput(msg));
+                break;
+        }
+    }
+
+    synchronized protected void not(){
+        //toSend = JMProtocolImpl.craftMessage(NetConst.STOP_MINING, null);
+        try {
+            sendMessage(JMProtocolImpl.craftMessage(NetConst.STOP_MINING, null));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
 
