@@ -21,6 +21,8 @@ public class Mining{
 	private Integer rewardAmount;
 	private Transaction[] unverifiedTransaction;
 	private MiningThread miningThread;
+	private Output[] unspentOutputs;
+	private Chain chain;
 	
 	public Mining(MinerJMProtocolImpl protocol) throws NoSuchAlgorithmException {
 		this.miningThread = new MiningThread(protocol);
@@ -61,6 +63,23 @@ public class Mining{
         this.miningThread.start();
 	}
 	
+	public Output[] getUnspentOutputs() {
+		return unspentOutputs;
+	}
+
+	public void setUnspentOutputs(Output[] unspentOutputs) {
+		this.unspentOutputs = unspentOutputs;
+	}
+
+	public Chain getChain() {
+		return chain;
+	}
+
+
+	public void setChain(Chain chain) {
+		this.chain = chain;
+	}
+	
 	private class MiningThread extends Thread{
 	
 		private Block block;
@@ -80,7 +99,7 @@ public class Mining{
 		public void setBlock(Block block) {
 			this.block = block;
 		}
-		
+
 		private byte[] calculateHash(int nonce) {
 		   block.setNonce(nonce);
 		   this.digest.update(block.getBytes());
@@ -119,4 +138,5 @@ public class Mining{
             System.err.println("Miner STOP: "+this.protocol.getPeer());
 		}
 	}
+
 }

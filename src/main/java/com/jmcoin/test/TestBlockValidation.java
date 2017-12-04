@@ -49,46 +49,11 @@ public class TestBlockValidation {
 	 * @throws NoSuchProviderException 
 	 * @throws NoSuchAlgorithmException 
 	 * @throws InvalidKeyException 
+	 * @throws StrongEncryptionNotAvailableException 
+	 * @throws InvalidAESStreamException 
+	 * @throws InvalidPasswordException 
+	 * @throws InvalidKeySpecException 
 	 */
-	private static boolean validateTrans(Chain chain, Transaction trans) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, IOException {
-		//if(!SignaturesVerification.verifyTransaction(trans.getSignature(), trans, trans.getPubKey())) return false;
-		//TODO Maxime does the job
-		int total = 0;
-		for(Input i : trans.getInputs()) {
-			Transaction t  = chain.findInBlockChain(i.getPrevTransactionHash());
-			Output output = null;
-			if(t.getOutputOut().getAddress() == SignaturesVerification.DeriveJMAddressFromPubKey(trans.getPubKey()) && t.getOutputOut().getAmount() == i.getAmount()) {
-				output = t.getOutputOut();
-			}
-			else if(t.getOutputBack().getAddress() == SignaturesVerification.DeriveJMAddressFromPubKey(trans.getPubKey()) && t.getOutputBack().getAmount() == i.getAmount()) {
-				output = t.getOutputBack();
-			}
-			if(output == null) {
-				return false;
-			}
-			String unvf = "";//JMProtocolImpl.sendRequest(NetConst.RELAY_NODE_LISTEN_PORT, NetConst.RELAY_DEBUG_HOST_NAME, NetConst.GIVE_ME_UNSPENT_OUTPUTS, null);
-			Output[] unspentOutputs = IOFileHandler.getFromJsonString(unvf, Output[].class);
-			boolean unspent = false;
-			for(Output uo : unspentOutputs) {
-				if(uo.equals(output)) {
-					unspent = true;
-				}
-			}
-			if(!unspent) {
-				return false;
-			}
-			//if i.output is not in unspent ouputs pool -> false
-			//if i.output.address is not this.outputs[0].address -> false
-			total += i.getAmount();
-		}
-		total -= trans.getOutputOut().getAmount();
-		total -= trans.getOutputBack().getAmount();
-		System.out.println("total = " + total);
-		if(total != 0)
-			return false;
-		
-		return true	;
-	}
 	
 	public static void main(String[] args) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, IOException, InvalidKeyLengthException, StrongEncryptionNotAvailableException {
 		createKeys("connard");
@@ -135,11 +100,14 @@ public class TestBlockValidation {
 		transactionToverify.addInput(input2);
 		transactionToverify.setOutputOut(outputOut);
 		transactionToverify.setOutputBack(outputBack);
+
+		/*
 		if(validateTrans(chain, transactionToverify)) {
 			System.out.println("Trans OK");
 		}else {
 			System.out.println("Trans KO");
 		}
+		*/
 		
 		blocks.add(genesis);
 		genesis.setPrevHash(null);		
