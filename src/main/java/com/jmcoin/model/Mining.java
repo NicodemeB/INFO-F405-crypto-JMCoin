@@ -21,6 +21,8 @@ public class Mining{
 	private Integer difficulty;
 	private Integer rewardAmount;
 	private Transaction[] unverifiedTransaction;
+	private Output[] unspentOutputs;
+	private Chain chain;
 	
 	public Mining() {
 	}
@@ -58,6 +60,24 @@ public class Mining{
         return value.get();
 	}
 	
+	public Output[] getUnspentOutputs() {
+		return unspentOutputs;
+	}
+
+
+	public void setUnspentOutputs(Output[] unspentOutputs) {
+		this.unspentOutputs = unspentOutputs;
+	}
+
+	public Chain getChain() {
+		return chain;
+	}
+
+
+	public void setChain(Chain chain) {
+		this.chain = chain;
+	}
+
 	private class MiningThread implements Callable<String> {
 	
 		private Block block;
@@ -95,4 +115,5 @@ public class Mining{
             return null;
 		}
 	}
+
 }
