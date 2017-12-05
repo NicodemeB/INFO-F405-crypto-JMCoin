@@ -23,7 +23,6 @@ public class TestWallet {
     public static void main(String args[]){
         try {
             Wallet w = new Wallet("a");
-            w.getAddresses();
             //w.createKeys("a");
             Input in = new Input();
             Output out = new Output();

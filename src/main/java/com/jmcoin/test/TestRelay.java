@@ -7,7 +7,7 @@ import java.io.IOException;
 public class TestRelay {
     
 	public static void run() throws IOException{
-        RelayNodeJMProtocolImpl rmp = new RelayNodeJMProtocolImpl();
+        RelayNodeJMProtocolImpl rmp = new RelayNodeJMProtocolImpl(new RelayNode());
         MultiThreadedServerClient server = new MultiThreadedServerClient(NetConst.RELAY_NODE_LISTEN_PORT, rmp);
         ClientSC cli = new ClientSC(NetConst.MASTER_NODE_LISTEN_PORT, NetConst.MASTER_HOST_NAME, rmp, server);
         server.setClient(cli);

@@ -8,15 +8,18 @@ import com.jmcoin.io.IOFileHandler;
 import com.jmcoin.model.Block;
 import com.jmcoin.model.Chain;
 import com.jmcoin.model.Input;
+import com.jmcoin.model.Mining;
 import com.jmcoin.model.Output;
 import com.jmcoin.model.Transaction;
 
 public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
-
+	
 	private Client client;
+	private Mining mining;
 	
 	public MinerJMProtocolImpl(MinerNode peer) throws IOException, NoSuchAlgorithmException {
 		super(peer);
+		this.mining = new Mining(this);
 		this.client = new Client(NetConst.RELAY_NODE_LISTEN_PORT, NetConst.RELAY_DEBUG_HOST_NAME, this);
         new Thread(new ReceiverThread<Client>(this.client)).start();
         new Thread(this.client).start();
@@ -25,16 +28,11 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
 	}
 	
-	public void sendMinedBlock(Block block) throws IOException {
-		this.client.sendMessage(JMProtocolImpl.craftMessage(NetConst.TAKE_MY_MINED_BLOCK, IOFileHandler.toJson(block)));
-	}
-	
-	public void getMiningInfos() throws IOException {
+	public Mining getMiningInfos() throws IOException {
 		this.client.sendMessage(JMProtocolImpl.craftMessage(NetConst.GIVE_ME_DIFFICULTY, null));
-		while(this.peer.getMining().getDifficulty()== null) {
+		while(this.mining.getDifficulty()== null) {
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
@@ -42,7 +40,7 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
 			}
 		}
 		this.client.sendMessage(JMProtocolImpl.craftMessage(NetConst.GIVE_ME_REWARD_AMOUNT, null));
-		while(this.peer.getMining().getRewardAmount() == null) {
+		while(this.mining.getRewardAmount() == null) {
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
@@ -50,19 +48,20 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
 			}
 		}
 		this.client.sendMessage(JMProtocolImpl.craftMessage(NetConst.GIVE_ME_UNVERIFIED_TRANSACTIONS, null));
-		while(this.peer.getMining().getUnverifiedTransaction() == null) {
+		while(this.mining.getUnverifiedTransaction() == null) {
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
+		return mining;
 	}
 
 	@Override
 	protected String stopMining() {
-		this.peer.getMining().stopMining();
-		return NetConst.RES_OKAY;
+		this.mining.stopMining();
+		return null;
 	}
 
 	@Override
@@ -91,15 +90,10 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
 	@Override
 	protected String giveMeUnspentOutputs() {return null;}
 
-	public static String sendRequest(int relayNodeListenPort, String relayDebugHostName, char takeMyMinedBlock, String s) {
-		//FIXME
-		return null;
-	}
-
 	@Override
 	protected void receiveDifficulty(String string) {
 		try{
-			this.peer.getMining().setDifficulty(Integer.parseInt(string));
+			this.mining.setDifficulty(Integer.parseInt(string));
 		}
 		catch(NumberFormatException nfe) {
 			nfe.printStackTrace();
@@ -108,13 +102,13 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
 
 	@Override
 	protected void receiveUnverifiedTransactions(String string) {
-		this.peer.getMining().setUnverifiedTransaction(IOFileHandler.getFromJsonString(string, Transaction[].class));
+		this.mining.setUnverifiedTransaction(IOFileHandler.getFromJsonString(string, Transaction[].class));
 	}
 
 	@Override
 	protected void receiveRewardAmount(String string) {
 		try{
-			this.peer.getMining().setRewardAmount(Integer.parseInt(string));
+			this.mining.setRewardAmount(Integer.parseInt(string));
 		}
 		catch(NumberFormatException nfe) {
 			nfe.printStackTrace();
@@ -126,18 +120,19 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
 
 	@Override
 	protected void receiveUnspentOutputs(String string) {
-		this.peer.getMining().setUnspentOutputs(IOFileHandler.getFromJsonString(string, Output[].class));
+		this.mining.setUnspentOutputs(IOFileHandler.getFromJsonString(string, Output[].class));
 	}
+	
 	public Chain getChain() throws IOException {
 		this.client.sendMessage(JMProtocolImpl.craftMessage(NetConst.GIVE_ME_BLOCKCHAIN_COPY, null));
-		Chain c = this.peer.getMining().getChain();
+		Chain c = this.mining.getChain();
 		while(c == null) {
 			try {
 				Thread.sleep(500);
 			}catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			c = this.peer.getMining().getChain();
+			c = this.mining.getChain();
 		}
 		return c;
 	}
@@ -158,14 +153,14 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
 			this.client.sendMessage(JMProtocolImpl.craftMessage(NetConst.GIVE_ME_UNSPENT_OUTPUTS, null));
 			//String unvf = "";//JMProtocolImpl.sendRequest(NetConst.RELAY_NODE_LISTEN_PORT, NetConst.RELAY_DEBUG_HOST_NAME, NetConst.GIVE_ME_UNSPENT_OUTPUTS, null);
 			//Output[] unspentOutputs = IOFileHandler.getFromJsonString(unvf, Output[].class);
-			Output[] unspentOutputs = this.peer.getMining().getUnspentOutputs(); 
+			Output[] unspentOutputs = this.mining.getUnspentOutputs(); 
 			while(unspentOutputs == null) {
 				try {
 					Thread.sleep(500);
 				}catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				unspentOutputs = this.peer.getMining().getUnspentOutputs();
+				unspentOutputs = this.mining.getUnspentOutputs();
 			}
 			boolean unspent = false;
 			for(Output uo : unspentOutputs) {
@@ -188,4 +183,14 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
 		
 		return true	;
 	}
+	
+	public void sendMinedBlock(Block block) throws IOException {
+		this.client.sendMessage(JMProtocolImpl.craftMessage(NetConst.TAKE_MY_MINED_BLOCK, IOFileHandler.toJson(block)));
+	}
+
+	@Override
+	protected String giveMeLastBlock() {return null;}
+
+	@Override
+	protected void receiveLastBlock(String block) {}
 }

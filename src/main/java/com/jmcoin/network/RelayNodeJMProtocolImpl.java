@@ -16,8 +16,8 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
     
     private ClientSC client;
 	
-	public RelayNodeJMProtocolImpl() throws IOException {
-		super(new RelayNode());
+	public RelayNodeJMProtocolImpl(RelayNode relay) throws IOException {
+		super(relay);
 	}
     
     private void receiveData(String payload) {
@@ -105,5 +105,16 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
 	protected String giveMeUnspentOutputs() {
 		this.client.setToSend(JMProtocolImpl.craftMessage(NetConst.GIVE_ME_UNSPENT_OUTPUTS, null));
 		return null;
+	}
+
+	@Override
+	protected String giveMeLastBlock() {
+		this.client.setToSend(JMProtocolImpl.craftMessage(NetConst.GIVE_ME_LAST_BLOCK, null));
+		return null;
+	}
+
+	@Override
+	protected void receiveLastBlock(String block) {
+		receiveBlockchainCopy(block);
 	}
 }

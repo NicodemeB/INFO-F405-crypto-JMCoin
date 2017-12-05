@@ -60,7 +60,7 @@ public class Client extends TemplateThread{
         case NetConst.CONNECTION_REQUEST:
             break;
         default:
-        	System.out.println(this.protocol.processInput(msg));
+        	this.protocol.processInput(msg);
             break;
 		}
 	}

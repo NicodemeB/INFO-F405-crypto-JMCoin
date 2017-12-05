@@ -11,7 +11,7 @@ public class ReceiverThread<X extends TemplateThread> implements Runnable{
     public ReceiverThread(X workerRunnable) {
         runnable = workerRunnable;
         input = workerRunnable.getIn();
-    }
+    } 
 
     @Override
     public void run() {

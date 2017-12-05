@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.Vector;
 
-public class MultiThreadedServerClient extends MultiThreadedServer<RelayNodeJMProtocolImpl>{
+public class MultiThreadedServerClient extends MultiThreadedServer{
 
     private Vector<WorkerRunnableSC> lThreadsSC;
     private Vector<WorkerRunnableSC> awaitingAnswers;

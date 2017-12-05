@@ -7,7 +7,6 @@ import java.util.Map;
 import org.bouncycastle.util.encoders.Hex;
 
 import com.jmcoin.crypto.SignaturesVerification;
-import com.jmcoin.io.IOFileHandler;
 import com.jmcoin.model.Block;
 import com.jmcoin.model.Chain;
 import com.jmcoin.model.Input;
@@ -22,6 +21,7 @@ public class MasterNode extends Peer{
     
     private Map<String, Output> unspentOutputs; //key = hash of the transaction containing the output
     private Chain chain;
+    private Block lastBlock;
     
     private int difficulty = NetConst.DEFAULT_DIFFICULTY;
 
@@ -30,7 +30,14 @@ public class MasterNode extends Peer{
     	chain = new Chain();
     	this.unverifiedTransactions = new LinkedList<>();
     	this.unspentOutputs = new HashMap<>();
+    	this.lastBlock = new Block();
+    	this.lastBlock.setDifficulty(32);
+    	this.lastBlock.setFinalHash("h0");
     }
+    
+    public Block getLastBlock() {
+		return lastBlock;
+	}
     
     public Map<String, Output> getUnspentOutputs() {
 		return unspentOutputs;
@@ -94,5 +101,6 @@ public class MasterNode extends Peer{
 			}
 		}
     	chain.addBlock(pBlock);
+    	this.lastBlock = pBlock;
     }
 }

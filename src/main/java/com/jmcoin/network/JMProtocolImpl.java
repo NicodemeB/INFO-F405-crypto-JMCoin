@@ -74,6 +74,11 @@ public abstract class JMProtocolImpl<X extends Peer> {
             case NetConst.RECEIVE_UNSPENT_OUTPUTS:
             	receiveUnspentOutputs(tokenizer.nextToken());
             	return NetConst.RES_OKAY;
+            case NetConst.GIVE_ME_LAST_BLOCK:
+            	return giveMeLastBlock();
+            case NetConst.RECEIVE_LAST_BLOCK:
+            	receiveLastBlock(tokenizer.nextToken());
+            	return NetConst.RES_OKAY;
             case NetConst.STOP_MINING:
                 return stopMining();
 			default:
@@ -137,6 +142,9 @@ public abstract class JMProtocolImpl<X extends Peer> {
 	 * @return
 	 */
 	protected abstract String giveMeDifficulty();
+	
+	protected abstract String giveMeLastBlock();
+	protected abstract void receiveLastBlock(String block);
 	/**
 	 * Builds a message to send over the network, compliant with the protocol
 	 * @param request {@link NetConst}.xxxxx

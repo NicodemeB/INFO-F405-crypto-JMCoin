@@ -1,43 +1,33 @@
 
 package com.jmcoin.model;
-import com.google.gson.Gson;
 import com.jmcoin.crypto.AES;
 import com.jmcoin.crypto.SignaturesVerification;
-import com.jmcoin.network.Client;
-import com.jmcoin.network.JMProtocolImpl;
-import com.jmcoin.network.NetConst;
-import com.jmcoin.network.ReceiverThread;
-import com.jmcoin.network.RelayNodeJMProtocolImpl;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 public class Wallet {
     
-    private String email;
+    //private String email;
     private KeyGenerator keyGen = new KeyGenerator(1024);
     private HashMap<PrivateKey,PublicKey> keys;
     private ArrayList<String> addresses;
@@ -49,28 +39,22 @@ public class Wallet {
     private final String PRIV_KEYS = REP + SEP + "Documents"+SEP+"PrivateKeys";
     private final String PUB_KEYS = REP + SEP + "Documents"+SEP+"PublicKeys";
     
-    private Client client;
-
-    public Wallet(String email) throws NoSuchAlgorithmException, NoSuchProviderException, IOException, InvalidKeySpecException, AES.InvalidPasswordException, AES.InvalidAESStreamException, AES.StrongEncryptionNotAvailableException
-    {
+    //FIXME is mail useful ?
+    public Wallet(String email) throws NoSuchAlgorithmException, NoSuchProviderException, IOException, InvalidKeySpecException, AES.InvalidPasswordException, AES.InvalidAESStreamException, AES.StrongEncryptionNotAvailableException{
     	String password = promptPassword();
+    	this.transactions = new ArrayList<>();
     	this.addresses = new ArrayList<String>();
     	File file = new File(PRIV_KEYS);
     	if(!file.exists() || !file.isDirectory()) file.mkdir();
     	file = new File(PUB_KEYS);
     	if(!file.exists() || !file.isDirectory()) file.mkdir();
-        this.email = email;
+        //this.email = email;
         this.keys = getWalletKeysFromFile(password);
         this.balance = getBalance(addresses);
-        //FIXME needs to be changed ?
-        this.client = new Client(NetConst.RELAY_NODE_LISTEN_PORT, NetConst.RELAY_DEBUG_HOST_NAME, new RelayNodeJMProtocolImpl());
-        new Thread(new ReceiverThread<Client>(this.client)).start();
-        new Thread(this.client).start();
     }   
     
     // ------------------------------------------Keys
-    public void createKeys(String password) throws IOException, AES.InvalidKeyLengthException, AES.StrongEncryptionNotAvailableException
-    {
+    public void createKeys(String password) throws IOException, AES.InvalidKeyLengthException, AES.StrongEncryptionNotAvailableException{
         keyGen.createKeys();
         PrivateKey privateKey = keyGen.getPrivateKey();
         PublicKey publicKey = keyGen.getPublicKey();
@@ -91,7 +75,7 @@ public class Wallet {
     {
         //RIPEMD160Digest dgst = new RIPEMD160Digest();
         for(PrivateKey privK : this.keys.keySet()){
-            getAddresses().add(SignaturesVerification.DeriveJMAddressFromPubKey(this.keys.get(privK)));
+            this.addresses.add(SignaturesVerification.DeriveJMAddressFromPubKey(this.keys.get(privK)));
         }
     }
     public HashMap<PrivateKey,PublicKey> getWalletKeysFromFile(String password) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, AES.InvalidPasswordException, AES.InvalidAESStreamException, AES.StrongEncryptionNotAvailableException 
@@ -155,54 +139,6 @@ public class Wallet {
         return keyCouples;
     }
     
-    //--------------------------------------------Transactions
-    public void createTransaction(String fromAddress, String toAddress, double amountToSend, PrivateKey privKey, PublicKey pubKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, FileNotFoundException, SignatureException
-    {
-        //Recupérer la liste de transacction avec des outputs disponibles pour cette adresse TO DO from network
-        ArrayList<Transaction> addressTransactions = new ArrayList<Transaction>();
-        ArrayList<Input> addressInputs = new ArrayList<Input>();
-        double totalOutputAmount = 0;
-        
-        for(int i = 0 ; i < addressTransactions.size(); i++)
-        {
-            if(addressTransactions.get(i).getOutputBack().getAddress().equals(fromAddress))
-            {
-                totalOutputAmount+= addressTransactions.get(i).getOutputBack().getAmount();
-                addressInputs.add(new Input(fromAddress,addressTransactions.get(i).getOutputBack().getAmount(),addressTransactions.get(i).getHash()));
-                
-            }
-            else
-            {  
-                if((addressTransactions.get(i).getOutputOut().getAddress().equals(fromAddress)))
-                {
-                    totalOutputAmount+= addressTransactions.get(i).getOutputOut().getAmount();
-                    addressInputs.add(new Input(fromAddress,addressTransactions.get(i).getOutputOut().getAmount(),addressTransactions.get(i).getHash()));
-                }
-                else
-                {
-                    System.out.println("Wallet : No output belonging to this address");
-                }
-            }           
-            
-        }
-        if(amountToSend <= totalOutputAmount)
-        {
-            Output oOut = new Output(amountToSend, toAddress);
-            Output oBack = new Output(totalOutputAmount-amountToSend, fromAddress);
-            Transaction tr = new Transaction(addressInputs,oOut, oBack,pubKey);
-            tr.setSignature(SignaturesVerification.signTransaction(tr.getBytes(false), privKey));
-            tr.computeHash();
-            sendTransaction(tr);
-        }
-        else
-        {
-            System.out.println("Wallet: Insuficient amount for that address");
-        }
-        //addTransaction(new Transaction());
-    }
-    public void sendTransaction(Transaction tr) throws IOException{
-        this.client.sendMessage(JMProtocolImpl.craftMessage(NetConst.TAKE_MY_NEW_TRANSACTION, new Gson().toJson(tr)));
-    }
     
     public void addTransaction(Transaction transaction){
         transactions.add(transaction);
@@ -252,18 +188,21 @@ public class Wallet {
         //scan.close();*/
         return "a";//FIXME using a scanner it not the right way to do this
     }
-    public HashMap<PrivateKey,PublicKey> getKeys() 
-    {
+    public HashMap<PrivateKey,PublicKey> getKeys() {
        return keys;
+       
     }
-    public String getEmail() {
+    
+    /*public String getEmail() {
         return email;
-    }
-    public ArrayList<String> getAddresses() {
+    }*/
+    
+    /*public ArrayList<String> getAddresses() {
         return addresses;
-    }
-    public void setKeys(HashMap<PrivateKey,PublicKey> keys) {
+    }*/
+    
+    /*public void setKeys(HashMap<PrivateKey,PublicKey> keys) {
         this.keys = keys;
-    }
+    }*/
 }
  

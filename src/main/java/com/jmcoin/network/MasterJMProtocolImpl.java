@@ -9,8 +9,8 @@ import com.jmcoin.model.Transaction;
 
 public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 	
-	public MasterJMProtocolImpl() throws IOException {
-		super(MasterNode.getInstance());
+	public MasterJMProtocolImpl(MasterNode masterNode) throws IOException {
+		super(masterNode);
 	}
 
 	@Override
@@ -30,7 +30,7 @@ public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 	protected String takeMyMinedBlockImpl(String payload) throws IOException {
 		if (payload != null) {
 			try {
-				peer.processBlock(IOFileHandler.getFromJsonString(payload, Block.class));
+				this.peer.processBlock(IOFileHandler.getFromJsonString(payload, Block.class));
 				return stopMining();
 			}
 			catch(JsonSyntaxException jse) {
@@ -59,16 +59,15 @@ public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 	
 	@Override
 	protected String giveMeRewardAmountImpl() {
-		return JMProtocolImpl.craftMessage(NetConst.RECEIVE_REWARD_AMOUNT, Integer.toString(peer.getRewardAmount()));
+		return JMProtocolImpl.craftMessage(NetConst.RECEIVE_REWARD_AMOUNT, Integer.toString(this.peer.getRewardAmount()));
 	}
 	
 	@Override
 	protected String giveMeBlockChainCopyImpl() {
-		return JMProtocolImpl.craftMessage(NetConst.RECEIVE_BLOCKCHAIN_COPY, IOFileHandler.toJson(peer.getChain()));
+		return JMProtocolImpl.craftMessage(NetConst.RECEIVE_BLOCKCHAIN_COPY, IOFileHandler.toJson(this.peer.getChain()));
 	}
 
 	@Override
-	//FIXME May be too big!
 	protected String giveMeUnspentOutputs() {
 		return JMProtocolImpl.craftMessage(NetConst.RECEIVE_UNSPENT_OUTPUTS, IOFileHandler.toJson(this.peer.getUnspentOutputs()));
 	}
@@ -87,4 +86,12 @@ public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 
 	@Override
 	protected void receiveUnspentOutputs(String string) {}
+
+	@Override
+	protected String giveMeLastBlock() {
+		return JMProtocolImpl.craftMessage(NetConst.RECEIVE_LAST_BLOCK, IOFileHandler.toJson(this.peer.getLastBlock()));
+	}
+
+	@Override
+	protected void receiveLastBlock(String block) {}
 }

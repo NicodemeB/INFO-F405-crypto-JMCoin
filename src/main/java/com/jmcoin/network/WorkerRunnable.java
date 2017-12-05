@@ -5,7 +5,7 @@ import java.net.Socket;
 
 public class WorkerRunnable extends TemplateThread{
 
-    private BroadcastThread<WorkerRunnable> bt;
+    //private BroadcastThread<WorkerRunnable> bt;
 
     private MultiThreadedServer server;
 

@@ -6,10 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.ExecutionException;
 import org.bouncycastle.util.encoders.Hex;
 
-import com.google.gson.Gson;
-import com.jmcoin.network.JMProtocolImpl;
 import com.jmcoin.network.MinerJMProtocolImpl;
-import com.jmcoin.network.NetConst;
 /**
  * @author Trifi Mohamed Nabil
  * @author Arbib Mohamed
@@ -58,6 +55,7 @@ public class Mining{
 	}
 	
 	public void mine(Block block) throws NoSuchAlgorithmException, InterruptedException, ExecutionException {
+		System.err.println("Start mining");
         this.miningThread.setBlock(block);
         this.miningThread.setRunning(true);
         this.miningThread.start();
