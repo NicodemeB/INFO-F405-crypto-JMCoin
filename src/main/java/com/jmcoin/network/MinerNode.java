@@ -65,10 +65,21 @@ public class MinerNode extends Peer{
 				block.getTransactions().add(trans[i]);
 			}
 		}
+		
 		int intRewardAmount = 0;
-		int tmp = mining.getRewardAmount();
-    	intRewardAmount = block.getSize() >= Block.MAX_BLOCK_SIZE ? tmp : intRewardAmount * ((tmp / Block.MAX_BLOCK_SIZE)+1);
-        PrivateKey privKey = this.wallet.getKeys().keySet().iterator().next();
+		
+		int sizeBlock = block.getTransactions().size();
+		if(sizeBlock < 10){
+			intRewardAmount = 2;
+		}else if(sizeBlock < 50){
+			intRewardAmount = 4;
+		}else if(sizeBlock < 100){
+			intRewardAmount = 8;
+		}else{
+			intRewardAmount = 10;
+		}
+    	
+    	PrivateKey privKey = this.wallet.getKeys().keySet().iterator().next();
         PublicKey pubKey = this.wallet.getKeys().get(privKey);
 		Transaction reward = new Transaction();
 		Output out = new Output();
