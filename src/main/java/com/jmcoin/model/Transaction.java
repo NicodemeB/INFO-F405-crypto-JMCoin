@@ -3,6 +3,7 @@ package com.jmcoin.model;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
+import java.security.Key;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
@@ -30,13 +31,13 @@ public class Transaction implements Serializable {
     @Lob
     private byte[] signature;
     @Basic(optional = false)
-    private PublicKey pubKey;
+    private byte[] pubKey;
 
     public Transaction() {
         inputs = new ArrayList<>();
     }
 
-    public void setPubKey(PublicKey pubKey) {
+    public void setPubKey(byte[] pubKey) {
         this.pubKey = pubKey;
     }
 
@@ -44,7 +45,7 @@ public class Transaction implements Serializable {
         this.signature = signature;
     }
 
-    public PublicKey getPubKey() {
+    public byte[] getPubKey() {
         return pubKey;
     }
 
@@ -86,11 +87,6 @@ public class Transaction implements Serializable {
     }
 
     public void setOutputBack(Output o) {
-        //this Output can be null
-
-		/*if(o == null) {
-			throw new IllegalArgumentException("Transaction.addOutputBack: Parameter cannot be null");
-		}*/
         this.outputBack = o;
 
     }
@@ -104,7 +100,7 @@ public class Transaction implements Serializable {
         size += (this.outputOut == null ? 0 : this.outputOut.getSize());
         size += (this.hash == null ? 0 : this.hash.length);
         size += (this.signature == null ? 0 : this.signature.length);
-        size += (this.pubKey == null ? 0 : this.pubKey.getEncoded().length);
+        size += (this.pubKey == null ? 0 : this.pubKey.length);
         return size;
     }
 
@@ -119,7 +115,7 @@ public class Transaction implements Serializable {
         if (!this.outputBack.equals(transaction.outputBack)) return false;
         return Arrays.equals(this.hash, transaction.hash) &&
                 Arrays.equals(this.signature, transaction.signature) &&
-                Arrays.equals(this.pubKey.getEncoded(), transaction.pubKey.getEncoded());
+                Arrays.equals(this.pubKey, transaction.pubKey);
     }
 
     /* FIXME should not be done here
@@ -149,7 +145,7 @@ public class Transaction implements Serializable {
             buf.put(input.getBytes());
         }
         if (withSign && this.signature != null) buf.put(this.signature);
-        if (this.pubKey != null) buf.put(pubKey.getEncoded());
+        if (this.pubKey != null) buf.put(pubKey);
         if (this.outputBack != null) buf.put(outputBack.getBytes());
         if (this.outputOut != null) buf.put(outputOut.getBytes());
         return buf.array();

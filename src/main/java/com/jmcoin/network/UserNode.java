@@ -9,16 +9,11 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 import com.jmcoin.crypto.SignaturesVerification;
 import com.jmcoin.crypto.AES.InvalidAESStreamException;
 import com.jmcoin.crypto.AES.InvalidPasswordException;
 import com.jmcoin.crypto.AES.StrongEncryptionNotAvailableException;
-import com.jmcoin.model.Block;
-import com.jmcoin.model.Chain;
 import com.jmcoin.model.Input;
 import com.jmcoin.model.Output;
 import com.jmcoin.model.Transaction;
@@ -27,35 +22,24 @@ import com.jmcoin.model.Wallet;
 public class UserNode extends Peer{
 
 	private Wallet wallet;
-	private Chain chain;
-	private Map<String, Output> unspentOutputs;
-	private Block lastBlock;
-	private ArrayList<Transaction> transToMe;
 	
-	public UserNode(String email) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException, IOException, InvalidPasswordException, InvalidAESStreamException, StrongEncryptionNotAvailableException {
-		this.wallet = new Wallet(email);
+	public UserNode(String password) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException, IOException, InvalidPasswordException, InvalidAESStreamException, StrongEncryptionNotAvailableException {
+		this.wallet = new Wallet(password);
 	}
 	
-    public Transaction createTransaction(UserJMProtocolImpl protocol, String fromAddress, String toAddress, double amountToSend, PrivateKey privKey, PublicKey pubKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, FileNotFoundException, SignatureException{
-        protocol.getClient().sendMessage(JMProtocolImpl.craftMessage(NetConst.GIVE_ME_TRANS_TO_THIS_ADDRESS, fromAddress));
-        while(this.transToMe == null) {
-        	try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-        }
-        ArrayList<Transaction> addressTransactions = this.transToMe;
-        Transaction tr = new Transaction();
+	public Transaction createTransaction(UserJMProtocolImpl protocol, String fromAddress, String toAddress,
+			double amountToSend, PrivateKey privKey, PublicKey pubKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, FileNotFoundException, SignatureException{
+    	Transaction[] addressTransactions = protocol.downloadObject(Transaction[].class, NetConst.GIVE_ME_TRANS_TO_THIS_ADDRESS, fromAddress, protocol.getClient());
+    	Transaction tr = new Transaction();
         double totalOutputAmount = 0;
-        for(int i = 0 ; i < addressTransactions.size(); i++){
-            if(addressTransactions.get(i).getOutputBack().getAddress().equals(fromAddress)){
-                totalOutputAmount+= addressTransactions.get(i).getOutputBack().getAmount();
-                tr.addInput(new Input(fromAddress,addressTransactions.get(i).getOutputBack().getAmount(),addressTransactions.get(i).getHash()));
+        for(int i = 0 ; i < addressTransactions.length; i++){
+            if(addressTransactions[i].getOutputBack().getAddress().equals(fromAddress)){
+                totalOutputAmount+= addressTransactions[i].getOutputBack().getAmount();
+                tr.addInput(new Input(fromAddress,addressTransactions[i].getOutputBack().getAmount(),addressTransactions[i].getHash()));
             }
-            else if((addressTransactions.get(i).getOutputOut().getAddress().equals(fromAddress))){
-            	totalOutputAmount+= addressTransactions.get(i).getOutputOut().getAmount();
-            	tr.addInput(new Input(fromAddress,addressTransactions.get(i).getOutputOut().getAmount(),addressTransactions.get(i).getHash()));
+            else if((addressTransactions[i].getOutputOut().getAddress().equals(fromAddress))){
+            	totalOutputAmount+= addressTransactions[i].getOutputOut().getAmount();
+            	tr.addInput(new Input(fromAddress,addressTransactions[i].getOutputOut().getAmount(),addressTransactions[i].getHash()));
             }
             else{
             	System.out.println("Wallet : No output belonging to this address");
@@ -66,7 +50,7 @@ public class UserNode extends Peer{
             Output oBack = new Output(totalOutputAmount-amountToSend, fromAddress);
             tr.setSignature(SignaturesVerification.signTransaction(tr.getBytes(false), privKey));
             tr.computeHash();
-            tr.setPubKey(pubKey);
+            tr.setPubKey(pubKey.getEncoded());
             tr.setOutputBack(oBack);
             tr.setOutputOut(oOut);
             return tr;
@@ -77,41 +61,7 @@ public class UserNode extends Peer{
 		return null;
     }
 
-    
-    public Map<String, Output> getUnspentOutputs() {
-		return unspentOutputs;
-	}
-    
-	public void setUnspentOutputs(Map<String, Output> unspentOutputs) {
-		this.unspentOutputs  =unspentOutputs;
-		
-	}
-
-	public void setBlockchainCopy(Chain chain) {
-		this.setChain(chain);
-	}
-
-	public void setLastBlock(Block lastBlock) {
-		this.lastBlock = lastBlock;
-	}
-	
-	public Block getLastBlock() {
-		return lastBlock;
-	}
-
-	public Chain getChain() {
-		return chain;
-	}
-
-	public void setChain(Chain chain) {
-		this.chain = chain;
-	}
-	
-	public List<Transaction> getTransToMe() {
-		return transToMe;
-	}
-	
-	public void setTransToMe(ArrayList<Transaction> transToMe) {
-		this.transToMe = transToMe;
+	public Wallet getWallet() {
+		return wallet;
 	}
 }

@@ -45,12 +45,12 @@ public class Genesis extends Block {
 		inGenesis.setPrevTransactionHash(null);
 		Output outGenesis = new Output();
 		outGenesis.setAmount(42);
-		outGenesis.setAddress(SignaturesVerification.DeriveJMAddressFromPubKey(pubKey));
+		outGenesis.setAddress(SignaturesVerification.DeriveJMAddressFromPubKey(pubKey.getEncoded()));
 		Transaction transGenesis = new Transaction();
 		transGenesis.setOutputBack(null);
 		transGenesis.setOutputOut(outGenesis);
 		transGenesis.addInput(inGenesis);
-		transGenesis.setPubKey(pubKey);
+		transGenesis.setPubKey(pubKey.getEncoded());
 		transGenesis.setSignature(SignaturesVerification.signTransaction(transGenesis.getBytes(false), privKey));
 		transGenesis.computeHash();
 		this.transactions.add(transGenesis);

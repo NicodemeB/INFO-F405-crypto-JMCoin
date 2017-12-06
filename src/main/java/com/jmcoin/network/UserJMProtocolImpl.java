@@ -3,9 +3,9 @@ package com.jmcoin.network;
 import java.io.IOException;
 import java.util.Map;
 
-import com.jmcoin.io.IOFileHandler;
 import com.jmcoin.model.Block;
 import com.jmcoin.model.Chain;
+import com.jmcoin.model.Transaction;
 
 public class UserJMProtocolImpl extends JMProtocolImpl<UserNode>{
 
@@ -27,15 +27,14 @@ public class UserJMProtocolImpl extends JMProtocolImpl<UserNode>{
 		return client;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void receiveUnspentOutputs(String string) {
-		this.peer.setUnspentOutputs(IOFileHandler.getFromJsonString(string, Map.class));
+		setBundle(string, Map.class);		
 	}
 
 	@Override
 	protected void receiveBlockchainCopy(String string) {
-		this.peer.setBlockchainCopy(IOFileHandler.getFromJsonString(string, Chain.class));
+		setBundle(string, Chain.class);
 	}
 
 	@Override
@@ -76,11 +75,13 @@ public class UserJMProtocolImpl extends JMProtocolImpl<UserNode>{
 
 	@Override
 	protected void receiveLastBlock(String block) {
-		this.peer.setLastBlock(IOFileHandler.getFromJsonString(block, Block.class));
+		setBundle(block, Block.class);
 	}
 
 	@Override
-	protected void receiveTransactionToThisAddress(String trans) {}
+	protected void receiveTransactionToThisAddress(String trans) {
+		setBundle(trans, Transaction[].class);
+	}
 
 	@Override
 	protected String giveMeTransactionsToThisAddress(String address) {return null;}

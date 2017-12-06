@@ -29,7 +29,7 @@ public class TestDBOperations {
         inGenesis.setPrevTransactionHash(null);
         Output outGenesis = new Output();
         outGenesis.setAmount(42);
-        outGenesis.setAddress(SignaturesVerification.DeriveJMAddressFromPubKey((PublicKey) keys[1]));
+        outGenesis.setAddress(SignaturesVerification.DeriveJMAddressFromPubKey(keys[1].getEncoded()));
         Output outGenesisBack = new Output();
         outGenesisBack.setAmount(0);
         outGenesisBack.setAddress(null);
@@ -37,7 +37,7 @@ public class TestDBOperations {
         transGenesis.setOutputBack(outGenesisBack);
         transGenesis.setOutputOut(outGenesis);
         addInput(inGenesis, transGenesis);
-        transGenesis.setPubKey((PublicKey) keys[1]);
+        transGenesis.setPubKey(keys[1].getEncoded());
         transGenesis.setSignature(SignaturesVerification.signTransaction(transGenesis.getBytes(false), (PrivateKey) keys[0]));
 /*        Reward reward = new Reward();
         reward.setOutputBack(null);

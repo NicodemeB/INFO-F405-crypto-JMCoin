@@ -43,6 +43,7 @@ public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 	@Override
 	protected boolean takeMyNewTransactionImpl(String payload) {
 		try {
+			System.err.println("Hi, I just received a new Transaction!");
 			this.peer.getUnverifiedTransactions().add(IOFileHandler.getFromJsonString(payload, Transaction.class));
 			return true;
 		}

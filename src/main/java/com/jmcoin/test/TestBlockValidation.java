@@ -73,7 +73,7 @@ public class TestBlockValidation {
 		inGenesis.setPrevTransactionHash(null);
 		Output outGenesis = new Output();
 		outGenesis.setAmount(42);
-		outGenesis.setAddress(SignaturesVerification.DeriveJMAddressFromPubKey(keys.get(keyConnard)));
+		outGenesis.setAddress(SignaturesVerification.DeriveJMAddressFromPubKey(keys.get(keyConnard).getEncoded()));
 		Output outGenesisBack = new Output();
 		outGenesisBack.setAmount(0);
 		outGenesisBack.setAddress(null);
@@ -81,7 +81,7 @@ public class TestBlockValidation {
 		transGenesis.setOutputBack(outGenesisBack);
 		transGenesis.setOutputOut(outGenesis);
 		transGenesis.addInput(inGenesis);
-		transGenesis.setPubKey(keys.get(keyConnasse));
+		transGenesis.setPubKey(keys.get(keyConnasse).getEncoded());
 		genesis.getTransactions().add(transGenesis);
 //		transGenesis.setSignature(SignaturesVerification.);
 		genesis.setPrevHash(null);
@@ -149,7 +149,7 @@ public class TestBlockValidation {
 					transaction.setOutputOut(outputOut);
 					transaction.setOutputBack(outputBack);
 					transaction.setSignature(SignaturesVerification.signTransaction(transaction.getBytes(false), privKey));
-					transaction.setPubKey(keys.get(privKey));
+					transaction.setPubKey(keys.get(privKey).getEncoded());
 					block.getTransactions().add(transaction);
 				}
 			}

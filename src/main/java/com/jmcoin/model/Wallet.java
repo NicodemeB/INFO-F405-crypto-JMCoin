@@ -65,7 +65,7 @@ public class Wallet {
     
     public void computeAddresses(HashMap<PrivateKey,PublicKey> keys) throws IOException{
         for(PrivateKey privK : this.keys.keySet()){
-            this.addresses.add(SignaturesVerification.DeriveJMAddressFromPubKey(this.keys.get(privK)));
+            this.addresses.add(SignaturesVerification.DeriveJMAddressFromPubKey(this.keys.get(privK).getEncoded()));
         }
     }
     
@@ -75,7 +75,6 @@ public class Wallet {
         ArrayList<PublicKey> publicKeyList = new ArrayList<>();
            
         try (Stream<Path> paths = Files.walk(Paths.get(PRIV_KEYS))) {
-
             paths
             .filter(Files::isRegularFile)
             .forEach(filePath-> {
@@ -110,8 +109,7 @@ public class Wallet {
                         publicKeyList.add(pubKey);
                     } 
                 } 
-                catch (IOException ex) 
-                {
+                catch (IOException ex) {
                     Logger.getLogger(Wallet.class.getName()).log(Level.SEVERE, null, ex);
                 } 
                 catch (InvalidKeySpecException ex) {
@@ -132,7 +130,7 @@ public class Wallet {
     // ------------------------------------------- Chain
     public double getAddressBalance(String address)
     {
-       //Recupérer la liste de transacction avec des outputs disponibles pour cette adresse TO DO from network
+       //TODO Recupérer la liste de transacction avec des outputs disponibles pour cette adresse TO DO from network
         ArrayList<Transaction> addressTransactions = new ArrayList<Transaction>();
         double totalOutputAmount = 0;
         
@@ -169,7 +167,6 @@ public class Wallet {
     
     public HashMap<PrivateKey,PublicKey> getKeys() {
        return keys;
-       
     }
 }
  

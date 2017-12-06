@@ -1,7 +1,9 @@
 package com.jmcoin.io;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import com.jmcoin.model.Transaction;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -16,7 +18,7 @@ import java.io.IOException;
  * @author enzo
  *
  */
-public abstract class IOFileHandler {
+public class IOFileHandler {
 	
 	/**
 	 * Checks if a file exists, and is not a directory
@@ -97,5 +99,4 @@ public abstract class IOFileHandler {
 	public static String toJson(Object o){
 		return new Gson().toJson(o);
 	}
-
 }

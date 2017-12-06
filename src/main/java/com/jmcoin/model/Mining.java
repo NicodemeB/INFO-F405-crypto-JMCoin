@@ -14,39 +14,16 @@ import com.jmcoin.network.MinerJMProtocolImpl;
  */
 public class Mining{
 	
-	private Integer difficulty;
+	/*private Integer difficulty;
 	private Integer rewardAmount;
 	private Transaction[] unverifiedTransaction;
-	private MiningThread miningThread;
 	private Output[] unspentOutputs;
-	private Chain chain;
+	private Chain chain;*/
+	private MiningThread miningThread;
+	
 	
 	public Mining(MinerJMProtocolImpl protocol) throws NoSuchAlgorithmException {
 		this.miningThread = new MiningThread(protocol);
-	}
-	
-	public Transaction[] getUnverifiedTransaction() {
-		return unverifiedTransaction;
-	}
-
-	public void setUnverifiedTransaction(Transaction[] unverifiedTransaction) {
-		this.unverifiedTransaction = unverifiedTransaction;
-	}
-
-	public Integer getDifficulty() {
-		return difficulty;
-	}
-
-	public void setDifficulty(int difficulty) {
-		this.difficulty = difficulty;
-	}
-
-	public Integer getRewardAmount() {
-		return rewardAmount;
-	}
-
-	public void setRewardAmount(int rewardAmount) {
-		this.rewardAmount = rewardAmount;
 	}
 	
 	public void stopMining() {
@@ -59,22 +36,6 @@ public class Mining{
         this.miningThread.setBlock(block);
         this.miningThread.setRunning(true);
         this.miningThread.start();
-	}
-	
-	public Output[] getUnspentOutputs() {
-		return unspentOutputs;
-	}
-
-	public void setUnspentOutputs(Output[] unspentOutputs) {
-		this.unspentOutputs = unspentOutputs;
-	}
-
-	public Chain getChain() {
-		return chain;
-	}
-
-	public void setChain(Chain chain) {
-		this.chain = chain;
 	}
 	
 	private class MiningThread extends Thread{

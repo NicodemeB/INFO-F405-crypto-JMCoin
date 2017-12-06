@@ -2,7 +2,6 @@ package com.jmcoin.network;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-
 import com.jmcoin.crypto.SignaturesVerification;
 import com.jmcoin.io.IOFileHandler;
 import com.jmcoin.model.Block;
@@ -30,32 +29,8 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
         }
 	}
 	
-	public Mining getMiningInfos() throws IOException {
-		this.client.sendMessage(JMProtocolImpl.craftMessage(NetConst.GIVE_ME_DIFFICULTY, null));
-		while(this.mining.getDifficulty()== null) {
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		this.client.sendMessage(JMProtocolImpl.craftMessage(NetConst.GIVE_ME_REWARD_AMOUNT, null));
-		while(this.mining.getRewardAmount() == null) {
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		this.client.sendMessage(JMProtocolImpl.craftMessage(NetConst.GIVE_ME_UNVERIFIED_TRANSACTIONS, null));
-		while(this.mining.getUnverifiedTransaction() == null) {
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		return mining;
+	public Client getClient() {
+		return client;
 	}
 
 	@Override
@@ -92,49 +67,27 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
 
 	@Override
 	protected void receiveDifficulty(String string) {
-		try{
-			this.mining.setDifficulty(Integer.parseInt(string));
-		}
-		catch(NumberFormatException nfe) {
-			nfe.printStackTrace();
-		}
+		setBundle(string , Integer.class);
 	}
 
 	@Override
 	protected void receiveUnverifiedTransactions(String string) {
-		this.mining.setUnverifiedTransaction(IOFileHandler.getFromJsonString(string, Transaction[].class));
+		setBundle(string , Transaction[].class);
 	}
 
 	@Override
 	protected void receiveRewardAmount(String string) {
-		try{
-			this.mining.setRewardAmount(Integer.parseInt(string));
-		}
-		catch(NumberFormatException nfe) {
-			nfe.printStackTrace();
-		}
+		setBundle(string , Integer.class);
 	}
 
 	@Override
-	protected void receiveBlockchainCopy(String nextToken) {}
+	protected void receiveBlockchainCopy(String string) {
+		setBundle(string , Chain.class);
+	}
 
 	@Override
 	protected void receiveUnspentOutputs(String string) {
-		this.mining.setUnspentOutputs(IOFileHandler.getFromJsonString(string, Output[].class));
-	}
-	
-	public Chain getChain() throws IOException {
-		this.client.sendMessage(JMProtocolImpl.craftMessage(NetConst.GIVE_ME_BLOCKCHAIN_COPY, null));
-		Chain c = this.mining.getChain();
-		while(c == null) {
-			try {
-				Thread.sleep(500);
-			}catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			c = this.mining.getChain();
-		}
-		return c;
+		setBundle(string , Output[].class);
 	}
 	
 	public boolean validateTransaction(Transaction trans, Chain chain) throws IOException {
@@ -151,16 +104,7 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
 			if(output == null) {
 				return false;
 			}
-			this.client.sendMessage(JMProtocolImpl.craftMessage(NetConst.GIVE_ME_UNSPENT_OUTPUTS, null));
-			Output[] unspentOutputs = this.mining.getUnspentOutputs(); 
-			while(unspentOutputs == null) {
-				try {
-					Thread.sleep(500);
-				}catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				unspentOutputs = this.mining.getUnspentOutputs();
-			}
+			Output[] unspentOutputs = downloadObject(Output[].class, NetConst.GIVE_ME_UNSPENT_OUTPUTS, null, client);
 			boolean unspent = false;
 			for(Output uo : unspentOutputs) {
 				if(uo.equals(output)) {

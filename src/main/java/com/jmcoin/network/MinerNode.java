@@ -29,9 +29,9 @@ public class MinerNode extends Peer{
 		this.wallet = new Wallet(password);
 	}
 	
-	public void mine(MinerJMProtocolImpl protocol) throws InvalidKeyException, ClassNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, IOException, InterruptedException, ExecutionException {
-		Mining mining = protocol.getMiningInfos();
-		Block block = buildBlock(mining);
+	public void mine(MinerJMProtocolImpl protocol) throws NoSuchAlgorithmException, InvalidKeyException, ClassNotFoundException, NoSuchProviderException, SignatureException, IOException, InterruptedException, ExecutionException{
+		Mining mining = new Mining(protocol);
+		Block block = buildBlock(protocol);
 		mining.mine(block);
 	}
 	
@@ -48,35 +48,37 @@ public class MinerNode extends Peer{
 	 * @throws InterruptedException
 	 * @throws ExecutionException
 	 */
-	public void mine(MinerJMProtocolImpl protocol, int diff) throws InvalidKeyException, ClassNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, IOException, InterruptedException, ExecutionException {
-		Mining mining = protocol.getMiningInfos();
-		Block block = buildBlock(mining);
+	public void mine(MinerJMProtocolImpl protocol, int diff) throws NoSuchAlgorithmException, InvalidKeyException, ClassNotFoundException, NoSuchProviderException, SignatureException, IOException, InterruptedException, ExecutionException{
+		Mining mining = new Mining(protocol);
+		Block block = buildBlock(protocol);
 		block.setDifficulty(diff);
 		mining.mine(block);
 	}
 	
-	private Block buildBlock(Mining mining) throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException {
+	private Block buildBlock(MinerJMProtocolImpl protocol) throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException {
+		int difficulty = protocol.downloadObject(Integer.class, NetConst.GIVE_ME_DIFFICULTY, null, protocol.getClient());
+		int rewardAmount = protocol.downloadObject(Integer.class, NetConst.GIVE_ME_REWARD_AMOUNT, null, protocol.getClient());
+		Transaction[] transactions = protocol.downloadObject(Transaction[].class, NetConst.GIVE_ME_UNVERIFIED_TRANSACTIONS, null, protocol.getClient());
+
 		Block block = new Block();
-		int difficulty = mining.getDifficulty();
-		Transaction trans[] = mining.getUnverifiedTransaction();
-		if(trans != null) {
-			for(int i = 0; i < trans.length; i++) {
+		if(transactions != null) {
+			for(int i = 0; i < transactions.length; i++) {
 				//TODO verify transaction
-				block.getTransactions().add(trans[i]);
+				block.getTransactions().add(transactions[i]);
 			}
 		}
 		int intRewardAmount = 0;
-		int tmp = mining.getRewardAmount();
+		int tmp = rewardAmount;
     	intRewardAmount = block.getSize() >= Block.MAX_BLOCK_SIZE ? tmp : intRewardAmount * ((tmp / Block.MAX_BLOCK_SIZE)+1);
         PrivateKey privKey = this.wallet.getKeys().keySet().iterator().next();
         PublicKey pubKey = this.wallet.getKeys().get(privKey);
 		Transaction reward = new Transaction();
 		Output out = new Output();
-		out.setAddress(SignaturesVerification.DeriveJMAddressFromPubKey(pubKey));
+		out.setAddress(SignaturesVerification.DeriveJMAddressFromPubKey(pubKey.getEncoded()));
 		out.setAmount(intRewardAmount);
 		reward.setOutputOut(out);
 		reward.setOutputBack(new Output());
-		reward.setPubKey(pubKey);
+		reward.setPubKey(pubKey.getEncoded());
 		reward.setSignature(SignaturesVerification.signTransaction(reward.getBytes(false), privKey));
 
 		block.setDifficulty(difficulty);

@@ -5,18 +5,28 @@ import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.InvalidKeyException;
+import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
+
 import org.bouncycastle.crypto.digests.RIPEMD160Digest;
 import org.bouncycastle.util.encoders.Hex;
 
 public abstract class SignaturesVerification {
 	
 	public static final String SHA1_WITH_DSA  = "SHA1withDSA";
+	
+	public static PublicKey computeKey(byte[] bytes) throws NoSuchAlgorithmException, InvalidKeySpecException {
+		X509EncodedKeySpec spec = new X509EncodedKeySpec(bytes);
+		KeyFactory keyFactory = KeyFactory.getInstance("DSA");
+		return keyFactory.generatePublic(spec);
+	}
 	
 	public static byte[] signTransaction(byte[] bytes, PrivateKey privKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, FileNotFoundException, IOException, SignatureException
     {
@@ -55,10 +65,10 @@ public abstract class SignaturesVerification {
         return verifies; 
     }
     
-    public static String DeriveJMAddressFromPubKey(PublicKey pubKey)
+    public static String DeriveJMAddressFromPubKey(byte[] pubKey)
     {
         RIPEMD160Digest dgst = new RIPEMD160Digest();
-        byte[] key = pubKey.getEncoded();
+        byte[] key = pubKey;
         dgst.update(key, 0, key.length);
         byte[] bytes = new byte[dgst.getDigestSize()];
         dgst.doFinal(bytes, 0);

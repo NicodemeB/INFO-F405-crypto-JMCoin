@@ -3,7 +3,9 @@ package com.jmcoin.network;
 import java.io.IOException;
 import java.util.StringTokenizer;
 
+import com.jmcoin.io.IOFileHandler;
 import com.jmcoin.model.Block;
+import com.jmcoin.model.Bundle;
 import com.jmcoin.model.Output;
 import com.jmcoin.model.Transaction;
 
@@ -17,6 +19,26 @@ public abstract class JMProtocolImpl<X extends Peer> {
 	
 	public JMProtocolImpl(X peer) {
 		this.peer = peer;
+	}
+	
+	protected <T> void setBundle(String payload, Class<T> type) {
+		Bundle<T> bundle = this.peer.createBundle(type);
+		bundle.setObject(IOFileHandler.getFromJsonString(payload, type));
+		this.peer.setBundle(bundle);
+	}
+	
+	@SuppressWarnings("unchecked")
+	protected <T> T downloadObject(Class<T> type, char req, String body, Client client) throws IOException {
+		client.sendMessage(JMProtocolImpl.craftMessage(req, body));
+		T t;
+        while((t = (T) this.peer.getBundle().getObject(type)) == null) {
+        	try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+        }
+		return t;
 	}
 
 	/**
