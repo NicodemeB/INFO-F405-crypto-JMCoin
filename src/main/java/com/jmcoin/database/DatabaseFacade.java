@@ -19,6 +19,12 @@ public class DatabaseFacade {
         return chain;
     }
 
+    public static void updateChain(Chain chain){
+        Connection.getTransaction().begin();
+        Connection.getManager().merge(chain);
+        Connection.getTransaction().commit();
+    }
+
     public static void removeBlockChain(Chain chain){
         Connection.getTransaction().begin();
         Connection.getManager().remove(chain);

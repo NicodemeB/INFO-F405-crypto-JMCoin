@@ -17,7 +17,6 @@ import com.jmcoin.crypto.AES.StrongEncryptionNotAvailableException;
 import com.jmcoin.model.Block;
 import com.jmcoin.model.Mining;
 import com.jmcoin.model.Output;
-import com.jmcoin.model.Reward;
 import com.jmcoin.model.Transaction;
 import com.jmcoin.model.Wallet;
 
@@ -71,7 +70,7 @@ public class MinerNode extends Peer{
     	intRewardAmount = block.getSize() >= Block.MAX_BLOCK_SIZE ? tmp : intRewardAmount * ((tmp / Block.MAX_BLOCK_SIZE)+1);
         PrivateKey privKey = this.wallet.getKeys().keySet().iterator().next();
         PublicKey pubKey = this.wallet.getKeys().get(privKey);
-		Reward reward = new Reward();
+		Transaction reward = new Transaction();
 		Output out = new Output();
 		out.setAddress(SignaturesVerification.DeriveJMAddressFromPubKey(pubKey));
 		out.setAmount(intRewardAmount);

@@ -11,12 +11,17 @@ import com.jmcoin.model.Block;
 import com.jmcoin.model.Chain;
 import com.jmcoin.model.Input;
 import com.jmcoin.model.Output;
-import com.jmcoin.model.Reward;
 import com.jmcoin.model.Transaction;
+
+import javax.persistence.Transient;
 
 public class MasterNode extends Peer{
 
     private static MasterNode instance = new MasterNode();
+	@Transient
+	public static final int REWARD_START_VALUE = 10;
+	@Transient
+	public static final int REWARD_RATE = 100;
     private LinkedList<Transaction> unverifiedTransactions;
     
     private Map<String, Output> unspentOutputs; //key = hash of the transaction containing the output
@@ -62,7 +67,7 @@ public class MasterNode extends Peer{
     //TODO compute this reward according to the the size of the transaction
     //almost empty -> low reward
     public int getRewardAmount() {
-    	return Reward.REWARD_START_VALUE / ((chain.getSize() / Reward.REWARD_RATE) + 1);
+    	return REWARD_START_VALUE / ((chain.getSize() / REWARD_RATE) + 1);
     }
     
     /**
