@@ -57,6 +57,8 @@ public abstract class JMProtocolImpl<X extends Peer> {
 				return takeMyNewTransactionImpl(tokenizer.nextToken()) ? NetConst.RES_OKAY : NetConst.RES_NOK;
 			case NetConst.GIVE_ME_UNSPENT_OUTPUTS:
 				return giveMeUnspentOutputs();
+			case NetConst.GIVE_ME_TRANS_TO_THIS_ADDRESS:
+            	return giveMeTransactionsToThisAddress(tokenizer.nextToken());
 			case NetConst.GIVE_ME_DIFFICULTY:
 				return giveMeDifficulty();
             case NetConst.RECEIVE_DIFFICULTY:
@@ -79,6 +81,9 @@ public abstract class JMProtocolImpl<X extends Peer> {
             case NetConst.RECEIVE_LAST_BLOCK:
             	receiveLastBlock(tokenizer.nextToken());
             	return NetConst.RES_OKAY;
+            case NetConst.RECEIVE_TRANS_TO_THIS_ADDRESS:
+            	receiveTransactionToThisAddress(tokenizer.nextToken());
+            	return NetConst.RES_OKAY;
             case NetConst.STOP_MINING:
                 return stopMining();
 			default:
@@ -93,8 +98,10 @@ public abstract class JMProtocolImpl<X extends Peer> {
 	protected abstract void receiveUnverifiedTransactions(String string);
 	protected abstract void receiveRewardAmount(String string);
 	protected abstract void receiveDifficulty(String string);
-    protected abstract String stopMining();
+	protected abstract void receiveLastBlock(String block);
+	protected abstract void receiveTransactionToThisAddress(String trans);
 	
+    protected abstract String stopMining();
 	/**
 	 * Returns unspent {@link Output} as a list
 	 * @return
@@ -142,9 +149,9 @@ public abstract class JMProtocolImpl<X extends Peer> {
 	 * @return
 	 */
 	protected abstract String giveMeDifficulty();
-	
 	protected abstract String giveMeLastBlock();
-	protected abstract void receiveLastBlock(String block);
+	protected abstract String giveMeTransactionsToThisAddress(String address);
+	
 	/**
 	 * Builds a message to send over the network, compliant with the protocol
 	 * @param request {@link NetConst}.xxxxx

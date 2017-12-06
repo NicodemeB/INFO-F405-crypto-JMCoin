@@ -2,6 +2,7 @@ package com.jmcoin.test;
 
 import java.io.IOException;
 
+import com.jmcoin.model.Chain;
 import com.jmcoin.network.MasterJMProtocolImpl;
 import com.jmcoin.network.MasterNode;
 import com.jmcoin.network.MultiThreadedServer;
@@ -19,5 +20,10 @@ public class TestMasterNode {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static Chain getChain() {
+		Chain chain = new Chain();
+		return chain;
 	}
 }

@@ -36,13 +36,6 @@ public class Transaction implements Serializable {
         inputs = new ArrayList<>();
     }
 
-    public Transaction(ArrayList<Input> inputs, Output oOut, Output oBack, PublicKey pubKey) {
-        this.inputs = inputs;
-        this.outputBack = oBack;
-        this.outputOut = oOut;
-        this.pubKey = pubKey;
-    }
-
     public void setPubKey(PublicKey pubKey) {
         this.pubKey = pubKey;
     }

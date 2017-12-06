@@ -94,4 +94,12 @@ public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 
 	@Override
 	protected void receiveLastBlock(String block) {}
+
+	@Override
+	protected void receiveTransactionToThisAddress(String trans) {}
+
+	@Override
+	protected String giveMeTransactionsToThisAddress(String address) {
+		return JMProtocolImpl.craftMessage(NetConst.RECEIVE_TRANS_TO_THIS_ADDRESS, IOFileHandler.toJson(this.peer.getTransactionsToThisAddress(address)));
+	}
 }

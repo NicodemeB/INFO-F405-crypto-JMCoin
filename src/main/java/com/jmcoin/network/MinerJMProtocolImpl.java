@@ -136,23 +136,22 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
 		}
 		return c;
 	}
+	
 	public boolean validateTransaction(Transaction trans, Chain chain) throws IOException {
 		int total = 0;
 		for(Input i : trans.getInputs()) {
 			Transaction t  = chain.findInBlockChain(i.getPrevTransactionHash());
 			Output output = null;
-			if(t.getOutputOut().getAddress() == SignaturesVerification.DeriveJMAddressFromPubKey(trans.getPubKey()) && t.getOutputOut().getAmount() == i.getAmount()) {
+			if(t.getOutputOut().getAddress().equals(SignaturesVerification.DeriveJMAddressFromPubKey(trans.getPubKey())) && t.getOutputOut().getAmount() == i.getAmount()) {
 				output = t.getOutputOut();
 			}
-			else if(t.getOutputBack().getAddress() == SignaturesVerification.DeriveJMAddressFromPubKey(trans.getPubKey()) && t.getOutputBack().getAmount() == i.getAmount()) {
+			else if(t.getOutputBack().getAddress().equals(SignaturesVerification.DeriveJMAddressFromPubKey(trans.getPubKey())) && t.getOutputBack().getAmount() == i.getAmount()) {
 				output = t.getOutputBack();
 			}
 			if(output == null) {
 				return false;
 			}
 			this.client.sendMessage(JMProtocolImpl.craftMessage(NetConst.GIVE_ME_UNSPENT_OUTPUTS, null));
-			//String unvf = "";//JMProtocolImpl.sendRequest(NetConst.RELAY_NODE_LISTEN_PORT, NetConst.RELAY_DEBUG_HOST_NAME, NetConst.GIVE_ME_UNSPENT_OUTPUTS, null);
-			//Output[] unspentOutputs = IOFileHandler.getFromJsonString(unvf, Output[].class);
 			Output[] unspentOutputs = this.mining.getUnspentOutputs(); 
 			while(unspentOutputs == null) {
 				try {
@@ -193,4 +192,10 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
 
 	@Override
 	protected void receiveLastBlock(String block) {}
+
+	@Override
+	protected void receiveTransactionToThisAddress(String trans) {}
+
+	@Override
+	protected String giveMeTransactionsToThisAddress(String address) {return null;}
 }

@@ -20,18 +20,15 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 public class Wallet {
     
-    //private String email;
     private KeyGenerator keyGen = new KeyGenerator(1024);
     private HashMap<PrivateKey,PublicKey> keys;
     private ArrayList<String> addresses;
-    private List<Transaction> transactions;
     private double balance;
     
     private final String REP = System.getProperty("user.home");
@@ -39,16 +36,12 @@ public class Wallet {
     private final String PRIV_KEYS = REP + SEP + "Documents"+SEP+"PrivateKeys";
     private final String PUB_KEYS = REP + SEP + "Documents"+SEP+"PublicKeys";
     
-    //FIXME is mail useful ?
-    public Wallet(String email) throws NoSuchAlgorithmException, NoSuchProviderException, IOException, InvalidKeySpecException, AES.InvalidPasswordException, AES.InvalidAESStreamException, AES.StrongEncryptionNotAvailableException{
-    	String password = promptPassword();
-    	this.transactions = new ArrayList<>();
+    public Wallet(String password) throws NoSuchAlgorithmException, NoSuchProviderException, IOException, InvalidKeySpecException, AES.InvalidPasswordException, AES.InvalidAESStreamException, AES.StrongEncryptionNotAvailableException{
     	this.addresses = new ArrayList<String>();
     	File file = new File(PRIV_KEYS);
     	if(!file.exists() || !file.isDirectory()) file.mkdir();
     	file = new File(PUB_KEYS);
     	if(!file.exists() || !file.isDirectory()) file.mkdir();
-        //this.email = email;
         this.keys = getWalletKeysFromFile(password);
         this.balance = getBalance(addresses);
     }   
@@ -58,8 +51,6 @@ public class Wallet {
         keyGen.createKeys();
         PrivateKey privateKey = keyGen.getPrivateKey();
         PublicKey publicKey = keyGen.getPublicKey();
-        //KeyPair pair = keyGen.getKeypair();
-
         char[] AESpw = password.toCharArray();
         ByteArrayInputStream inputPrivateKey = new ByteArrayInputStream(privateKey.getEncoded());
         ByteArrayOutputStream encryptedPrivateKey = new ByteArrayOutputStream();
@@ -71,15 +62,14 @@ public class Wallet {
         keys.put(privateKey,publicKey);
         computeAddresses(this.keys);
     }
-    public void computeAddresses(HashMap<PrivateKey,PublicKey> keys) throws IOException
-    {
-        //RIPEMD160Digest dgst = new RIPEMD160Digest();
+    
+    public void computeAddresses(HashMap<PrivateKey,PublicKey> keys) throws IOException{
         for(PrivateKey privK : this.keys.keySet()){
             this.addresses.add(SignaturesVerification.DeriveJMAddressFromPubKey(this.keys.get(privK)));
         }
     }
-    public HashMap<PrivateKey,PublicKey> getWalletKeysFromFile(String password) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, AES.InvalidPasswordException, AES.InvalidAESStreamException, AES.StrongEncryptionNotAvailableException 
-    {
+    
+    public HashMap<PrivateKey,PublicKey> getWalletKeysFromFile(String password) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, AES.InvalidPasswordException, AES.InvalidAESStreamException, AES.StrongEncryptionNotAvailableException {
         KeyFactory kf = KeyFactory.getInstance("DSA");
         ArrayList<PrivateKey> privateKeyList = new ArrayList<>();
         ArrayList<PublicKey> publicKeyList = new ArrayList<>();
@@ -139,11 +129,6 @@ public class Wallet {
         return keyCouples;
     }
     
-    
-    public void addTransaction(Transaction transaction){
-        transactions.add(transaction);
-    }
-    
     // ------------------------------------------- Chain
     public double getAddressBalance(String address)
     {
@@ -171,6 +156,7 @@ public class Wallet {
         }
         return totalOutputAmount;
     }
+    
     public double getBalance(ArrayList<String> adresses)
     {
         double totalAmount = 0; 
@@ -180,29 +166,10 @@ public class Wallet {
         }
         return totalAmount;
     }
-    public String promptPassword(){
-    	/*Scanner scan = new Scanner(System.in);
-        System.out.print("Enter password to decrypt private keys : ");
-        // Below Statement used for getting String including sentence
-        String s = scan.nextLine();
-        //scan.close();*/
-        return "a";//FIXME using a scanner it not the right way to do this
-    }
+    
     public HashMap<PrivateKey,PublicKey> getKeys() {
        return keys;
        
     }
-    
-    /*public String getEmail() {
-        return email;
-    }*/
-    
-    /*public ArrayList<String> getAddresses() {
-        return addresses;
-    }*/
-    
-    /*public void setKeys(HashMap<PrivateKey,PublicKey> keys) {
-        this.keys = keys;
-    }*/
 }
  

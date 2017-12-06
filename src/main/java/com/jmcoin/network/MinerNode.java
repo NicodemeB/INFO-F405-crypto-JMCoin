@@ -25,9 +25,9 @@ public class MinerNode extends Peer{
 
 	private Wallet wallet;
 	
-	public MinerNode(String email) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException, IOException, InvalidPasswordException, InvalidAESStreamException, StrongEncryptionNotAvailableException {
+	public MinerNode(String password) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException, IOException, InvalidPasswordException, InvalidAESStreamException, StrongEncryptionNotAvailableException {
 		super();
-		this.wallet = new Wallet(email);
+		this.wallet = new Wallet(password);
 	}
 	
 	public void mine(MinerJMProtocolImpl protocol) throws InvalidKeyException, ClassNotFoundException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, IOException, InterruptedException, ExecutionException {

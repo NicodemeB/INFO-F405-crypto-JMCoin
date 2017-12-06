@@ -27,7 +27,6 @@ public class Block implements Serializable {
 
 	@Transient
 	public static final int MAX_BLOCK_SIZE = 1024 * 50; //FIXME do we need to set this value ? check
-	//if we can add transaction according to this size
 
 	@OneToMany(cascade = CascadeType.ALL)
 	protected List<Transaction> transactions;
@@ -43,7 +42,7 @@ public class Block implements Serializable {
 	protected int nonce;
 	
 	public Block() {
-		transactions = new ArrayList<>(NetConst.MAX_SENT_TRANSACTIONS); //FIXME do we need to set an arbitrary value ?
+		transactions = new ArrayList<>(NetConst.MAX_SENT_TRANSACTIONS);
 	}
 	
 	public int getNonce() {

@@ -1,12 +1,15 @@
 package com.jmcoin.network;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.bouncycastle.util.encoders.Hex;
 
 import com.jmcoin.crypto.SignaturesVerification;
+import com.jmcoin.database.DatabaseFacade;
 import com.jmcoin.model.Block;
 import com.jmcoin.model.Chain;
 import com.jmcoin.model.Input;
@@ -66,7 +69,6 @@ public class MasterNode extends Peer{
     }
     
     /**
-     * TODO Fork -> some verified transactions could set as "unverified". Same thing with spent outputs
      * @param pBlock
      */
     public void processBlock(Block pBlock) {
@@ -103,4 +105,10 @@ public class MasterNode extends Peer{
     	chain.addBlock(pBlock);
     	this.lastBlock = pBlock;
     }
+
+	public List<Transaction> getTransactionsToThisAddress(String address) {
+		List<Transaction> transactions = new ArrayList<>();
+		//FIXME get all transactions related to this address
+		return transactions;
+	}
 }

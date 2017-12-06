@@ -78,5 +78,11 @@ public class UserJMProtocolImpl extends JMProtocolImpl<UserNode>{
 	protected void receiveLastBlock(String block) {
 		this.peer.setLastBlock(IOFileHandler.getFromJsonString(block, Block.class));
 	}
+
+	@Override
+	protected void receiveTransactionToThisAddress(String trans) {}
+
+	@Override
+	protected String giveMeTransactionsToThisAddress(String address) {return null;}
 	
 }

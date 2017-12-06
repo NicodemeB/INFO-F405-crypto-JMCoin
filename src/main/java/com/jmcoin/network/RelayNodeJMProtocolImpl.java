@@ -115,6 +115,17 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
 
 	@Override
 	protected void receiveLastBlock(String block) {
-		receiveBlockchainCopy(block);
+		receiveData(block);
+	}
+
+	@Override
+	protected void receiveTransactionToThisAddress(String trans) {
+		receiveData(trans);
+	}
+
+	@Override
+	protected String giveMeTransactionsToThisAddress(String address) {
+		this.client.setToSend(JMProtocolImpl.craftMessage(NetConst.GIVE_ME_TRANS_TO_THIS_ADDRESS, address));
+		return null;
 	}
 }

@@ -20,11 +20,6 @@ public class TestUserNode {
 			TestRelay.run();
 			UserNode node = new UserNode("a");
 			UserJMProtocolImpl protocol = new UserJMProtocolImpl(node);
-			protocol.getClient().sendMessage(JMProtocolImpl.craftMessage(NetConst.GIVE_ME_BLOCKCHAIN_COPY, null));
-			while(node.getBlockchainCopy() == null) {
-				Thread.sleep(500);
-			}
-			System.out.println("------------------" +node.getBlockchainCopy() + "-----------------------");
 			protocol.getClient().sendMessage(JMProtocolImpl.craftMessage(NetConst.GIVE_ME_UNSPENT_OUTPUTS, null));
 			while(node.getUnspentOutputs() == null) {
 				Thread.sleep(500);

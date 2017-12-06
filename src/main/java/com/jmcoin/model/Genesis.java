@@ -16,13 +16,13 @@ import com.jmcoin.crypto.AES;
 import com.jmcoin.crypto.AES.InvalidKeyLengthException;
 import com.jmcoin.crypto.AES.StrongEncryptionNotAvailableException;
 import com.jmcoin.crypto.SignaturesVerification;
+import com.jmcoin.network.NetConst;
 
 public class Genesis extends Block {
 	
 	private static final long serialVersionUID = -3874611565736597876L;
 	private static Genesis genesis;
 	
-	//FIXME remove it
 	private static Key[] createKeys(String password) throws IOException, AES.InvalidKeyLengthException, AES.StrongEncryptionNotAvailableException, NoSuchAlgorithmException, NoSuchProviderException{
 		KeyGenerator keyGen = new KeyGenerator(1024);
         keyGen.createKeys();
@@ -51,10 +51,10 @@ public class Genesis extends Block {
 		transGenesis.setOutputOut(outGenesis);
 		transGenesis.addInput(inGenesis);
 		transGenesis.setPubKey(pubKey);
-		transactions.add(transGenesis);
 		transGenesis.setSignature(SignaturesVerification.signTransaction(transGenesis.getBytes(false), privKey));
 		transGenesis.computeHash();
-		difficulty = 1;//FIXME NetConst.DEFAULT_DIFFICULTY;
+		this.transactions.add(transGenesis);
+		this.difficulty = NetConst.DEFAULT_DIFFICULTY;
 	}
 	
 	public static Genesis getInstance() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, FileNotFoundException, SignatureException, IOException, InvalidKeyLengthException, StrongEncryptionNotAvailableException {

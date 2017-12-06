@@ -5,8 +5,6 @@ import java.net.Socket;
 
 public class WorkerRunnable extends TemplateThread{
 
-    //private BroadcastThread<WorkerRunnable> bt;
-
     private MultiThreadedServer server;
 
     public MultiThreadedServer getServer() {
@@ -41,7 +39,7 @@ public class WorkerRunnable extends TemplateThread{
             do {
                 if (getToSend() != null){
                     System.out.println("Thread #"+Thread.currentThread().getId() +this.protocol.getClass().getSimpleName()+" WorkRunnable - to send : " + toSend.toString());
-                    if (toSend.toString().equals("54$null$#"))
+                    if (toSend.toString().equals(NetConst.STOP_MINING_REQ))
                         server.not();
                     else
                         sendMessage(toSend);
