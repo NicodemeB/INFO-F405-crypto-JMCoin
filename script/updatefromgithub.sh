@@ -32,3 +32,4 @@ then
 else 
 	echo "${BLUE}[SCRIPT UPDATE INFO] Seems to NOT have a new commit..${NC}"
 fi
+
