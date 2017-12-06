@@ -5,7 +5,6 @@
         <class>com.jmcoin.model.Chain</class>
         <class>com.jmcoin.model.Block</class>
         <class>com.jmcoin.model.Transaction</class>
-        <class>com.jmcoin.model.Reward</class>
         <class>com.jmcoin.model.Input</class>
         <class>com.jmcoin.model.Output</class>
         <properties>
