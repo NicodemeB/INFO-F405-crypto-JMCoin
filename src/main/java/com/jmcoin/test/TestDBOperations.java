@@ -1,6 +1,5 @@
 package com.jmcoin.test;
 
-import com.google.gson.Gson;
 import com.jmcoin.crypto.AES;
 import com.jmcoin.crypto.SignaturesVerification;
 import com.jmcoin.database.DatabaseFacade;
@@ -39,22 +38,16 @@ public class TestDBOperations {
         addInput(inGenesis, transGenesis);
         transGenesis.setPubKey(keys[1].getEncoded());
         transGenesis.setSignature(SignaturesVerification.signTransaction(transGenesis.getBytes(false), (PrivateKey) keys[0]));
-/*        Reward reward = new Reward();
-        reward.setOutputBack(null);
-        Output rewardOuputOut = new Output();
-        rewardOuputOut.setAddress(SignaturesVerification.DeriveJMAddressFromPubKey((PublicKey) keys[1]));
-        rewardOuputOut.setAmount(50);
-        reward.setOutputOut(rewardOuputOut);
-        reward.setPubKey((PublicKey) keys[1]);
-        reward.setSignature(SignaturesVerification.signTransaction(reward.getBytes(false), (PrivateKey) keys[0]));
-        genesis.getTransactions().add(reward);*/
         genesis.getTransactions().add(transGenesis);
         genesis.setPrevHash(null);
         addOutputs(outGenesis, outGenesisBack, transGenesis);
         addBlock(genesis, c);
-        DatabaseFacade.storeBlockChain(c);
-        System.out.println(new Gson().toJson(DatabaseFacade.getStoredChain()));
-        showMeTheObjectTypeOfEachChildrenBlockInTheGivenChain(DatabaseFacade.getStoredChain());
+        //DatabaseFacade.storeBlockChain(c);
+        //System.out.println(new Gson().toJson(DatabaseFacade.getStoredChain()));
+        //showMeTheObjectTypeOfEachChildrenBlockInTheGivenChain(DatabaseFacade.getStoredChain());
+        System.out.println(DatabaseFacade.getLastBlock());
+        System.out.println(DatabaseFacade.getBlockWithHash("testHash"));
+        System.out.println(DatabaseFacade.getAllTransactionsWithAddress("613ddcfef76704943d2394cee0befb1389fd698f"));
         //DatabaseFacade.removeBlockChain(c);
     }
 

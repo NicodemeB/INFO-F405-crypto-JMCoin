@@ -10,6 +10,9 @@ import java.util.Arrays;
 import java.util.List;
 
 @Entity
+@NamedQueries({
+        @NamedQuery(name = "Transaction.findAll", query = "SELECT t FROM Transaction t")
+})
 public class Transaction implements Serializable {
 
 
