@@ -1,10 +1,12 @@
 package com.jmcoin.model;
 
+import java.lang.reflect.Type;
+
 public class Bundle<X>{
 	
 	private X object;
 
-	public <T> X getObject(Class<T> type) {
+	public X getObject(Type type) {
 		X x = object;
 		this.object = null;
 		return x;

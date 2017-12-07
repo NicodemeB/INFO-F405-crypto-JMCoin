@@ -6,6 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 import java.util.List;
+
 import com.google.gson.JsonSyntaxException;
 import com.jmcoin.model.Block;
 import com.jmcoin.model.Transaction;
@@ -33,8 +34,8 @@ public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 	protected String takeMyMinedBlockImpl(String payload) throws IOException {
 		if (payload != null) {
 			try {
-				this.peer.processMinedBlock(this.peer.getGson().fromJson(payload, Block.class));
-				return stopMining();
+				if(this.peer.processMinedBlock(this.peer.getGson().fromJson(payload, Block.class)))
+					return stopMining();
 			}
 			catch(JsonSyntaxException | InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException | SignatureException jse) {
 				jse.printStackTrace();
@@ -47,7 +48,6 @@ public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 	protected boolean takeMyNewTransactionImpl(String payload) {
 		try {
 			Transaction transaction = this.peer.getGson().fromJson(payload, Transaction.class);
-			System.err.println("Hi, I just received a new Transaction!");
 			this.peer.getUnverifiedTransactions().add(transaction);
 			return true;
 		}

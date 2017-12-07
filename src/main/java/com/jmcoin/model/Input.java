@@ -21,17 +21,21 @@ public class Input implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Basic(optional = false)
 	private Long id;
-	@Basic(optional = false)
-    public String address;
+	/*@Basic(optional = false)
+    private String address;*/
 	@Basic(optional = false)
     private double amount;
     @Lob
     private byte[] prevTransactionHash;
     
     public Input(){};
-    public Input(String adr, double amount, byte[] prevTrans)
+    /*public Input(String adr, double amount, byte[] prevTrans)
     {
         this.address = adr;
+        this.amount = amount;
+        this.prevTransactionHash = prevTrans;
+    }*/
+    public Input(double amount, byte[] prevTrans){
         this.amount = amount;
         this.prevTransactionHash = prevTrans;
     }

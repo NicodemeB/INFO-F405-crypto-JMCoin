@@ -14,13 +14,7 @@ import com.jmcoin.network.MinerJMProtocolImpl;
  */
 public class Mining{
 	
-	/*private Integer difficulty;
-	private Integer rewardAmount;
-	private Transaction[] unverifiedTransaction;
-	private Output[] unspentOutputs;
-	private Chain chain;*/
 	private MiningThread miningThread;
-	
 	
 	public Mining(MinerJMProtocolImpl protocol) throws NoSuchAlgorithmException {
 		this.miningThread = new MiningThread(protocol);
@@ -28,15 +22,23 @@ public class Mining{
 	
 	public void stopMining() {
 		System.out.println("**************** !! STOP !! ****************");
-		this.miningThread.setRunning(false);
+		this.miningThread.running = false;
 	}
 	
-	public void mine(Block block) throws NoSuchAlgorithmException, InterruptedException, ExecutionException {
-		System.err.println("Start mining");
-        this.miningThread.setBlock(block);
-        this.miningThread.setRunning(true);
-        this.miningThread.start();
+	public void restart() {
+		this.miningThread.running = false;
 	}
+	
+	public void mine(Block block, MinerJMProtocolImpl protocol) throws NoSuchAlgorithmException, InterruptedException, ExecutionException {
+		this.miningThread.setRunning(false);
+		while(this.miningThread.isRunning()) {
+			Thread.sleep(500);
+		}
+		this.miningThread = new MiningThread(protocol);
+		this.miningThread.setBlock(block);
+		this.miningThread.setRunning(true);
+		this.miningThread.start();
+    }
 	
 	private class MiningThread extends Thread{
 	
@@ -50,14 +52,18 @@ public class Mining{
 			this.protocol = protocolImpl;
 		}
 		
+		public void setBlock(Block block) {
+			this.block = block;
+		}
+		
+		public boolean isRunning() {
+			return running;
+		}
+		
 		public void setRunning(boolean running) {
 			this.running = running;
 		}
 		
-		public void setBlock(Block block) {
-			this.block = block;
-		}
-
 		private byte[] calculateHash(int nonce) {
 		   block.setNonce(nonce);
 		   this.digest.update(block.getBytes());
@@ -75,7 +81,7 @@ public class Mining{
 		
 		@Override
 		public void run() {
-        	if(this.block.getSize() > Block.MAX_BLOCK_SIZE) {
+        	if(this.block == null || this.block.getSize() > Block.MAX_BLOCK_SIZE) {
         		this.running = false;
         	}
         	int nonce = Integer.MIN_VALUE;
@@ -88,12 +94,11 @@ public class Mining{
         			Thread.sleep(100);
         		}
             	if(this.running)verifyAndSetHash(nonce);
-            	this.running = false;
 			}
             catch (InterruptedException|IOException e) {
 				e.printStackTrace();
 			}
+            this.running = false;
 		}
 	}
-
 }

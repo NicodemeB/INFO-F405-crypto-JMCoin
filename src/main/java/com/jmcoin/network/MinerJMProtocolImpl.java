@@ -2,6 +2,10 @@ package com.jmcoin.network;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.google.gson.reflect.TypeToken;
 import com.jmcoin.crypto.SignaturesVerification;
 import com.jmcoin.model.Block;
 import com.jmcoin.model.Chain;
@@ -17,7 +21,6 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
 	
 	public MinerJMProtocolImpl(MinerNode peer) throws IOException, NoSuchAlgorithmException {
 		super(peer);
-		this.mining = new Mining(this);
 		this.client = new Client(NetConst.RELAY_NODE_LISTEN_PORT, NetConst.RELAY_DEBUG_HOST_NAME, this);
         new Thread(new ReceiverThread<Client>(this.client)).start();
         new Thread(this.client).start();
@@ -26,6 +29,7 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        this.mining = new Mining(this);
 	}
 	
 	public Client getClient() {
@@ -35,7 +39,7 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
 	@Override
 	protected String stopMining() {
 		this.mining.stopMining();
-		return null;
+		return NetConst.RES_OKAY;
 	}
 
 	@Override
@@ -86,7 +90,7 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
 
 	@Override
 	protected void receiveUnspentOutputs(String string) {
-		setBundle(string , Output[].class);
+		setBundle(string , new TypeToken<Map<String, Output>>(){}.getType());
 	}
 	
 	public boolean validateTransaction(Transaction trans, Chain chain) throws IOException {
@@ -103,9 +107,9 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
 			if(output == null) {
 				return false;
 			}
-			Output[] unspentOutputs = downloadObject(Output[].class, NetConst.GIVE_ME_UNSPENT_OUTPUTS, null, client);
+			HashMap<String, Output> unspentOutputs = downloadObject(new TypeToken<Map<String, Output>>(){}.getType(), NetConst.GIVE_ME_UNSPENT_OUTPUTS, null, client);
 			boolean unspent = false;
-			for(Output uo : unspentOutputs) {
+			for(Output uo : unspentOutputs.values()) {
 				if(uo.equals(output)) {
 					unspent = true;
 				}
@@ -142,4 +146,8 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
 
 	@Override
 	protected String giveMeTransactionsToThisAddress(String address) {return null;}
+
+	public Mining getMining() {
+		return this.mining;
+	}
 }

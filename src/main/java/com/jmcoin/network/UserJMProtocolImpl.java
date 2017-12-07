@@ -3,8 +3,10 @@ package com.jmcoin.network;
 import java.io.IOException;
 import java.util.Map;
 
+import com.google.gson.reflect.TypeToken;
 import com.jmcoin.model.Block;
 import com.jmcoin.model.Chain;
+import com.jmcoin.model.Output;
 import com.jmcoin.model.Transaction;
 
 public class UserJMProtocolImpl extends JMProtocolImpl<UserNode>{
@@ -29,7 +31,7 @@ public class UserJMProtocolImpl extends JMProtocolImpl<UserNode>{
 
 	@Override
 	protected void receiveUnspentOutputs(String string) {
-		setBundle(string, Map.class);		
+		setBundle(string, new TypeToken<Map<String, Output>>(){}.getType());		
 	}
 
 	@Override

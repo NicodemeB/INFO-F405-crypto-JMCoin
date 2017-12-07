@@ -13,9 +13,6 @@ import com.jmcoin.crypto.AES.InvalidPasswordException;
 import com.jmcoin.crypto.AES.StrongEncryptionNotAvailableException;
 import com.jmcoin.model.Transaction;
 import com.jmcoin.network.JMProtocolImpl;
-import com.jmcoin.network.MasterJMProtocolImpl;
-import com.jmcoin.network.MasterNode;
-import com.jmcoin.network.MultiThreadedServer;
 import com.jmcoin.network.NetConst;
 import com.jmcoin.network.UserJMProtocolImpl;
 import com.jmcoin.network.UserNode;
@@ -24,7 +21,7 @@ public class TestSendNewTransaction {
 	
 	public static void main(String[] args) {
 		try {
-			new Thread(new MultiThreadedServer(NetConst.MASTER_NODE_LISTEN_PORT, new MasterJMProtocolImpl(MasterNode.getInstance()))).start();
+			TestMasterNode.runMaster();
 		} catch (IOException e2) {
 			e2.printStackTrace();
 		}

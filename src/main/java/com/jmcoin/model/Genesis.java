@@ -55,6 +55,9 @@ public class Genesis extends Block {
 		transGenesis.computeHash();
 		this.transactions.add(transGenesis);
 		this.difficulty = NetConst.DEFAULT_DIFFICULTY;
+		this.finalHash = "H0";//FIXME change it
+		this.nonce = 0;
+		this.timeCreation = System.currentTimeMillis(); //now
 	}
 	
 	public static Genesis getInstance() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, FileNotFoundException, SignatureException, IOException, InvalidKeyLengthException, StrongEncryptionNotAvailableException {

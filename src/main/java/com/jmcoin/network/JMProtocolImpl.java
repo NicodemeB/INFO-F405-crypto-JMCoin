@@ -1,7 +1,9 @@
 package com.jmcoin.network;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.StringTokenizer;
+
 import com.jmcoin.model.Block;
 import com.jmcoin.model.Bundle;
 import com.jmcoin.model.Output;
@@ -19,14 +21,14 @@ public abstract class JMProtocolImpl<X extends Peer> {
 		this.peer = peer;
 	}
 	
-	protected <T> void setBundle(String payload, Class<T> type) {
+	protected <T> void setBundle(String payload, Type type) {
 		Bundle<T> bundle = this.peer.createBundle(type);
 		bundle.setObject(this.peer.getGson().fromJson(payload, type));
 		this.peer.setBundle(bundle);
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected <T> T downloadObject(Class<T> type, char req, String body, Client client) throws IOException {
+	protected <T> T downloadObject(Type type, char req, String body, Client client) throws IOException {
 		client.sendMessage(JMProtocolImpl.craftMessage(req, body));
 		T t;
         while((t = (T) this.peer.getBundle().getObject(type)) == null) {
@@ -68,7 +70,7 @@ public abstract class JMProtocolImpl<X extends Peer> {
 				return giveMeUnverifiedTransactionsImpl();
 			case NetConst.TAKE_MY_MINED_BLOCK:
 				try {
-					return takeMyMinedBlockImpl(tokenizer.nextToken());
+					return takeMyMinedBlockImpl(tokenizer.nextToken()) == null ? NetConst.RES_OKAY:NetConst.RES_NOK;
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

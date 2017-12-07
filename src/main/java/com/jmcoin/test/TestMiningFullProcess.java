@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutionException;
 import com.jmcoin.crypto.AES.InvalidAESStreamException;
 import com.jmcoin.crypto.AES.InvalidPasswordException;
 import com.jmcoin.crypto.AES.StrongEncryptionNotAvailableException;
+import com.jmcoin.model.Block;
 import com.jmcoin.network.MinerJMProtocolImpl;
 import com.jmcoin.network.MinerNode;
 
@@ -39,7 +40,9 @@ public class TestMiningFullProcess {
 		try {
 			minerHard = new MinerNode(args[0]);
 			MinerJMProtocolImpl minerJMProtocolImpl = new MinerJMProtocolImpl(minerHard);
-	    	minerHard.mine(minerJMProtocolImpl, 25);
+			Block block = minerHard.buildBlock(minerJMProtocolImpl);
+			block.setDifficulty(25);
+			minerJMProtocolImpl.getMining().mine(block, minerJMProtocolImpl);
 		} catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException | IOException
 				| InvalidPasswordException | InvalidAESStreamException | StrongEncryptionNotAvailableException | InvalidKeyException | ClassNotFoundException | SignatureException | InterruptedException | ExecutionException e1) {
 			e1.printStackTrace();
@@ -50,13 +53,14 @@ public class TestMiningFullProcess {
 		try {
 			miner = new MinerNode(args[0]);
 			MinerJMProtocolImpl minerJMProtocolImpl = new MinerJMProtocolImpl(miner);
-        	miner.mine(minerJMProtocolImpl);
+			minerJMProtocolImpl.getMining().mine(miner.buildBlock(minerJMProtocolImpl), minerJMProtocolImpl);
 		} catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException | IOException
 				| InvalidPasswordException | InvalidAESStreamException | StrongEncryptionNotAvailableException | InvalidKeyException | ClassNotFoundException | SignatureException | InterruptedException | ExecutionException e1) {
 			e1.printStackTrace();
 			System.out.println("TestMiningFullProcess: Cannot create Miner/Wallet");
 			return;
 		}
+		//TODO relaunch if the miner is stopped
 	}
 
 }

@@ -9,7 +9,6 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
-
 import com.jmcoin.crypto.SignaturesVerification;
 import com.jmcoin.crypto.AES.InvalidAESStreamException;
 import com.jmcoin.crypto.AES.InvalidPasswordException;
@@ -30,16 +29,16 @@ public class UserNode extends Peer{
 	public Transaction createTransaction(UserJMProtocolImpl protocol, String fromAddress, String toAddress,
 			double amountToSend, PrivateKey privKey, PublicKey pubKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, FileNotFoundException, SignatureException{
 		Transaction[] addressTransactions = protocol.downloadObject(Transaction[].class, NetConst.GIVE_ME_TRANS_TO_THIS_ADDRESS, "[\""+fromAddress+"\"]", protocol.getClient());
-    	Transaction tr = new Transaction();
+		Transaction tr = new Transaction();
         double totalOutputAmount = 0;
         for(int i = 0 ; i < addressTransactions.length; i++){
             if(addressTransactions[i].getOutputBack().getAddress().equals(fromAddress)){
                 totalOutputAmount+= addressTransactions[i].getOutputBack().getAmount();
-                tr.addInput(new Input(fromAddress,addressTransactions[i].getOutputBack().getAmount(),addressTransactions[i].getHash()));
+                tr.addInput(new Input(addressTransactions[i].getOutputBack().getAmount(),addressTransactions[i].getHash()));
             }
             else if((addressTransactions[i].getOutputOut().getAddress().equals(fromAddress))){
             	totalOutputAmount+= addressTransactions[i].getOutputOut().getAmount();
-            	tr.addInput(new Input(fromAddress,addressTransactions[i].getOutputOut().getAmount(),addressTransactions[i].getHash()));
+            	tr.addInput(new Input(addressTransactions[i].getOutputOut().getAmount(),addressTransactions[i].getHash()));
             }
             else{
             	System.out.println("Wallet : No output belonging to this address");

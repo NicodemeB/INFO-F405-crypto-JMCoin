@@ -27,11 +27,8 @@ import com.jmcoin.model.Block;
 import com.jmcoin.model.Chain;
 import com.jmcoin.model.Input;
 import com.jmcoin.model.KeyGenerator;
-import com.jmcoin.model.Mining;
 import com.jmcoin.model.Output;
 import com.jmcoin.model.Transaction;
-import com.jmcoin.network.MinerJMProtocolImpl;
-import com.jmcoin.network.MinerNode;
 
 public class TestBlockValidation {
 	
@@ -125,8 +122,6 @@ public class TestBlockValidation {
 	private static Chain buildBlock(Block genesis, PrivateKey[] privKeys) throws NoSuchAlgorithmException, InterruptedException, ExecutionException, InvalidKeyException, NoSuchProviderException, FileNotFoundException, SignatureException, IOException, InvalidKeySpecException, InvalidPasswordException, InvalidAESStreamException, StrongEncryptionNotAvailableException {
 		Random rand = new Random();
 		Chain chain = new Chain();
-		MinerNode minerNode = new MinerNode("a");
-		Mining mining = new Mining(new MinerJMProtocolImpl(minerNode));
 		Block prevBlock = null;
 		for(int i = 0; i < 10; i++) {
 			Block block;
@@ -158,7 +153,6 @@ public class TestBlockValidation {
 				prevBlock = genesis;
 			}
 			block.setDifficulty(4);
-			mining.mine(block);
 			block.setTimeCreation(System.currentTimeMillis());
 			chain.getBlocks().put(block.getFinalHash(), block);
 			System.out.println(new Gson().toJson(block));

@@ -8,14 +8,15 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.concurrent.ExecutionException;
+import java.util.Map;
 
+import com.google.gson.reflect.TypeToken;
 import com.jmcoin.crypto.SignaturesVerification;
 import com.jmcoin.crypto.AES.InvalidAESStreamException;
 import com.jmcoin.crypto.AES.InvalidPasswordException;
 import com.jmcoin.crypto.AES.StrongEncryptionNotAvailableException;
 import com.jmcoin.model.Block;
-import com.jmcoin.model.Mining;
+import com.jmcoin.model.Chain;
 import com.jmcoin.model.Output;
 import com.jmcoin.model.Transaction;
 import com.jmcoin.model.Wallet;
@@ -29,43 +30,18 @@ public class MinerNode extends Peer{
 		this.wallet = new Wallet(password);
 	}
 	
-	public void mine(MinerJMProtocolImpl protocol) throws NoSuchAlgorithmException, InvalidKeyException, ClassNotFoundException, NoSuchProviderException, SignatureException, IOException, InterruptedException, ExecutionException{
-		Mining mining = new Mining(protocol);
-		Block block = buildBlock(protocol);
-		mining.mine(block);
-	}
-	
-	/**
-	 * Debug prupos only
-	 * @param protocol
-	 * @param diff
-	 * @throws InvalidKeyException
-	 * @throws ClassNotFoundException
-	 * @throws NoSuchAlgorithmException
-	 * @throws NoSuchProviderException
-	 * @throws SignatureException
-	 * @throws IOException
-	 * @throws InterruptedException
-	 * @throws ExecutionException
-	 */
-	public void mine(MinerJMProtocolImpl protocol, int diff) throws NoSuchAlgorithmException, InvalidKeyException, ClassNotFoundException, NoSuchProviderException, SignatureException, IOException, InterruptedException, ExecutionException{
-		Mining mining = new Mining(protocol);
-		Block block = buildBlock(protocol);
-		block.setDifficulty(diff);
-		mining.mine(block);
-	}
-	
-	private Block buildBlock(MinerJMProtocolImpl protocol) throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException {
+	public Block buildBlock(MinerJMProtocolImpl protocol) throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException {
 		int difficulty = protocol.downloadObject(Integer.class, NetConst.GIVE_ME_DIFFICULTY, null, protocol.getClient());
 		int rewardAmount = protocol.downloadObject(Integer.class, NetConst.GIVE_ME_REWARD_AMOUNT, null, protocol.getClient());
 		Transaction[] transactions = protocol.downloadObject(Transaction[].class, NetConst.GIVE_ME_UNVERIFIED_TRANSACTIONS, null, protocol.getClient());
 		Block lastBlock = protocol.downloadObject(Block.class, NetConst.GIVE_ME_LAST_BLOCK, null, protocol.getClient());
-		
+		Map<String, Output> unspentOutputs = protocol.downloadObject(new TypeToken<Map<String, Output>>(){}.getType(), NetConst.GIVE_ME_UNSPENT_OUTPUTS, null, protocol.getClient());
+		Chain chain = protocol.downloadObject(Chain.class, NetConst.GIVE_ME_BLOCKCHAIN_COPY, null, protocol.getClient());
 		Block block = new Block();
 		if(transactions != null) {
 			for(int i = 0; i < transactions.length; i++) {
-				//TODO verify transaction
-				block.getTransactions().add(transactions[i]);
+				if(verifyBlockTransaction(transactions[i], chain, unspentOutputs))
+					block.getTransactions().add(transactions[i]);
 			}
 		}
 		int intRewardAmount = 0;		

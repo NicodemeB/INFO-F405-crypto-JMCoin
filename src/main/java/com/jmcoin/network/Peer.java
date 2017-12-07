@@ -2,10 +2,12 @@ package com.jmcoin.network;
 
 import com.google.gson.Gson;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SignatureException;
+import java.util.Map;
 
 import com.jmcoin.crypto.SignaturesVerification;
 import com.jmcoin.model.Bundle;
@@ -33,7 +35,7 @@ public abstract class Peer {
 		return bundle;
 	}
 	
-	protected <T> Bundle<T> createBundle(Class<T> type) {
+	protected <T> Bundle<T> createBundle(Type type) {
 		Bundle<T> bundle = new Bundle<>();
 		setBundle(bundle);
 		return bundle;
@@ -42,9 +44,10 @@ public abstract class Peer {
 	protected void setBundle(Bundle<? extends Object> bundle) {
 		this.bundle = bundle;
 	}
-	protected Boolean verifyBlockTransaction(Transaction trans, Chain chain, Output[] unspentOutputs) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, IOException {
-		if(SignaturesVerification.verifyTransaction(trans.getSignature(), trans.getBytes(false), KeyGenerator.getPublicKey(trans.getPubKey()))) 
-		{
+	
+	//TODO finish it!
+	protected Boolean verifyBlockTransaction(Transaction trans, Chain chain, Map<String, Output> unspentOutputs) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, IOException {
+		if(SignaturesVerification.verifyTransaction(trans.getSignature(), trans.getBytes(false), KeyGenerator.getPublicKey(trans.getPubKey()))) {
 			String address = SignaturesVerification.DeriveJMAddressFromPubKey(trans.getPubKey());
 			for(Input input : trans.getInputs()) 
 			{
@@ -61,7 +64,7 @@ public abstract class Peer {
 						return false; //not normal
 					
 					boolean unspent = false;
-					for(Output uo : unspentOutputs) {
+					for(Output uo : unspentOutputs.values()) {
 						if(uo.equals(outToMe)) {
 							unspent = true;
 						}
