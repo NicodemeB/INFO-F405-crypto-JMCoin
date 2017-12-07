@@ -43,8 +43,8 @@ public class MinerNode extends Peer{
 					block.getTransactions().add(transactions[i]);
 			}
 		}
-		double doubleRewardAmount = protocol.downloadObject(Integer.class, NetConst.GIVE_ME_REWARD_AMOUNT, null, protocol.getClient()) * (1.0/NetConst.MAX_SENT_TRANSACTIONS);
-		//TODO use rewardAmount
+		int value = protocol.downloadObject(Integer.class, NetConst.GIVE_ME_REWARD_AMOUNT, null, protocol.getClient());
+		double doubleRewardAmount = value * (1.0/NetConst.MAX_SENT_TRANSACTIONS);
 		//TODO choose the key
     	PrivateKey privKey = this.wallet.getKeys().keySet().iterator().next();
         PublicKey pubKey = this.wallet.getKeys().get(privKey);
