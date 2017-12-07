@@ -19,14 +19,10 @@ import com.jmcoin.model.Input;
 import com.jmcoin.model.Output;
 import com.jmcoin.model.Transaction;
 
-import javax.persistence.Transient;
-
 public class MasterNode extends Peer{
 
     private static MasterNode instance = new MasterNode();
-	@Transient
 	public static final int REWARD_START_VALUE = 10;
-	@Transient
 	public static final int REWARD_RATE = 100;
     private LinkedList<Transaction> unverifiedTransactions;
     
