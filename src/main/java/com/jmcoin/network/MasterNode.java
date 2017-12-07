@@ -1,5 +1,10 @@
 package com.jmcoin.network;
 
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SignatureException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -14,14 +19,10 @@ import com.jmcoin.model.Input;
 import com.jmcoin.model.Output;
 import com.jmcoin.model.Transaction;
 
-import javax.persistence.Transient;
-
 public class MasterNode extends Peer{
 
     private static MasterNode instance = new MasterNode();
-	@Transient
 	public static final int REWARD_START_VALUE = 10;
-	@Transient
 	public static final int REWARD_RATE = 100;
     private LinkedList<Transaction> unverifiedTransactions;
     
@@ -71,42 +72,89 @@ public class MasterNode extends Peer{
     }
     
     /**
+     * TODO Fork -> some verified transactions could set as "unverified". Same thing with spent outputs
      * @param pBlock
+     * @throws IOException 
+     * @throws SignatureException 
+     * @throws NoSuchProviderException 
+     * @throws NoSuchAlgorithmException 
+     * @throws InvalidKeyException 
      */
-    public void processBlock(Block pBlock) {
-		for(final Transaction trans : pBlock.getTransactions()){
-			//remove from unverified transaction
-			this.unverifiedTransactions.removeIf(trans::equals);
-			//check unspent outputs
-			String address = SignaturesVerification.DeriveJMAddressFromPubKey(trans.getPubKey());
-			for(Input input : trans.getInputs()) {
-				Transaction prevTrans = chain.findInBlockChain(input.getPrevTransactionHash());
-				if(prevTrans == null) {
-					//Reward
+    public void processMinedBlock(Block pBlock) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, IOException {
+    		//TODO verifier le hash du bloc 
+    		//variable temporaires utilisées pour mettre à jour les pools de manière atomique
+    		Map<String,Output> tempToRemoveOutputs = new HashMap<String,Output>();
+    		Map<String,Output> tempToAddOutputs = new HashMap<String,Output>();
+    	
+    		for(final Transaction trans : pBlock.getTransactions())
+    		{
+			if(super.verifyBlockTransaction(trans, chain, (Output[])this.unspentOutputs.values().toArray()))
+			{
+				String address = SignaturesVerification.DeriveJMAddressFromPubKey(trans.getPubKey());
+				//reparcourir les inputs déja validés pour traitement
+				for(Input input : trans.getInputs())
+				{
+					Transaction prevTrans = chain.findInBlockChain(input.getPrevTransactionHash());
+					if(prevTrans.getOutputOut().getAddress().equals(address))
+					{
+						tempToRemoveOutputs.put(Hex.toHexString(prevTrans.getHash()),prevTrans.getOutputOut());
+					}
+					else if (prevTrans.getOutputBack().getAddress().equals(address))
+					{
+						tempToRemoveOutputs.put(Hex.toHexString(prevTrans.getHash()),prevTrans.getOutputBack());
+					}
+					//sinon probleme mais normalement impossible
 				}
-				else {
-					Output outToMe = null; //in previous transaction, find the output which was for me
-					if(prevTrans.getOutputBack().getAddress().equals(address))
-						outToMe = prevTrans.getOutputBack();
-					else if (prevTrans.getOutputOut().getAddress().equals(address))
-						outToMe = prevTrans.getOutputOut();
-					else
-						return; //not normal
-					double diff = outToMe.getAmount() - input.getAmount();
-					if(diff != 0)
-						return; //not normal
-					else if(diff == 0)
-						this.unspentOutputs.remove(Hex.toHexString(prevTrans.getHash()));//remove from unspent outputs
+				//adding new outputs to the pool
+				tempToAddOutputs.put(Hex.toHexString(trans.getHash())+"$"+trans.getOutputOut().getAddress(),trans.getOutputOut());//delimiter pour avoir une clé unique : concat du hash / adresse
+				if(trans.getOutputBack() != null) 
+				{
+					tempToAddOutputs.put(Hex.toHexString(trans.getHash())+"$"+trans.getOutputBack().getAddress(),trans.getOutputBack());
 				}
-			}
-			this.unspentOutputs.put(Hex.toHexString(trans.getHash()), trans.getOutputOut());
-			if(trans.getOutputBack() != null) {
-				this.unspentOutputs.put(Hex.toHexString(trans.getHash()), trans.getOutputBack());
 			}
 		}
-    	chain.addBlock(pBlock);
-    	this.lastBlock = pBlock;
+    		for(final Transaction trans : pBlock.getTransactions()){
+    			if(!this.unverifiedTransactions.removeIf(trans::equals))return; //transaction has to be in unverified transaction pool before being added to the chain
+    			//Bouger le reste aussi ?
+    		}
+    		for (Map.Entry<String,Output> entry : tempToRemoveOutputs.entrySet())
+    		{
+    		    unspentOutputs.remove(entry.getKey());
+    		}
+    		for (Map.Entry<String,Output> entry : tempToAddOutputs.entrySet())
+    		{
+    		    unspentOutputs.put(entry.getKey(),entry.getValue());
+    		}
+    		chain.addBlock(pBlock);
+    		this.lastBlock = pBlock;
     }
+    
+    /* To delete ?
+     public boolean canBeAdded(Block pBlock){
+	    	if(pBlock.getClass() == Genesis.class)return true;
+	    	if(!isFinalHashRight(pBlock))return false;
+	    	if (!doesPrevBlocKExists(pBlock)) return false;
+	    	if (pBlock.getSize() > Block.MAX_BLOCK_SIZE) return false;
+	    	return true;
+    }
+    public boolean isFinalHashRight(Block pBlock) {
+	    	BigInteger value = new BigInteger(pBlock.getFinalHash(), 16);
+	    	return value.shiftRight(32*8 - pBlock.getDifficulty()).intValue() == 0;
+    }
+    /**
+     * Checks if the previous block exists in the chain, based on the hash
+     * @param pBlock
+     * @return
+     */
+    /*private boolean doesPrevBlocKExists(Block pBlock) {
+	    	for(String key : chain.getBlocks().keySet()) {
+	    		if (chain.getBlocks().get(key).getFinalHash().equals(pBlock.getPrevHash())) {
+	    			return true;
+				}
+	    	}
+	    	return false;
+    }
+      */
 
 	public List<Transaction> getTransactionsToThisAddress(String addresses) {
 		String[] tabAddresses = gson.fromJson(addresses, String[].class);
