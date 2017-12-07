@@ -1,46 +1,31 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.jmcoin.test;
 
-import com.jmcoin.crypto.SignaturesVerification;
-import com.jmcoin.model.Input;
-import com.jmcoin.model.Output;
-import com.jmcoin.model.Transaction;
-import com.jmcoin.model.Wallet;
+import com.jmcoin.crypto.AES.InvalidAESStreamException;
+import com.jmcoin.crypto.AES.InvalidPasswordException;
+import com.jmcoin.crypto.AES.StrongEncryptionNotAvailableException;
+import com.jmcoin.network.UserJMProtocolImpl;
+import com.jmcoin.network.UserNode;
 
-import java.security.PrivateKey;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.spec.InvalidKeySpecException;
 /**
  *
  * @author Famille
  */
 public class TestWallet {
     public static void main(String args[]){
-        try {
-            Wallet w = new Wallet("a");
-            //w.createKeys("a");
-            Input in = new Input();
-            Output out = new Output();
-            out.setAmount(10);
-            Transaction tr = new Transaction();
-            tr.addInput(in);
-            tr.setOutputOut(out);
-            tr.setOutputBack(null);
-            byte[] signature = SignaturesVerification.signTransaction(tr.getBytes(false), w.getKeys().entrySet().iterator().next().getKey());
-            for(PrivateKey key : w.getKeys().keySet()) {
-                if(SignaturesVerification.verifyTransaction(signature, tr.getBytes(false), w.getKeys().get(key))) {
-                	System.out.println("Verified");
-                }
-            }
-            System.out.println("End");
-        } catch (Exception ex) {
-            Logger.getLogger(TestWallet.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    	try {
+			TestMasterNode.runMaster();
+			TestRelay.run();
+	    	UserNode userNode = new UserNode("a");
+	    	UserJMProtocolImpl protocol = new UserJMProtocolImpl(userNode);
+	    	userNode.getWallet().computeBalance(protocol);
+		} catch (IOException | NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException | InvalidPasswordException | InvalidAESStreamException | StrongEncryptionNotAvailableException e) {
+			e.printStackTrace();
+		}
+    	
     }
 }
 

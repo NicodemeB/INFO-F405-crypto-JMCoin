@@ -1,5 +1,4 @@
 package com.jmcoin.test;
-
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -9,11 +8,9 @@ import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Map;
-
 import com.jmcoin.crypto.AES.InvalidAESStreamException;
 import com.jmcoin.crypto.AES.InvalidPasswordException;
 import com.jmcoin.crypto.AES.StrongEncryptionNotAvailableException;
-import com.jmcoin.io.IOFileHandler;
 import com.jmcoin.model.Transaction;
 import com.jmcoin.network.JMProtocolImpl;
 import com.jmcoin.network.MasterJMProtocolImpl;
@@ -55,11 +52,10 @@ public class TestSendNewTransaction {
 		try {
 			Transaction transaction = node.createTransaction(protocol, "connard", "connasse", 0, privKey, pubKey);
 			if(transaction != null)
-				protocol.getClient().sendMessage(JMProtocolImpl.craftMessage(NetConst.TAKE_MY_NEW_TRANSACTION, IOFileHandler.toJson(transaction)));
+				protocol.getClient().sendMessage(JMProtocolImpl.craftMessage(NetConst.TAKE_MY_NEW_TRANSACTION, node.getGson().toJson(transaction)));
 		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException | SignatureException
 				| IOException e) {
 			e.printStackTrace();
 		}
 	}
-
 }

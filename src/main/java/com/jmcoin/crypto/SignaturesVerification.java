@@ -28,8 +28,7 @@ public abstract class SignaturesVerification {
 		return keyFactory.generatePublic(spec);
 	}
 	
-	public static byte[] signTransaction(byte[] bytes, PrivateKey privKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, FileNotFoundException, IOException, SignatureException
-    {
+	public static byte[] signTransaction(byte[] bytes, PrivateKey privKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, FileNotFoundException, IOException, SignatureException{
         Signature dsa = Signature.getInstance(SignaturesVerification.SHA1_WITH_DSA, "SUN"); 
         dsa.initSign(privKey);
         BufferedInputStream bufIn = new BufferedInputStream(new ByteArrayInputStream(bytes));
@@ -44,8 +43,7 @@ public abstract class SignaturesVerification {
 	
 	
 	
-    public static boolean verifyTransaction(byte[] signature, byte[] transaction, PublicKey pubKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, SignatureException
-    {
+    public static boolean verifyTransaction(byte[] signature, byte[] transaction, PublicKey pubKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, SignatureException{
         boolean verifies = false;
         if(signature == null || transaction == null || pubKey == null){
         	return false;

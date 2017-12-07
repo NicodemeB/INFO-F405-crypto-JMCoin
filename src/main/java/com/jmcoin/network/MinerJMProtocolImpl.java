@@ -3,7 +3,6 @@ package com.jmcoin.network;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import com.jmcoin.crypto.SignaturesVerification;
-import com.jmcoin.io.IOFileHandler;
 import com.jmcoin.model.Block;
 import com.jmcoin.model.Chain;
 import com.jmcoin.model.Input;
@@ -123,19 +122,20 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
 		System.out.println("total = " + total);
 		if(total != 0)
 			return false;
-		
 		return true	;
 	}
 	
 	public void sendMinedBlock(Block block) throws IOException {
-		this.client.sendMessage(JMProtocolImpl.craftMessage(NetConst.TAKE_MY_MINED_BLOCK, IOFileHandler.toJson(block)));
+		this.client.sendMessage(JMProtocolImpl.craftMessage(NetConst.TAKE_MY_MINED_BLOCK, this.peer.getGson().toJson(block)));
 	}
 
 	@Override
 	protected String giveMeLastBlock() {return null;}
 
 	@Override
-	protected void receiveLastBlock(String block) {}
+	protected void receiveLastBlock(String block) {
+		setBundle(block, Block.class);
+	}
 
 	@Override
 	protected void receiveTransactionToThisAddress(String trans) {}

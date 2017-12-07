@@ -1,9 +1,14 @@
 package com.jmcoin.network;
 
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SignatureException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 import com.google.gson.JsonSyntaxException;
-import com.jmcoin.io.IOFileHandler;
+import com.jmcoin.crypto.SignaturesVerification;
 import com.jmcoin.model.Block;
 import com.jmcoin.model.Transaction;
 
@@ -23,14 +28,14 @@ public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 		List<Transaction> transactions = this.peer.getUnverifiedTransactions().size() > NetConst.MAX_SENT_TRANSACTIONS ?
 				this.peer.getUnverifiedTransactions().subList(0, NetConst.MAX_SENT_TRANSACTIONS):
 					this.peer.getUnverifiedTransactions();
-		return JMProtocolImpl.craftMessage(NetConst.RECEIVE_UNVERIFIED_TRANS, IOFileHandler.toJson(transactions));
+		return JMProtocolImpl.craftMessage(NetConst.RECEIVE_UNVERIFIED_TRANS, this.peer.getGson().toJson(transactions));
 	}
 
 	@Override
 	protected String takeMyMinedBlockImpl(String payload) throws IOException {
 		if (payload != null) {
 			try {
-				this.peer.processBlock(IOFileHandler.getFromJsonString(payload, Block.class));
+				this.peer.processBlock(this.peer.getGson().fromJson(payload, Block.class));
 				return stopMining();
 			}
 			catch(JsonSyntaxException jse) {
@@ -43,8 +48,9 @@ public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 	@Override
 	protected boolean takeMyNewTransactionImpl(String payload) {
 		try {
+			Transaction transaction = this.peer.getGson().fromJson(payload, Transaction.class);
 			System.err.println("Hi, I just received a new Transaction!");
-			this.peer.getUnverifiedTransactions().add(IOFileHandler.getFromJsonString(payload, Transaction.class));
+			this.peer.getUnverifiedTransactions().add(transaction);
 			return true;
 		}
 		catch(JsonSyntaxException jse) {
@@ -65,12 +71,12 @@ public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 	
 	@Override
 	protected String giveMeBlockChainCopyImpl() {
-		return JMProtocolImpl.craftMessage(NetConst.RECEIVE_BLOCKCHAIN_COPY, IOFileHandler.toJson(this.peer.getChain()));
+		return JMProtocolImpl.craftMessage(NetConst.RECEIVE_BLOCKCHAIN_COPY, this.peer.getGson().toJson(this.peer.getChain()));
 	}
 
 	@Override
 	protected String giveMeUnspentOutputs() {
-		return JMProtocolImpl.craftMessage(NetConst.RECEIVE_UNSPENT_OUTPUTS, IOFileHandler.toJson(this.peer.getUnspentOutputs()));
+		return JMProtocolImpl.craftMessage(NetConst.RECEIVE_UNSPENT_OUTPUTS, this.peer.getGson().toJson(this.peer.getUnspentOutputs()));
 	}
 
 	@Override
@@ -90,7 +96,7 @@ public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 
 	@Override
 	protected String giveMeLastBlock() {
-		return JMProtocolImpl.craftMessage(NetConst.RECEIVE_LAST_BLOCK, IOFileHandler.toJson(this.peer.getLastBlock()));
+		return JMProtocolImpl.craftMessage(NetConst.RECEIVE_LAST_BLOCK, this.peer.getGson().toJson(this.peer.getLastBlock()));
 	}
 
 	@Override
@@ -101,6 +107,6 @@ public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 
 	@Override
 	protected String giveMeTransactionsToThisAddress(String address) {
-		return JMProtocolImpl.craftMessage(NetConst.RECEIVE_TRANS_TO_THIS_ADDRESS, IOFileHandler.toJson(this.peer.getTransactionsToThisAddress(address)));
+		return JMProtocolImpl.craftMessage(NetConst.RECEIVE_TRANS_TO_THIS_ADDRESS, this.peer.getGson().toJson(this.peer.getTransactionsToThisAddress(address)));
 	}
 }

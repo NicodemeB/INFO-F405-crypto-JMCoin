@@ -36,9 +36,9 @@ public class MasterNode extends Peer{
     	this.chain = new Chain();
     	this.unverifiedTransactions = new LinkedList<>();
     	this.unspentOutputs = new HashMap<>();
+    	//TODO fetch the last block in the db
+    	//TODO fetch the blockchain
     	this.lastBlock = new Block();
-    	this.lastBlock.setDifficulty(32);
-    	this.lastBlock.setFinalHash("h0");
     }
     
     public Block getLastBlock() {
@@ -65,7 +65,6 @@ public class MasterNode extends Peer{
 		return chain;
 	}
     
-    //TODO compute this reward according to the the size of the transaction
     //almost empty -> low reward
     public int getRewardAmount() {
     	return REWARD_START_VALUE / ((chain.getSize() / REWARD_RATE) + 1);
@@ -109,9 +108,13 @@ public class MasterNode extends Peer{
     	this.lastBlock = pBlock;
     }
 
-	public List<Transaction> getTransactionsToThisAddress(String address) {
+	public List<Transaction> getTransactionsToThisAddress(String addresses) {
+		String[] tabAddresses = gson.fromJson(addresses, String[].class);
 		List<Transaction> transactions = new ArrayList<>();
-		//FIXME get all transactions related to this address
+		for(String address : tabAddresses) {
+			System.out.println(address);
+			//FIXME get all transactions related to this address
+		}
 		return transactions;
 	}
 }

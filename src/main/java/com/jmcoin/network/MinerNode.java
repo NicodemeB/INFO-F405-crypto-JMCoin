@@ -59,7 +59,8 @@ public class MinerNode extends Peer{
 		int difficulty = protocol.downloadObject(Integer.class, NetConst.GIVE_ME_DIFFICULTY, null, protocol.getClient());
 		int rewardAmount = protocol.downloadObject(Integer.class, NetConst.GIVE_ME_REWARD_AMOUNT, null, protocol.getClient());
 		Transaction[] transactions = protocol.downloadObject(Transaction[].class, NetConst.GIVE_ME_UNVERIFIED_TRANSACTIONS, null, protocol.getClient());
-
+		Block lastBlock = protocol.downloadObject(Block.class, NetConst.GIVE_ME_LAST_BLOCK, null, protocol.getClient());
+		
 		Block block = new Block();
 		if(transactions != null) {
 			for(int i = 0; i < transactions.length; i++) {
@@ -79,6 +80,7 @@ public class MinerNode extends Peer{
 			intRewardAmount = 10;
 		}
 		//TODO use rewardAmount
+		//TODO choose the key
     	PrivateKey privKey = this.wallet.getKeys().keySet().iterator().next();
         PublicKey pubKey = this.wallet.getKeys().get(privKey);
 		Transaction reward = new Transaction();
@@ -92,7 +94,7 @@ public class MinerNode extends Peer{
 
 		block.setDifficulty(difficulty);
 		block.setTimeCreation(System.currentTimeMillis());
-		block.setPrevHash(null); //FIXME find prev block in the chain or let the master do the job
+		block.setPrevHash(lastBlock.getFinalHash());
 		return block;
 	}
 }

@@ -1,8 +1,7 @@
-
 package com.jmcoin.model;
 import com.jmcoin.crypto.AES;
 import com.jmcoin.crypto.SignaturesVerification;
-
+import com.jmcoin.network.UserJMProtocolImpl;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -43,39 +42,49 @@ public class Wallet {
     	file = new File(PUB_KEYS);
     	if(!file.exists() || !file.isDirectory()) file.mkdir();
         this.keys = getWalletKeysFromFile(password);
-        this.balance = getBalance(addresses);
-    }   
-    
-    // ------------------------------------------Keys
-    public void createKeys(String password) throws IOException, AES.InvalidKeyLengthException, AES.StrongEncryptionNotAvailableException{
-        keyGen.createKeys();
-        PrivateKey privateKey = keyGen.getPrivateKey();
-        PublicKey publicKey = keyGen.getPublicKey();
-        char[] AESpw = password.toCharArray();
-        ByteArrayInputStream inputPrivateKey = new ByteArrayInputStream(privateKey.getEncoded());
-        ByteArrayOutputStream encryptedPrivateKey = new ByteArrayOutputStream();
-        
-        AES.encrypt(128, AESpw, inputPrivateKey , encryptedPrivateKey);
-
-        keyGen.writeToFile(PUB_KEYS+SEP+"publicKey_"+System.currentTimeMillis()+".txt", publicKey.getEncoded());
-        keyGen.writeToFile(PRIV_KEYS+SEP+"privateKey_"+System.currentTimeMillis()+".txt", encryptedPrivateKey.toByteArray());
-        keys.put(privateKey,publicKey);
-        computeAddresses(this.keys);
-    }
-    
-    public void computeAddresses(HashMap<PrivateKey,PublicKey> keys) throws IOException{
         for(PrivateKey privK : this.keys.keySet()){
             this.addresses.add(SignaturesVerification.DeriveJMAddressFromPubKey(this.keys.get(privK).getEncoded()));
         }
     }
     
-    public HashMap<PrivateKey,PublicKey> getWalletKeysFromFile(String password) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, AES.InvalidPasswordException, AES.InvalidAESStreamException, AES.StrongEncryptionNotAvailableException {
+    public void computeBalance(UserJMProtocolImpl protocol) throws IOException {
+    	this.balance = protocol.getAddressBalance(this.addresses.toArray(new String[0]));
+    }
+    
+    public double getBalance() {
+		return balance;
+    }
+    
+    /**
+     * Creates keys and write them into files
+     * @param password
+     * @throws IOException
+     * @throws AES.InvalidKeyLengthException
+     * @throws AES.StrongEncryptionNotAvailableException
+     */
+    public void createKeys(String password) throws IOException, AES.InvalidKeyLengthException, AES.StrongEncryptionNotAvailableException{
+        keyGen.createKeys();
+        PrivateKey privateKey = keyGen.getPrivateKey();
+        PublicKey publicKey = keyGen.getPublicKey();
+        ByteArrayInputStream inputPrivateKey = new ByteArrayInputStream(privateKey.getEncoded());
+        ByteArrayOutputStream encryptedPrivateKey = new ByteArrayOutputStream();
+        
+        AES.encrypt(128, password.toCharArray(), inputPrivateKey , encryptedPrivateKey);
+
+        keyGen.writeToFile(PUB_KEYS+SEP+"publicKey_"+System.currentTimeMillis()+".txt", publicKey.getEncoded());
+        keyGen.writeToFile(PRIV_KEYS+SEP+"privateKey_"+System.currentTimeMillis()+".txt", encryptedPrivateKey.toByteArray());
+        keys.put(privateKey,publicKey);
+        this.addresses.add(SignaturesVerification.DeriveJMAddressFromPubKey(publicKey.getEncoded()));
+    }
+    
+    private HashMap<PrivateKey,PublicKey> getWalletKeysFromFile(String password) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, AES.InvalidPasswordException, AES.InvalidAESStreamException, AES.StrongEncryptionNotAvailableException {
         KeyFactory kf = KeyFactory.getInstance("DSA");
         ArrayList<PrivateKey> privateKeyList = new ArrayList<>();
         ArrayList<PublicKey> publicKeyList = new ArrayList<>();
            
         try (Stream<Path> paths = Files.walk(Paths.get(PRIV_KEYS))) {
             paths
+            .sorted()
             .filter(Files::isRegularFile)
             .forEach(filePath-> {
                 try {
@@ -94,10 +103,9 @@ public class Wallet {
                 }
             }); 
         }
-        
         try (Stream<Path> paths = Files.walk(Paths.get(PUB_KEYS))) {
-
             paths
+            .sorted()
             .filter(Files::isRegularFile)
             .forEach(filePath-> {
                 
@@ -119,54 +127,18 @@ public class Wallet {
         } 
         
         HashMap<PrivateKey,PublicKey> keyCouples = new HashMap<>();
-        for(int i = 0; i < privateKeyList.size() && i < publicKeyList.size(); i++)
-        {
+        for(int i = 0; i < privateKeyList.size() && i < publicKeyList.size(); i++){
             keyCouples.put(privateKeyList.get(i), publicKeyList.get(i));
         }
-
         return keyCouples;
-    }
-    
-    // ------------------------------------------- Chain
-    public double getAddressBalance(String address)
-    {
-       //TODO Recupérer la liste de transacction avec des outputs disponibles pour cette adresse TO DO from network
-        ArrayList<Transaction> addressTransactions = new ArrayList<Transaction>();
-        double totalOutputAmount = 0;
-        
-        for(int i = 0 ; i < addressTransactions.size(); i++)
-        {
-            if(addressTransactions.get(i).getOutputBack().getAddress().equals(address))
-            {
-                totalOutputAmount+= addressTransactions.get(i).getOutputBack().getAmount();
-            }
-            else
-            {   //Revérification qu'il y a bien une des deux outputs qui appartient à l'adresse, nécessaire ?
-                if((addressTransactions.get(i).getOutputOut().getAddress().equals(address)))
-                {
-                    totalOutputAmount+= addressTransactions.get(i).getOutputOut().getAmount();
-                }
-                else
-                {
-                    System.out.println("Wallet : No output belonging to this address");
-                }
-            }
-        }
-        return totalOutputAmount;
-    }
-    
-    public double getBalance(ArrayList<String> adresses)
-    {
-        double totalAmount = 0; 
-        for(String address : addresses)
-        {
-           totalAmount += getAddressBalance(address);
-        }
-        return totalAmount;
     }
     
     public HashMap<PrivateKey,PublicKey> getKeys() {
        return keys;
     }
+    
+    public ArrayList<String> getAddresses() {
+		return addresses;
+	}
 }
  

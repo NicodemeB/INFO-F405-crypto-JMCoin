@@ -2,7 +2,6 @@ package com.jmcoin.network;
 
 import java.io.IOException;
 
-import com.jmcoin.io.IOFileHandler;
 import com.jmcoin.model.Chain;
 
 /**
@@ -24,6 +23,6 @@ public class RelayNode extends Peer{
 	}
 	
 	public void updateBlockChain(String bc) {
-		this.localChainCopy = IOFileHandler.getFromJsonString(bc, Chain.class);
+		this.localChainCopy = this.gson.fromJson(bc, Chain.class);
 	}
 }
