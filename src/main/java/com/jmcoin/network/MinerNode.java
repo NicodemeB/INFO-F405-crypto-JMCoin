@@ -68,17 +68,7 @@ public class MinerNode extends Peer{
 				block.getTransactions().add(transactions[i]);
 			}
 		}
-		int intRewardAmount = 0;		
-		int sizeBlock = block.getTransactions().size();
-		if(sizeBlock < 10){
-			intRewardAmount = 2;
-		}else if(sizeBlock < 50){
-			intRewardAmount = 4;
-		}else if(sizeBlock < 100){
-			intRewardAmount = 8;
-		}else{
-			intRewardAmount = 10;
-		}
+		double doubleRewardAmount = MasterNode.getInstance().getRewardAmount()*(1.0/NetConst.MAX_SENT_TRANSACTIONS);
 		//TODO use rewardAmount
 		//TODO choose the key
     	PrivateKey privKey = this.wallet.getKeys().keySet().iterator().next();
@@ -86,7 +76,7 @@ public class MinerNode extends Peer{
 		Transaction reward = new Transaction();
 		Output out = new Output();
 		out.setAddress(SignaturesVerification.DeriveJMAddressFromPubKey(pubKey.getEncoded()));
-		out.setAmount(intRewardAmount);
+		out.setAmount(doubleRewardAmount);
 		reward.setOutputOut(out);
 		reward.setOutputBack(new Output());
 		reward.setPubKey(pubKey.getEncoded());
