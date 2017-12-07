@@ -1,6 +1,10 @@
 package com.jmcoin.network;
 
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SignatureException;
 import java.util.List;
 import com.google.gson.JsonSyntaxException;
 import com.jmcoin.io.IOFileHandler;
@@ -30,11 +34,14 @@ public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 	protected String takeMyMinedBlockImpl(String payload) throws IOException {
 		if (payload != null) {
 			try {
-				this.peer.processBlock(IOFileHandler.getFromJsonString(payload, Block.class));
+				this.peer.processMinedBlock(IOFileHandler.getFromJsonString(payload, Block.class));
 				return stopMining();
 			}
 			catch(JsonSyntaxException jse) {
 				jse.printStackTrace();
+			} catch (InvalidKeyException | SignatureException | NoSuchProviderException | NoSuchAlgorithmException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 		return null;

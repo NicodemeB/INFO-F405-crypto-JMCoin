@@ -16,6 +16,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
@@ -69,35 +70,6 @@ public class KeyGenerator {
 		fos.close();
 	}
         
-        /*public KeyPair LoadKeyPair(String path, String algorithm) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException
-        {
-            // Read Public Key.
-            File filePublicKey = new File(path + "/public.key");
-            FileInputStream fis = new FileInputStream(path + "/public.key");
-            byte[] encodedPublicKey = new byte[(int) filePublicKey.length()];
-            fis.read(encodedPublicKey);
-            fis.close();
-
-            // Read Private Key.
-            File filePrivateKey = new File(path + "/private.key");
-            fis = new FileInputStream(path + "/private.key");
-            byte[] encodedPrivateKey = new byte[(int) filePrivateKey.length()];
-            fis.read(encodedPrivateKey);
-            fis.close();
-
-            // Generate KeyPair.
-            KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
-            X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(
-                            encodedPublicKey);
-            PublicKey publicKey = keyFactory.generatePublic(publicKeySpec);
-
-            PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(
-                            encodedPrivateKey);
-            PrivateKey privateKey = keyFactory.generatePrivate(privateKeySpec);
-
-            return new KeyPair(publicKey, privateKey);
-	}*/
-        
 	public void writeToFile(String path, byte[] key) throws IOException {
 		File f = new File(path);
 		f.getParentFile().mkdirs();
@@ -107,13 +79,31 @@ public class KeyGenerator {
 		fos.close();
 	}
         
-        public byte[] getFileInBytes(String path) throws IOException {
+    public byte[] getFileInBytes(String path) throws IOException {
 		
-                File f = new File(path);
-                FileInputStream fis = new FileInputStream(f);
+        File f = new File(path);
+        FileInputStream fis = new FileInputStream(f);
 		byte[] fbytes = new byte[(int) f.length()];
 		fis.read(fbytes);
 		fis.close();
 		return fbytes;
 	}
+    public static PublicKey getPublicKey(byte[] bytePubKey)
+    {
+    		KeyFactory kf;
+			try {
+				kf = KeyFactory.getInstance("DSA");
+				PublicKey pubKey = kf.generatePublic(new X509EncodedKeySpec(bytePubKey));
+				return pubKey;
+			} catch (NoSuchAlgorithmException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InvalidKeySpecException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return null;
+    		
+    }
+        
 }
