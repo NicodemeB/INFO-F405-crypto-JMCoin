@@ -1,8 +1,14 @@
-echo "runing update" 
+#echo "runing update"
 cd /home/kali/IdeaProjects/JMCoin
-CURRENTCOMMITNUMBER=$(git rev-list --count dev)
+
+git stash >> /dev/null
+git fetch >> /dev/null
+
+CURRENTCOMMITNUMBER=$(git rev-list --count origin/dev)
 LOCALCOMMITNUMBER=$(cat /home/kali/Desktop/commits.txt)
 
+#echo "curent" $CURRENTCOMMITNUMBER
+#echo "local" $LOCALCOMMITNUMBER
 
 BLUE='\033[1;34m'
 NC='\033[0m' # No Color
@@ -29,7 +35,6 @@ then
 
 	echo "${BLUE}[SCRIPT UPDATE INFO] Running new commit ...${NC}"
 	mvn exec:java -Dexec.mainClass="com.jmcoin.test.TestMasterNode"
-else 
-	echo "${BLUE}[SCRIPT UPDATE INFO] Seems to NOT have a new commit..${NC}"
+#else
+#	echo "${BLUE}[SCRIPT UPDATE INFO] Seems to NOT have a new commit..${NC}"
 fi
-
