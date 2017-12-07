@@ -44,8 +44,7 @@ public abstract class Peer {
 	protected void setBundle(Bundle<? extends Object> bundle) {
 		this.bundle = bundle;
 	}
-	
-	//TODO finish it!
+
 	protected Boolean verifyBlockTransaction(Transaction trans, Chain chain, Map<String, Output> unspentOutputs) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, IOException {
 		if(SignaturesVerification.verifyTransaction(trans.getSignature(), trans.getBytes(false), KeyGenerator.getPublicKey(trans.getPubKey()))) {
 			String address = SignaturesVerification.DeriveJMAddressFromPubKey(trans.getPubKey());
@@ -62,15 +61,17 @@ public abstract class Peer {
 						outToMe = prevTrans.getOutputOut();
 					else
 						return false; //not normal
-					
 					boolean unspent = false;
-					for(Output uo : unspentOutputs.values()) {
-						if(uo.equals(outToMe)) {
+					String outputKey =  trans.getHash()+"$"+outToMe.getAddress();
+					for (Map.Entry<String,Output> entry : unspentOutputs.entrySet())
+					{
+						if(outputKey.equals(entry.getKey()))//Si ce n'est pas trouvé dans la liste
+						{
 							unspent = true;
 						}
 					}
-					if(!unspent)	return false; // Output déja dépensée
 					
+					if(!unspent)	return false; // Output déja dépensée
 					if(outToMe.getAmount() == input.getAmount())
 					{	
 						//remove from unspent outputs

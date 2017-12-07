@@ -37,11 +37,11 @@ public class UserNode extends Peer{
                 tr.addInput(new Input(addressTransactions[i].getOutputBack().getAmount(),addressTransactions[i].getHash()));
             }
             else if((addressTransactions[i].getOutputOut().getAddress().equals(fromAddress))){
-            	totalOutputAmount+= addressTransactions[i].getOutputOut().getAmount();
-            	tr.addInput(new Input(addressTransactions[i].getOutputOut().getAmount(),addressTransactions[i].getHash()));
+	            	totalOutputAmount+= addressTransactions[i].getOutputOut().getAmount();
+	            	tr.addInput(new Input(addressTransactions[i].getOutputOut().getAmount(),addressTransactions[i].getHash()));
             }
             else{
-            	System.out.println("Wallet : No output belonging to this address");
+            		System.out.println("Wallet : No output belonging to this address");
             }           
         }
         if(amountToSend <= totalOutputAmount){
