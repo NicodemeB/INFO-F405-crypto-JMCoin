@@ -57,7 +57,6 @@ public class MinerNode extends Peer{
 	
 	private Block buildBlock(MinerJMProtocolImpl protocol) throws IOException, ClassNotFoundException, InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException {
 		int difficulty = protocol.downloadObject(Integer.class, NetConst.GIVE_ME_DIFFICULTY, null, protocol.getClient());
-		int rewardAmount = protocol.downloadObject(Integer.class, NetConst.GIVE_ME_REWARD_AMOUNT, null, protocol.getClient());
 		Transaction[] transactions = protocol.downloadObject(Transaction[].class, NetConst.GIVE_ME_UNVERIFIED_TRANSACTIONS, null, protocol.getClient());
 		Block lastBlock = protocol.downloadObject(Block.class, NetConst.GIVE_ME_LAST_BLOCK, null, protocol.getClient());
 		
@@ -68,7 +67,7 @@ public class MinerNode extends Peer{
 				block.getTransactions().add(transactions[i]);
 			}
 		}
-		double doubleRewardAmount = MasterNode.getInstance().getRewardAmount()*(1.0/NetConst.MAX_SENT_TRANSACTIONS);
+		double doubleRewardAmount = protocol.downloadObject(Integer.class, NetConst.GIVE_ME_REWARD_AMOUNT, null, protocol.getClient()) * (1.0/NetConst.MAX_SENT_TRANSACTIONS);
 		//TODO use rewardAmount
 		//TODO choose the key
     	PrivateKey privKey = this.wallet.getKeys().keySet().iterator().next();
