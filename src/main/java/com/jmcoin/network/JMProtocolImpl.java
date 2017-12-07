@@ -2,8 +2,6 @@ package com.jmcoin.network;
 
 import java.io.IOException;
 import java.util.StringTokenizer;
-
-import com.jmcoin.io.IOFileHandler;
 import com.jmcoin.model.Block;
 import com.jmcoin.model.Bundle;
 import com.jmcoin.model.Output;
@@ -23,7 +21,7 @@ public abstract class JMProtocolImpl<X extends Peer> {
 	
 	protected <T> void setBundle(String payload, Class<T> type) {
 		Bundle<T> bundle = this.peer.createBundle(type);
-		bundle.setObject(IOFileHandler.getFromJsonString(payload, type));
+		bundle.setObject(this.peer.getGson().fromJson(payload, type));
 		this.peer.setBundle(bundle);
 	}
 	

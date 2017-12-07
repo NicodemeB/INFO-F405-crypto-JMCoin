@@ -29,7 +29,7 @@ public class UserNode extends Peer{
 	
 	public Transaction createTransaction(UserJMProtocolImpl protocol, String fromAddress, String toAddress,
 			double amountToSend, PrivateKey privKey, PublicKey pubKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, FileNotFoundException, SignatureException{
-    	Transaction[] addressTransactions = protocol.downloadObject(Transaction[].class, NetConst.GIVE_ME_TRANS_TO_THIS_ADDRESS, fromAddress, protocol.getClient());
+		Transaction[] addressTransactions = protocol.downloadObject(Transaction[].class, NetConst.GIVE_ME_TRANS_TO_THIS_ADDRESS, "[\""+fromAddress+"\"]", protocol.getClient());
     	Transaction tr = new Transaction();
         double totalOutputAmount = 0;
         for(int i = 0 ; i < addressTransactions.length; i++){
@@ -48,11 +48,11 @@ public class UserNode extends Peer{
         if(amountToSend <= totalOutputAmount){
             Output oOut = new Output(amountToSend, toAddress);
             Output oBack = new Output(totalOutputAmount-amountToSend, fromAddress);
-            tr.setSignature(SignaturesVerification.signTransaction(tr.getBytes(false), privKey));
-            tr.computeHash();
             tr.setPubKey(pubKey.getEncoded());
             tr.setOutputBack(oBack);
             tr.setOutputOut(oOut);
+            tr.setSignature(SignaturesVerification.signTransaction(tr.getBytes(false), privKey));
+            tr.computeHash();
             return tr;
         }
         else{

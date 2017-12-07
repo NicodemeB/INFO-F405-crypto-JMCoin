@@ -86,4 +86,22 @@ public class UserJMProtocolImpl extends JMProtocolImpl<UserNode>{
 	@Override
 	protected String giveMeTransactionsToThisAddress(String address) {return null;}
 	
+	public double getAddressBalance(String ... addresses) throws IOException{
+    	Transaction[] transactions = downloadObject(Transaction[].class, NetConst.GIVE_ME_TRANS_TO_THIS_ADDRESS, this.peer.getGson().toJson(addresses), getClient());
+        double totalOutputAmount = 0;
+        for(int j = 0; j < addresses.length; j++) {
+        	for(int i = 0 ; i < transactions.length; i++){
+                if(transactions[i].getOutputBack().getAddress().equals(addresses[j])){
+                    totalOutputAmount+= transactions[i].getOutputBack().getAmount();
+                }
+                else if(transactions[i].getOutputOut().getAddress().equals(addresses[j])){
+                	totalOutputAmount+= transactions[i].getOutputOut().getAmount();
+                }
+                else{
+                	System.out.println("Wallet : No output belonging to this address");
+                }
+            }
+        }
+        return totalOutputAmount;
+    }
 }
