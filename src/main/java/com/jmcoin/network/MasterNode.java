@@ -123,7 +123,6 @@ public class MasterNode extends Peer{
     }
     
     /**
-     * TODO Fork -> some verified transactions could set as "unverified". Same thing with spent outputs
      * @param pBlock
      * @throws IOException 
      * @throws SignatureException 
@@ -162,7 +161,6 @@ public class MasterNode extends Peer{
 		for(final Transaction trans : pBlock.getTransactions()){
 			if(!this.unverifiedTransactions.removeIf(trans::equals))
 				return false; //transaction has to be in unverified transaction pool before being added to the chain
-			//Bouger le reste aussi ?
 		}
 		for (String key : tempToRemoveOutputs.keySet()){
 		    unspentOutputs.remove(key);

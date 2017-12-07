@@ -9,6 +9,11 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.ArrayList;
+import java.util.Map;
+
+import org.bouncycastle.util.encoders.Hex;
+
 import com.jmcoin.crypto.SignaturesVerification;
 import com.jmcoin.crypto.AES.InvalidAESStreamException;
 import com.jmcoin.crypto.AES.InvalidPasswordException;
@@ -26,9 +31,41 @@ public class UserNode extends Peer{
 		this.wallet = new Wallet(password);
 	}
 	
+	public Transaction[] getAvailableTransactionsForAddress(UserJMProtocolImpl protocol,String fromAddress, Map<String,Output> unspentOutputs)
+	{
+		Transaction[] addressTransactions;
+		ArrayList<Transaction> availableTransactions = new ArrayList<Transaction>();
+		try {
+			addressTransactions = protocol.downloadObject(Transaction[].class, NetConst.GIVE_ME_TRANS_TO_THIS_ADDRESS, "[\""+fromAddress+"\"]", protocol.getClient());
+			for(int i = 0 ; i < addressTransactions.length; i++){
+				
+				if(addressTransactions[i].getOutputBack().getAddress().equals(fromAddress))
+				{	
+					//Si l'output est contenue dans le pool des transactions disponibles
+					if((unspentOutputs.containsKey(Hex.toHexString(addressTransactions[i].getHash())+"$"+addressTransactions[i].getOutputBack().getAddress())))
+					{
+						availableTransactions.add(addressTransactions[i]);
+					}
+				}
+				else if((addressTransactions[i].getOutputOut().getAddress().equals(fromAddress))){
+					if((unspentOutputs.containsKey(Hex.toHexString(addressTransactions[i].getHash())+"$"+addressTransactions[i].getOutputOut().getAddress())))
+					{
+						availableTransactions.add(addressTransactions[i]);
+					}
+				}
+			}
+				return addressTransactions;
+			} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+		
+	}
+	
 	public Transaction createTransaction(UserJMProtocolImpl protocol, String fromAddress, String toAddress,
-			double amountToSend, PrivateKey privKey, PublicKey pubKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, FileNotFoundException, SignatureException{
-		Transaction[] addressTransactions = protocol.downloadObject(Transaction[].class, NetConst.GIVE_ME_TRANS_TO_THIS_ADDRESS, "[\""+fromAddress+"\"]", protocol.getClient());
+		double amountToSend, PrivateKey privKey, PublicKey pubKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, FileNotFoundException, SignatureException{
+		Transaction [] addressTransactions = null;//FIXME add unspent output pool getAvailableTransactionsForAddress(protocol,fromAddress,);
 		Transaction tr = new Transaction();
         double totalOutputAmount = 0;
         for(int i = 0 ; i < addressTransactions.length; i++){

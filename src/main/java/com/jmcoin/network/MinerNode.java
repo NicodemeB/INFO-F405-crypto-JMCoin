@@ -46,7 +46,7 @@ public class MinerNode extends Peer{
 		int value = protocol.downloadObject(Integer.class, NetConst.GIVE_ME_REWARD_AMOUNT, null, protocol.getClient());
 		double doubleRewardAmount = value * (1.0/NetConst.MAX_SENT_TRANSACTIONS);
 		//TODO choose the key
-    	PrivateKey privKey = this.wallet.getKeys().keySet().iterator().next();
+		PrivateKey privKey = this.wallet.getKeys().keySet().iterator().next();
         PublicKey pubKey = this.wallet.getKeys().get(privKey);
 		Transaction reward = new Transaction();
 		Output out = new Output();

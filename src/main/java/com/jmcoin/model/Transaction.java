@@ -119,23 +119,6 @@ public class Transaction implements Serializable {
                 Arrays.equals(this.pubKey, transaction.pubKey);
     }
 
-    /* FIXME should not be done here
-     * public boolean isValid() {
-        int total = 0;
-        for (Input i : inputs) {
-            String unvf = JMProtocolImpl.sendRequest(NetConst.RELAY_NODE_LISTEN_PORT, NetConst.RELAY_DEBUG_HOST_NAME, NetConst.GIVE_ME_UNSPENT_OUTPUTS, null);
-            Output[] unspentOutputs = IOFileHandler.getFromJsonString(unvf, Output[].class);
-            //if i.output is not in unspent ouputs pool -> false
-            //if i.output.address is not this.outputs[0].address -> false
-            total += i.getAmount();
-        }
-        total += outputOut.getAmount();
-        total += outputBack.getAmount();
-        if (total != 0) return false;
-
-        return false;
-    }*/
-
     /**
      * @param withSign has to be false when this routine is called in order to compute the signature!
      * @return

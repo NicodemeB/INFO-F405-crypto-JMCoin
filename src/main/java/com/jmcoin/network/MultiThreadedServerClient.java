@@ -53,7 +53,7 @@ public class MultiThreadedServerClient extends MultiThreadedServer{
                 e.printStackTrace();
             }
         }
-        System.out.println("Server Stopped.") ;
+        System.out.println("Server Stopped.");
     }
 
     @Override
