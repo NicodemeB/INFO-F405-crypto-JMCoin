@@ -50,7 +50,7 @@ public class UserNode extends Peer{
 					}
 				}
 			}
-			return addressTransactions;
+			return (Transaction[])availableTransactions.toArray();
 		}
 		catch (IOException e) {
 			e.printStackTrace();
@@ -63,22 +63,29 @@ public class UserNode extends Peer{
 		double amountToSend, PrivateKey privKey, PublicKey pubKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, FileNotFoundException, SignatureException{
 		Map<String, Output> unspentOutputs = protocol.downloadObject(new TypeToken<Map<String, Output>>(){}.getType(), NetConst.GIVE_ME_UNSPENT_OUTPUTS, null, protocol.getClient());
 		Transaction [] addressTransactions = getAvailableTransactionsForAddress(protocol,fromAddress, unspentOutputs);
-		if(addressTransactions == null)return null;
+		if(addressTransactions == null) return null;
 		Transaction tr = new Transaction();
         double totalOutputAmount = 0;
-        for(int i = 0 ; i < addressTransactions.length; i++){
+        int i = 0;
+        while( i < addressTransactions.length && totalOutputAmount < amountToSend)
+        {
             if(addressTransactions[i].getOutputBack().getAddress().equals(fromAddress)){
                 totalOutputAmount+= addressTransactions[i].getOutputBack().getAmount();
                 tr.addInput(new Input(addressTransactions[i].getOutputBack().getAmount(),addressTransactions[i].getHash()));
+                //TODO verifier si Out pas encore utilisée localement
+                //TODO Stocker les outputs utilisée
             }
             else if((addressTransactions[i].getOutputOut().getAddress().equals(fromAddress))){
 	            	totalOutputAmount+= addressTransactions[i].getOutputOut().getAmount();
 	            	tr.addInput(new Input(addressTransactions[i].getOutputOut().getAmount(),addressTransactions[i].getHash()));
+	            	//verifier si Out pas encore utilisée localement
+	            	//Stocker l'outputs utilisée
             }
-            else{
-            	//TODO return or continue ?!
-            	System.out.println("Wallet : No output belonging to this address");
-            }           
+            else {
+            		System.out.println("Wallet : No output belonging to this address");
+            		return null;
+            }  
+            i++;
         }
         if(amountToSend <= totalOutputAmount){
             Output oOut = new Output(amountToSend, toAddress);
@@ -88,6 +95,7 @@ public class UserNode extends Peer{
             tr.setOutputOut(oOut);
             tr.setSignature(SignaturesVerification.signTransaction(tr.getBytes(false), privKey));
             tr.computeHash();
+            
             return tr;
         }
         else{
