@@ -8,7 +8,6 @@ import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SignatureException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,6 +18,7 @@ import org.bouncycastle.util.encoders.Hex;
 import com.jmcoin.crypto.AES.InvalidKeyLengthException;
 import com.jmcoin.crypto.AES.StrongEncryptionNotAvailableException;
 import com.jmcoin.crypto.SignaturesVerification;
+import com.jmcoin.database.DatabaseFacade;
 import com.jmcoin.model.Block;
 import com.jmcoin.model.Chain;
 import com.jmcoin.model.Genesis;
@@ -34,7 +34,7 @@ public class MasterNode extends Peer{
 	public static final int REWARD_RATE = 100;
     private LinkedList<Transaction> unverifiedTransactions;
     
-    private Map<String, Output> unspentOutputs; //key = hash of the transaction containing the output
+    private Map<String, Output> unspentOutputs;
     private Chain chain;
     private Block lastBlock;
        
@@ -42,12 +42,26 @@ public class MasterNode extends Peer{
 
     private MasterNode(){
     	super();
-    	this.chain = new Chain();
     	this.unverifiedTransactions = new LinkedList<>();
     	this.unspentOutputs = new HashMap<>();
-    	//TODO fetch the last block in the db
-    	//TODO fetch the blockchain
-    	this.lastBlock = new Block();
+    	
+    	//TODO uncomment this
+    	/*this.chain = DatabaseFacade.getStoredChain();
+    	this.lastBlock = DatabaseFacade.getLastBlock();
+    	if(this.lastBlock == null) {
+    		try {
+				this.lastBlock = Genesis.getInstance();
+			} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException | SignatureException
+					| IOException | InvalidKeyLengthException | StrongEncryptionNotAvailableException e) {
+				e.printStackTrace();
+			}
+    	}*/
+    	this.chain = new Chain();
+    	try {
+			this.lastBlock = Genesis.getInstance();
+		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException | SignatureException
+				| IOException | InvalidKeyLengthException | StrongEncryptionNotAvailableException e) {
+		}
     }
     
     public void debugMasterNode() throws NoSuchAlgorithmException, NoSuchProviderException {
@@ -141,14 +155,16 @@ public class MasterNode extends Peer{
 				//reparcourir les inputs déja validés pour traitement
 				for(Input input : trans.getInputs()){
 					Transaction prevTrans = chain.findInBlockChain(input.getPrevTransactionHash());
-					if(prevTrans.getOutputOut().getAddress().equals(address)){
-						tempToRemoveOutputs.put(Hex.toHexString(prevTrans.getHash()),prevTrans.getOutputOut());
-					}
-					else if (prevTrans.getOutputBack().getAddress().equals(address)){
-						tempToRemoveOutputs.put(Hex.toHexString(prevTrans.getHash()),prevTrans.getOutputBack());
-					}
-					else {
-						return false; //sinon probleme mais normalement impossible
+					if(prevTrans != null) {
+						if(prevTrans.getOutputOut().getAddress().equals(address)){
+							tempToRemoveOutputs.put(Hex.toHexString(prevTrans.getHash()),prevTrans.getOutputOut());
+						}
+						else if (prevTrans.getOutputBack().getAddress().equals(address)){
+							tempToRemoveOutputs.put(Hex.toHexString(prevTrans.getHash()),prevTrans.getOutputBack());
+						}
+						else {
+							return false; //sinon probleme mais normalement impossible
+						}
 					}
 				}
 				//adding new outputs to the pool
@@ -168,7 +184,6 @@ public class MasterNode extends Peer{
 		for (Map.Entry<String,Output> entry : tempToAddOutputs.entrySet()){
 		    unspentOutputs.put(entry.getKey(),entry.getValue());
 		}
-		
 		this.chain.getBlocks().put(pBlock.getFinalHash() + pBlock.getTimeCreation(), pBlock);
 		this.lastBlock = pBlock;
 		return true;
@@ -178,7 +193,7 @@ public class MasterNode extends Peer{
     	if(pBlock == null)return false;
     	if(pBlock.getClass().equals(Genesis.class))return true;
     	if(!isFinalHashRight(pBlock))return false;
-    	if (!doesPrevBlocKExist(pBlock)) return false;
+//FIXME uncomment this    	if (DatabaseFacade.getBlockWithHash(pBlock.getPrevHash()) == null) return false;
     	if (pBlock.getSize() > Block.MAX_BLOCK_SIZE) return false;
     	return true;
     }
@@ -187,29 +202,9 @@ public class MasterNode extends Peer{
 	    BigInteger value = new BigInteger(pBlock.getFinalHash(), 16);
 	    return value.shiftRight(32*8 - pBlock.getDifficulty()).intValue() == 0;
     }
-    
-    /**
-     * Checks if the previous block exists in the chain, based on the hash
-     * @param pBlock
-     * @return
-     */
-    private boolean doesPrevBlocKExist(Block pBlock) {
-    	//FIXME put it in the DB
-    	for(String key : chain.getBlocks().keySet()) {
-    		if (chain.getBlocks().get(key).getFinalHash().equals(pBlock.getPrevHash())) {
-    			return true;
-			}
-	    }
-	    return false;
-    }
 
 	public List<Transaction> getTransactionsToThisAddress(String addresses) {
 		String[] tabAddresses = gson.fromJson(addresses, String[].class);
-		List<Transaction> transactions = new ArrayList<>();
-		for(String address : tabAddresses) {
-			System.out.println(address);
-			//FIXME get all transactions related to this address
-		}
-		return transactions;
+		return DatabaseFacade.getAllTransactionsWithAddress(tabAddresses);
 	}
 }
