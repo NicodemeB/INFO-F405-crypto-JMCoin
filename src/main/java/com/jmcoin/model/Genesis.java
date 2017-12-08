@@ -18,9 +18,14 @@ import com.jmcoin.crypto.AES.StrongEncryptionNotAvailableException;
 import com.jmcoin.crypto.SignaturesVerification;
 import com.jmcoin.network.NetConst;
 
+import javax.persistence.Entity;
+import javax.persistence.Transient;
+
+@Entity
 public class Genesis extends Block {
 	
 	private static final long serialVersionUID = -3874611565736597876L;
+	@Transient
 	private static Genesis genesis;
 	
 	private static Key[] createKeys(String password) throws IOException, AES.InvalidKeyLengthException, AES.StrongEncryptionNotAvailableException, NoSuchAlgorithmException, NoSuchProviderException{
