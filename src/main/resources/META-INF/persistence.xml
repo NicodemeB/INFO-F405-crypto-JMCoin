@@ -7,6 +7,7 @@
         <class>com.jmcoin.model.Transaction</class>
         <class>com.jmcoin.model.Input</class>
         <class>com.jmcoin.model.Output</class>
+        <class>com.jmcoin.model.Genesis</class>
         <properties>
             <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
             <property name="javax.persistence.jdbc.url" value="jdbc:mysql://BigDaddy/jmcoin"/>
