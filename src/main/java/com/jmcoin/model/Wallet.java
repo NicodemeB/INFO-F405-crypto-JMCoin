@@ -19,6 +19,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -29,6 +30,7 @@ public class Wallet {
     private HashMap<PrivateKey,PublicKey> keys;
     private ArrayList<String> addresses;
     private double balance;
+    private Map<String,Output> pendingOutputs;
     
     private final String REP = System.getProperty("user.home");
     private final String SEP = System.getProperty("file.separator");
@@ -140,5 +142,16 @@ public class Wallet {
     public ArrayList<String> getAddresses() {
 		return addresses;
 	}
+    public Map<String,Output> getPendingOutputs()
+    {
+    		return pendingOutputs;
+    }
+    public void updatePendingOutputs(Map<String,Output> tempToRemoveOutputs)
+    {
+    		for (String key : tempToRemoveOutputs.keySet()){
+		    if(pendingOutputs.containsKey(key))
+    			pendingOutputs.remove(key);
+		}
+    }
 }
  

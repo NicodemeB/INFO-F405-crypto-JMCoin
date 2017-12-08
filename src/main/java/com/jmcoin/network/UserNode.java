@@ -27,6 +27,7 @@ import com.jmcoin.model.Wallet;
 public class UserNode extends Peer{
 
 	private Wallet wallet;
+	private Map<String,Output> usedOutputs;
 	
 	public UserNode(String password) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException, IOException, InvalidPasswordException, InvalidAESStreamException, StrongEncryptionNotAvailableException {
 		this.wallet = new Wallet(password);
@@ -61,6 +62,7 @@ public class UserNode extends Peer{
 	
 	public Transaction createTransaction(UserJMProtocolImpl protocol, String fromAddress, String toAddress,
 		double amountToSend, PrivateKey privKey, PublicKey pubKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, FileNotFoundException, SignatureException{
+		Map<String,Output> pendingOutputs = this.wallet.getPendingOutputs();
 		Map<String, Output> unspentOutputs = protocol.downloadObject(new TypeToken<Map<String, Output>>(){}.getType(), NetConst.GIVE_ME_UNSPENT_OUTPUTS, null, protocol.getClient());
 		Transaction [] addressTransactions = getAvailableTransactionsForAddress(protocol,fromAddress, unspentOutputs);
 		if(addressTransactions == null) return null;
@@ -69,17 +71,26 @@ public class UserNode extends Peer{
         int i = 0;
         while( i < addressTransactions.length && totalOutputAmount < amountToSend)
         {
+        		String key = Hex.toHexString(addressTransactions[i].getHash());
             if(addressTransactions[i].getOutputBack().getAddress().equals(fromAddress)){
-                totalOutputAmount+= addressTransactions[i].getOutputBack().getAmount();
-                tr.addInput(new Input(addressTransactions[i].getOutputBack().getAmount(),addressTransactions[i].getHash()));
-                //TODO verifier si Out pas encore utilisée localement
-                //TODO Stocker les outputs utilisée
+            		//verifier si Out pas encore utilisée localement
+            		key += "$"+addressTransactions[i].getOutputBack().getAddress();
+            		if(pendingOutputs.containsKey(key) == false)
+            		{
+            			totalOutputAmount+= addressTransactions[i].getOutputBack().getAmount();
+                     tr.addInput(new Input(addressTransactions[i].getOutputBack().getAmount(),addressTransactions[i].getHash()));
+                     this.usedOutputs.put(key, addressTransactions[i].getOutputBack());
+            		}
             }
             else if((addressTransactions[i].getOutputOut().getAddress().equals(fromAddress))){
-	            	totalOutputAmount+= addressTransactions[i].getOutputOut().getAmount();
-	            	tr.addInput(new Input(addressTransactions[i].getOutputOut().getAmount(),addressTransactions[i].getHash()));
+	            	key += "$"+addressTransactions[i].getOutputOut().getAddress();
 	            	//verifier si Out pas encore utilisée localement
-	            	//Stocker l'outputs utilisée
+	            	if(pendingOutputs.containsKey(key) == false)
+	        		{
+		            	totalOutputAmount+= addressTransactions[i].getOutputOut().getAmount();
+		            	tr.addInput(new Input(addressTransactions[i].getOutputOut().getAmount(),addressTransactions[i].getHash()));
+		            	this.usedOutputs.put(key, addressTransactions[i].getOutputBack());
+	        		}
             }
             else {
             		System.out.println("Wallet : No output belonging to this address");
@@ -95,7 +106,7 @@ public class UserNode extends Peer{
             tr.setOutputOut(oOut);
             tr.setSignature(SignaturesVerification.signTransaction(tr.getBytes(false), privKey));
             tr.computeHash();
-            
+          	this.wallet.getPendingOutputs().putAll(usedOutputs);
             return tr;
         }
         else{
