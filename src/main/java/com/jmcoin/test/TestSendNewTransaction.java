@@ -47,7 +47,7 @@ public class TestSendNewTransaction {
 		PrivateKey privKey = keys.keySet().iterator().next();
 		PublicKey pubKey = keys.get(privKey);
 		try {
-			Transaction transaction = node.createTransaction(protocol, "connard", "connasse", 0, privKey, pubKey);
+			Transaction transaction = node.createTransaction(protocol, "connard", "connasse", 0, privKey, pubKey,node.getWallet());
 			if(transaction != null)
 				protocol.getClient().sendMessage(JMProtocolImpl.craftMessage(NetConst.TAKE_MY_NEW_TRANSACTION, node.getGson().toJson(transaction)));
 		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException | SignatureException

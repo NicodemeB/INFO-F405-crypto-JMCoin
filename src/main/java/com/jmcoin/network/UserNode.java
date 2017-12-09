@@ -33,20 +33,24 @@ public class UserNode extends Peer{
 		this.wallet = new Wallet(password);
 	}
 	
-	public Transaction[] getAvailableTransactionsForAddress(UserJMProtocolImpl protocol,String fromAddress, Map<String,Output> unspentOutputs){
+	public Transaction[] getAvailableTransactionsForAddress(UserJMProtocolImpl protocol,String fromAddress, Map<String,Output> unspentOutputs, Wallet wallet){
 		Transaction[] addressTransactions;
 		ArrayList<Transaction> availableTransactions = new ArrayList<Transaction>();
 		try {
 			addressTransactions = protocol.downloadObject(Transaction[].class, NetConst.GIVE_ME_TRANS_TO_THIS_ADDRESS, "[\""+fromAddress+"\"]", protocol.getClient());
 			for(int i = 0 ; i < addressTransactions.length; i++){
+				
+				String keyOut = Hex.toHexString(addressTransactions[i].getHash())+"$"+addressTransactions[i].getOutputOut().getAddress();
+				String keyBack = Hex.toHexString(addressTransactions[i].getHash())+"$"+addressTransactions[i].getOutputBack().getAddress();
+					
 				if(addressTransactions[i].getOutputBack().getAddress().equals(fromAddress)){	
-					//Si l'output est contenue dans le pool des transactions disponibles
-					if((unspentOutputs.containsKey(Hex.toHexString(addressTransactions[i].getHash())+"$"+addressTransactions[i].getOutputBack().getAddress()))){
+					//Si l'output est contenue dans le pool des output disponibles et que l'output n'est pas en attente
+					if((unspentOutputs.containsKey(keyBack)) && wallet.getPendingOutputs().containsKey(keyBack) == false){
 						availableTransactions.add(addressTransactions[i]);
 					}
 				}
 				else if((addressTransactions[i].getOutputOut().getAddress().equals(fromAddress))){
-					if((unspentOutputs.containsKey(Hex.toHexString(addressTransactions[i].getHash())+"$"+addressTransactions[i].getOutputOut().getAddress()))){
+					if((unspentOutputs.containsKey(keyOut)) && wallet.getPendingOutputs().containsKey(keyOut) == false){
 						availableTransactions.add(addressTransactions[i]);
 					}
 				}
@@ -61,10 +65,11 @@ public class UserNode extends Peer{
 	}
 	
 	public Transaction createTransaction(UserJMProtocolImpl protocol, String fromAddress, String toAddress,
-		double amountToSend, PrivateKey privKey, PublicKey pubKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, FileNotFoundException, SignatureException{
+		double amountToSend, PrivateKey privKey, PublicKey pubKey, Wallet wallet) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, FileNotFoundException, SignatureException{
 		Map<String,Output> pendingOutputs = this.wallet.getPendingOutputs();
 		Map<String, Output> unspentOutputs = protocol.downloadObject(new TypeToken<Map<String, Output>>(){}.getType(), NetConst.GIVE_ME_UNSPENT_OUTPUTS, null, protocol.getClient());
-		Transaction [] addressTransactions = getAvailableTransactionsForAddress(protocol,fromAddress, unspentOutputs);
+		wallet.updatePendingOutputs(unspentOutputs);
+		Transaction [] addressTransactions = getAvailableTransactionsForAddress(protocol,fromAddress, unspentOutputs, wallet);
 		if(addressTransactions == null) return null;
 		Transaction tr = new Transaction();
         double totalOutputAmount = 0;

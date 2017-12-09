@@ -146,10 +146,10 @@ public class Wallet {
     {
     		return pendingOutputs;
     }
-    public void updatePendingOutputs(Map<String,Output> tempToRemoveOutputs)
+    public void updatePendingOutputs(Map<String,Output> unspentOutputs)
     {
-    		for (String key : tempToRemoveOutputs.keySet()){
-		    if(pendingOutputs.containsKey(key))
+    		for (String key : pendingOutputs.keySet()){
+		    if(!unspentOutputs.containsKey(key))
     			pendingOutputs.remove(key);
 		}
     }
