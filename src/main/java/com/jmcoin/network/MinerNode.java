@@ -106,9 +106,9 @@ public class MinerNode extends Peer{
 				try {
 					Block block = buildBlock(protocol);
 					mine(block);
-					while(this.miningThread.running) {
-						Thread.sleep(5000);
-					}
+					while(this.miningThread.running)
+						Thread.sleep(500);
+					Thread.sleep(5000);
 				} catch (InvalidKeyException | ClassNotFoundException | NoSuchAlgorithmException | NoSuchProviderException
 						| SignatureException | IOException | InterruptedException e) {
 					e.printStackTrace();
@@ -158,11 +158,10 @@ public class MinerNode extends Peer{
 	               		this.protocol.sendMinedBlock(block);
 	               		this.running = false;
 	               	}
-	    			Thread.sleep(100);
 	    		}
 	        	if(this.running)verifyAndSetHash(nonce);
 			}
-	        catch (InterruptedException|IOException e) {
+	        catch (IOException e) {
 				e.printStackTrace();
 			}
 	        this.running = false;

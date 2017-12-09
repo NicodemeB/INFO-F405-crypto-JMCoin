@@ -11,28 +11,8 @@ import com.jmcoin.crypto.AES.StrongEncryptionNotAvailableException;
 import com.jmcoin.network.MinerJMProtocolImpl;
 import com.jmcoin.network.MinerNode;
 
-public class TestMiningFullProcess {
-	
-	/**
-	 * To run this routine, keys have to exist. If it's not the case, please open TestWallet, uncomment "before w.createKeys("a");"
-	 * and run TestWallet to create keys.
-	 * To pass appropriate arguments:
-	 * Run As > Run configurations > Arguments > Program Arguments and write 'a a' (without quotes) > Run 
-	 * @param args
-	 */
-	public static void main(String[] args){
-		try {
-			TestMasterNode.runMaster();
-		} catch (IOException e2) {
-			e2.printStackTrace();
-		}
-		try {
-			TestRelay.run();
-		} catch (IOException e1) {
-			System.err.println("Nobody is listening call to you so clearly, but you don't want to hear me");
-			System.err.println("-------------------------------------------------------------------------");
-			e1.printStackTrace();
-		}
+public class TestMineur {
+	public static void main(String[] args) {
 		MinerNode minerHard;
 		try {
 			minerHard = new MinerNode("a");
@@ -45,5 +25,4 @@ public class TestMiningFullProcess {
 			return;
 		}
 	}
-
 }
