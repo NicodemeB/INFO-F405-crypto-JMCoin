@@ -28,7 +28,6 @@ public class ClientSC extends Client{
                 Thread.sleep(100);
             } while (true);
         } catch (IOException e) {
-            e.printStackTrace();
             try {
                 close();
                 System.out.println("close");

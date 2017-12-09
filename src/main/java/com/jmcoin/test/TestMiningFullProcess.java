@@ -21,11 +21,11 @@ public class TestMiningFullProcess {
 	 * @param args
 	 */
 	public static void main(String[] args){
-		try {
+		/*try {
 			TestMasterNode.runMaster();
 		} catch (IOException e2) {
 			e2.printStackTrace();
-		}
+		}*/
 		try {
 			TestRelay.run();
 		} catch (IOException e1) {
@@ -37,10 +37,10 @@ public class TestMiningFullProcess {
 		MinerNode minerHard;
 		MinerNode miner;
 		try {
-			miner = new MinerNode(args[0]);
+			miner = new MinerNode("a"); //FIXME replace by args[0]
 			System.out.println("************************************"+miner+"*********************************************");
 			MinerJMProtocolImpl minerJMProtocolImpl = new MinerJMProtocolImpl(miner);			
-			minerHard = new MinerNode(args[0]);
+			minerHard = new MinerNode("a");
 			System.out.println("************************************"+minerHard+"*********************************************");
 			MinerJMProtocolImpl minerJMProtocolImpl1 = new MinerJMProtocolImpl(minerHard);
 			minerHard.startMining(minerJMProtocolImpl1);

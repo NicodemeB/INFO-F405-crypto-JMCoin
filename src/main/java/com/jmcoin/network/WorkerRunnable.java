@@ -47,7 +47,6 @@ public class WorkerRunnable extends TemplateThread{
                 Thread.sleep(100);
             } while (loop);
         } catch (IOException e) {
-            e.printStackTrace();
             try {
                 close();
             } catch (IOException e1) {

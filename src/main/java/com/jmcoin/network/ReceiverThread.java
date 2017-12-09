@@ -25,7 +25,6 @@ public class ReceiverThread<X extends TemplateThread> implements Runnable{
                 Thread.sleep(10);
             }while (loop);
         } catch (IOException e) {
-            e.printStackTrace();
             try {
                 this.runnable.close();
             } catch (IOException e1) {

@@ -34,7 +34,6 @@ public class WorkerRunnableSC extends WorkerRunnable {
                 Thread.sleep(100);
             } while (true);
         } catch (IOException|InterruptedException e) {
-            e.printStackTrace();
             try {
                 close();
             } catch (IOException e1) {
