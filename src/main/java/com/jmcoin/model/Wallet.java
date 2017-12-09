@@ -30,7 +30,7 @@ public class Wallet {
     private HashMap<PrivateKey,PublicKey> keys;
     private ArrayList<String> addresses;
     private double balance;
-    private Map<String,Output> pendingOutputs;
+    private Map<String,Output> pendingOutputs = new HashMap<>();
     
     private final String REP = System.getProperty("user.home");
     private final String SEP = System.getProperty("file.separator");
@@ -142,14 +142,15 @@ public class Wallet {
     public ArrayList<String> getAddresses() {
 		return addresses;
 	}
-    public Map<String,Output> getPendingOutputs()
-    {
+    
+    public Map<String,Output> getPendingOutputs(){
     		return pendingOutputs;
     }
-    public void updatePendingOutputs(Map<String,Output> tempToRemoveOutputs)
+    
+    public void updatePendingOutputs(Map<String,Output> unspentOutputs)
     {
-    		for (String key : tempToRemoveOutputs.keySet()){
-		    if(pendingOutputs.containsKey(key))
+    		for (String key : pendingOutputs.keySet()){
+		    if(!unspentOutputs.containsKey(key))
     			pendingOutputs.remove(key);
 		}
     }

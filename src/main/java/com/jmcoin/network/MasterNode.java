@@ -185,10 +185,7 @@ public class MasterNode extends Peer{
 		}
 		for (String key : tempToRemoveOutputs.keySet()){
 		    unspentOutputs.remove(key);
-		}
-		
-		//TODO Envoyer "tempToRemoveOutputs" aux wallets pour qu'ils mettent à jour leurs listes
-		
+		}		
 		for (Map.Entry<String,Output> entry : tempToAddOutputs.entrySet()){
 		    unspentOutputs.put(entry.getKey(),entry.getValue());
 		}
