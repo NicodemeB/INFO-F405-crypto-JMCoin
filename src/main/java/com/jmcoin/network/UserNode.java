@@ -38,6 +38,7 @@ public class UserNode extends Peer{
 		ArrayList<Transaction> availableTransactions = new ArrayList<Transaction>();
 		try {
 			addressTransactions = protocol.downloadObject(NetConst.GIVE_ME_TRANS_TO_THIS_ADDRESS, "[\""+fromAddress+"\"]", protocol.getClient());
+			if(addressTransactions.length == 0)return null;
 			for(int i = 0 ; i < addressTransactions.length; i++){
 				
 				String keyOut = Hex.toHexString(addressTransactions[i].getHash())+DELIMITER+addressTransactions[i].getOutputOut().getAddress();

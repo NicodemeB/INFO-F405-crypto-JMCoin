@@ -12,7 +12,6 @@ import com.jmcoin.crypto.AES.InvalidAESStreamException;
 import com.jmcoin.crypto.AES.InvalidPasswordException;
 import com.jmcoin.crypto.AES.StrongEncryptionNotAvailableException;
 import com.jmcoin.model.Transaction;
-import com.jmcoin.network.JMProtocolImpl;
 import com.jmcoin.network.NetConst;
 import com.jmcoin.network.UserJMProtocolImpl;
 import com.jmcoin.network.UserNode;
