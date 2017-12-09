@@ -106,6 +106,11 @@ public class MasterNode extends Peer{
 		}
     	unvfTrans1.computeHash();
     	this.unverifiedTransactions.add(unvfTrans1);
+    	Block block = new Block();
+    	block.getTransactions().add(unvfTrans1);
+    	block.setDifficulty(14);
+    	block.setNonce(5);
+    	this.chain.getBlocks().put("B1", block);
     }
     
     public Block getLastBlock() {
@@ -168,9 +173,9 @@ public class MasterNode extends Peer{
 					}
 				}
 				//adding new outputs to the pool
-				tempToAddOutputs.put(Hex.toHexString(trans.getHash())+"$"+trans.getOutputOut().getAddress(),trans.getOutputOut());//delimiter pour avoir une clé unique : concat du hash / adresse
+				tempToAddOutputs.put(Hex.toHexString(trans.getHash())+DELIMITER+trans.getOutputOut().getAddress(),trans.getOutputOut());//delimiter pour avoir une clé unique : concat du hash / adresse
 				if(trans.getOutputBack() != null) {
-					tempToAddOutputs.put(Hex.toHexString(trans.getHash())+"$"+trans.getOutputBack().getAddress(),trans.getOutputBack());
+					tempToAddOutputs.put(Hex.toHexString(trans.getHash())+DELIMITER+trans.getOutputBack().getAddress(),trans.getOutputBack());
 				}
 			}
 		}

@@ -44,7 +44,7 @@ public abstract class TemplateThread extends Thread{
 		return in;
 	}
     
-    synchronized void sendMessage(Object msg) throws IOException {
+    public synchronized void sendMessage(Object msg) throws IOException {
         out.writeObject(msg);
         out.flush();
         toSend = null;

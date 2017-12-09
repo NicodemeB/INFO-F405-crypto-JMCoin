@@ -74,9 +74,8 @@ public class WorkerRunnable extends TemplateThread{
     }
 
     synchronized protected void not(){
-        //toSend = JMProtocolImpl.craftMessage(NetConst.STOP_MINING, null);
         try {
-            sendMessage(JMProtocolImpl.craftMessage(NetConst.STOP_MINING, null));
+            sendMessage(this.protocol.craftMessage(NetConst.STOP_MINING, null));
         } catch (IOException e) {
             e.printStackTrace();
         }

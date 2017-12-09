@@ -10,14 +10,12 @@ import com.jmcoin.crypto.SignaturesVerification;
 import com.jmcoin.model.Block;
 import com.jmcoin.model.Chain;
 import com.jmcoin.model.Input;
-import com.jmcoin.model.Mining;
 import com.jmcoin.model.Output;
 import com.jmcoin.model.Transaction;
 
 public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
 	
 	private Client client;
-	private Mining mining;
 	
 	public MinerJMProtocolImpl(MinerNode peer) throws IOException, NoSuchAlgorithmException {
 		super(peer);
@@ -29,7 +27,6 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        this.mining = new Mining(this);
 	}
 	
 	public Client getClient() {
@@ -38,21 +35,22 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
 
 	@Override
 	protected String stopMining() {
-		this.mining.stopMining();
+		System.err.println("**************** !! STOP !! ****************");
+		this.peer.stopMiningThread();
 		return NetConst.RES_OKAY;
 	}
 
 	@Override
 	//unused
-	protected String giveMeBlockChainCopyImpl() {return null;}
+	protected String giveMeBlockChainCopyImpl(String id) {return null;}
 
 	@Override
 	//unused
-	protected String giveMeRewardAmountImpl() {return null;}
+	protected String giveMeRewardAmountImpl(String id) {return null;}
 
 	@Override
 	//unused
-	protected String giveMeUnverifiedTransactionsImpl() {return null;}
+	protected String giveMeUnverifiedTransactionsImpl(String id) {return null;}
 
 	@Override
 	//unused
@@ -63,33 +61,33 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
 	protected boolean takeMyNewTransactionImpl(String payload) {return false;}
 	
 	@Override
-	protected String giveMeDifficulty() {return null;}
+	protected String giveMeDifficulty(String id) {return null;}
 
 	@Override
-	protected String giveMeUnspentOutputs() {return null;}
+	protected String giveMeUnspentOutputs(String id) {return null;}
 
 	@Override
-	protected void receiveDifficulty(String string) {
+	protected void receiveDifficulty(String string, String id) {
 		setBundle(string , Integer.class);
 	}
 
 	@Override
-	protected void receiveUnverifiedTransactions(String string) {
+	protected void receiveUnverifiedTransactions(String string, String id) {
 		setBundle(string , Transaction[].class);
 	}
 
 	@Override
-	protected void receiveRewardAmount(String string) {
+	protected void receiveRewardAmount(String string, String id) {
 		setBundle(string , Integer.class);
 	}
 
 	@Override
-	protected void receiveBlockchainCopy(String string) {
+	protected void receiveBlockchainCopy(String string, String id) {
 		setBundle(string , Chain.class);
 	}
 
 	@Override
-	protected void receiveUnspentOutputs(String string) {
+	protected void receiveUnspentOutputs(String string, String id) {
 		setBundle(string , new TypeToken<Map<String, Output>>(){}.getType());
 	}
 	
@@ -107,7 +105,7 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
 			if(output == null) {
 				return false;
 			}
-			HashMap<String, Output> unspentOutputs = downloadObject(new TypeToken<Map<String, Output>>(){}.getType(), NetConst.GIVE_ME_UNSPENT_OUTPUTS, null, client);
+			HashMap<String, Output> unspentOutputs = downloadObject(NetConst.GIVE_ME_UNSPENT_OUTPUTS, null, client);
 			boolean unspent = false;
 			for(Output uo : unspentOutputs.values()) {
 				if(uo.equals(output)) {
@@ -130,24 +128,20 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
 	}
 	
 	public void sendMinedBlock(Block block) throws IOException {
-		this.client.sendMessage(JMProtocolImpl.craftMessage(NetConst.TAKE_MY_MINED_BLOCK, this.peer.getGson().toJson(block)));
+		this.client.sendMessage(craftMessage(NetConst.TAKE_MY_MINED_BLOCK, this.peer.getGson().toJson(block)));
 	}
 
 	@Override
-	protected String giveMeLastBlock() {return null;}
+	protected String giveMeLastBlock(String id) {return null;}
 
 	@Override
-	protected void receiveLastBlock(String block) {
+	protected void receiveLastBlock(String block, String id) {
 		setBundle(block, Block.class);
 	}
 
 	@Override
-	protected void receiveTransactionToThisAddress(String trans) {}
+	protected void receiveTransactionToThisAddress(String trans, String id) {}
 
 	@Override
-	protected String giveMeTransactionsToThisAddress(String address) {return null;}
-
-	public Mining getMining() {
-		return this.mining;
-	}
+	protected String giveMeTransactionsToThisAddress(String address, String id) {return null;}
 }

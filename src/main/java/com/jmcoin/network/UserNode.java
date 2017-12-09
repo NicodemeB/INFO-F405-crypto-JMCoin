@@ -13,12 +13,11 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import org.bouncycastle.util.encoders.Hex;
-
-import com.google.gson.reflect.TypeToken;
 import com.jmcoin.crypto.SignaturesVerification;
 import com.jmcoin.crypto.AES.InvalidAESStreamException;
 import com.jmcoin.crypto.AES.InvalidPasswordException;
 import com.jmcoin.crypto.AES.StrongEncryptionNotAvailableException;
+import com.jmcoin.model.Chain;
 import com.jmcoin.model.Input;
 import com.jmcoin.model.Output;
 import com.jmcoin.model.Transaction;
@@ -37,16 +36,16 @@ public class UserNode extends Peer{
 		Transaction[] addressTransactions;
 		ArrayList<Transaction> availableTransactions = new ArrayList<Transaction>();
 		try {
-			addressTransactions = protocol.downloadObject(Transaction[].class, NetConst.GIVE_ME_TRANS_TO_THIS_ADDRESS, "[\""+fromAddress+"\"]", protocol.getClient());
+			addressTransactions = protocol.downloadObject(NetConst.GIVE_ME_TRANS_TO_THIS_ADDRESS, "[\""+fromAddress+"\"]", protocol.getClient());
 			for(int i = 0 ; i < addressTransactions.length; i++){
 				if(addressTransactions[i].getOutputBack().getAddress().equals(fromAddress)){	
 					//Si l'output est contenue dans le pool des transactions disponibles
-					if((unspentOutputs.containsKey(Hex.toHexString(addressTransactions[i].getHash())+"$"+addressTransactions[i].getOutputBack().getAddress()))){
+					if((unspentOutputs.containsKey(Hex.toHexString(addressTransactions[i].getHash())+DELIMITER+addressTransactions[i].getOutputBack().getAddress()))){
 						availableTransactions.add(addressTransactions[i]);
 					}
 				}
 				else if((addressTransactions[i].getOutputOut().getAddress().equals(fromAddress))){
-					if((unspentOutputs.containsKey(Hex.toHexString(addressTransactions[i].getHash())+"$"+addressTransactions[i].getOutputOut().getAddress()))){
+					if((unspentOutputs.containsKey(Hex.toHexString(addressTransactions[i].getHash())+DELIMITER+addressTransactions[i].getOutputOut().getAddress()))){
 						availableTransactions.add(addressTransactions[i]);
 					}
 				}
@@ -63,7 +62,7 @@ public class UserNode extends Peer{
 	public Transaction createTransaction(UserJMProtocolImpl protocol, String fromAddress, String toAddress,
 		double amountToSend, PrivateKey privKey, PublicKey pubKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, FileNotFoundException, SignatureException{
 		Map<String,Output> pendingOutputs = this.wallet.getPendingOutputs();
-		Map<String, Output> unspentOutputs = protocol.downloadObject(new TypeToken<Map<String, Output>>(){}.getType(), NetConst.GIVE_ME_UNSPENT_OUTPUTS, null, protocol.getClient());
+		Map<String, Output> unspentOutputs = protocol.downloadObject(NetConst.GIVE_ME_UNSPENT_OUTPUTS, null, protocol.getClient());
 		Transaction [] addressTransactions = getAvailableTransactionsForAddress(protocol,fromAddress, unspentOutputs);
 		if(addressTransactions == null) return null;
 		Transaction tr = new Transaction();
@@ -74,7 +73,7 @@ public class UserNode extends Peer{
         		String key = Hex.toHexString(addressTransactions[i].getHash());
             if(addressTransactions[i].getOutputBack().getAddress().equals(fromAddress)){
             		//verifier si Out pas encore utilisée localement
-            		key += "$"+addressTransactions[i].getOutputBack().getAddress();
+            		key += DELIMITER+addressTransactions[i].getOutputBack().getAddress();
             		if(pendingOutputs.containsKey(key) == false)
             		{
             			totalOutputAmount+= addressTransactions[i].getOutputBack().getAmount();
@@ -83,7 +82,7 @@ public class UserNode extends Peer{
             		}
             }
             else if((addressTransactions[i].getOutputOut().getAddress().equals(fromAddress))){
-	            	key += "$"+addressTransactions[i].getOutputOut().getAddress();
+	            	key += DELIMITER+addressTransactions[i].getOutputOut().getAddress();
 	            	//verifier si Out pas encore utilisée localement
 	            	if(pendingOutputs.containsKey(key) == false)
 	        		{
@@ -117,5 +116,12 @@ public class UserNode extends Peer{
 
 	public Wallet getWallet() {
 		return wallet;
+	}
+	
+	public void debugUserNode(UserJMProtocolImpl protocol) throws IOException {
+		Chain c1 = protocol.downloadObject(NetConst.GIVE_ME_BLOCKCHAIN_COPY, null, protocol.getClient());
+		System.err.println("User: chain received " + c1);
+		Chain c2 = protocol.downloadObject(NetConst.GIVE_ME_BLOCKCHAIN_COPY, null, protocol.getClient());
+		System.err.println("User: chain received " + c2);
 	}
 }

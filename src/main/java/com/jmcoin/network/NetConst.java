@@ -42,5 +42,5 @@ public abstract class NetConst {
 	public static final char RECEIVE_UNSPENT_OUTPUTS		= 'E';
 	public static final char RECEIVE_LAST_BLOCK				= 'F';
 	public static final char RECEIVE_TRANS_TO_THIS_ADDRESS	= 'G';
-	public static final String STOP_MINING_REQ 				= "54$null$#";
+	public static final String STOP_MINING_REQ 				= "54$null$-1$";
 }

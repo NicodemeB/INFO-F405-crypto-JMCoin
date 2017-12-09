@@ -18,6 +18,7 @@ public class TestRelay {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
+            
         }
         cli.sendMessage(NetConst.CONNECTION_REQUEST);
         Thread thread = new Thread(cli);

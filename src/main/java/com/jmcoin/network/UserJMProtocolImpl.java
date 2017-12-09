@@ -30,38 +30,38 @@ public class UserJMProtocolImpl extends JMProtocolImpl<UserNode>{
 	}
 
 	@Override
-	protected void receiveUnspentOutputs(String string) {
+	protected void receiveUnspentOutputs(String string, String id) {
 		setBundle(string, new TypeToken<Map<String, Output>>(){}.getType());		
 	}
 
 	@Override
-	protected void receiveBlockchainCopy(String string) {
+	protected void receiveBlockchainCopy(String string, String id) {
 		setBundle(string, Chain.class);
 	}
 
 	@Override
-	protected void receiveUnverifiedTransactions(String string) {}
+	protected void receiveUnverifiedTransactions(String string, String id) {}
 
 	@Override
-	protected void receiveRewardAmount(String string) {}
+	protected void receiveRewardAmount(String string, String id) {}
 
 	@Override
-	protected void receiveDifficulty(String string) {}
+	protected void receiveDifficulty(String string, String id) {}
 
 	@Override
 	protected String stopMining() {return null;}
 
 	@Override
-	protected String giveMeUnspentOutputs() {return null;}
+	protected String giveMeUnspentOutputs(String id) {return null;}
 
 	@Override
-	protected String giveMeBlockChainCopyImpl() {return null;}
+	protected String giveMeBlockChainCopyImpl(String id) {return null;}
 
 	@Override
-	protected String giveMeRewardAmountImpl() {return null;}
+	protected String giveMeRewardAmountImpl(String id) {return null;}
 
 	@Override
-	protected String giveMeUnverifiedTransactionsImpl() {return null;}
+	protected String giveMeUnverifiedTransactionsImpl(String id) {return null;}
 
 	@Override
 	protected String takeMyMinedBlockImpl(String payload) throws IOException {return null;}
@@ -70,26 +70,26 @@ public class UserJMProtocolImpl extends JMProtocolImpl<UserNode>{
 	protected boolean takeMyNewTransactionImpl(String payload) {return false;}
 
 	@Override
-	protected String giveMeDifficulty() {return null;}
+	protected String giveMeDifficulty(String id) {return null;}
 
 	@Override
-	protected String giveMeLastBlock() {return null;}
+	protected String giveMeLastBlock(String id) {return null;}
 
 	@Override
-	protected void receiveLastBlock(String block) {
+	protected void receiveLastBlock(String block, String id) {
 		setBundle(block, Block.class);
 	}
 
 	@Override
-	protected void receiveTransactionToThisAddress(String trans) {
+	protected void receiveTransactionToThisAddress(String trans, String id) {
 		setBundle(trans, Transaction[].class);
 	}
 
 	@Override
-	protected String giveMeTransactionsToThisAddress(String address) {return null;}
+	protected String giveMeTransactionsToThisAddress(String address, String id) {return null;}
 	
 	public double getAddressBalance(String ... addresses) throws IOException{
-    	Transaction[] transactions = downloadObject(Transaction[].class, NetConst.GIVE_ME_TRANS_TO_THIS_ADDRESS, this.peer.getGson().toJson(addresses), getClient());
+    	Transaction[] transactions = downloadObject(NetConst.GIVE_ME_TRANS_TO_THIS_ADDRESS, this.peer.getGson().toJson(addresses), getClient());
         double totalOutputAmount = 0;
         for(int j = 0; j < addresses.length; j++) {
         	for(int i = 0 ; i < transactions.length; i++){

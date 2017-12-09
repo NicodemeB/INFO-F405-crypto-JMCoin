@@ -2,17 +2,24 @@ package com.jmcoin.network;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.security.SecureRandom;
 
 public class WorkerRunnableSC extends WorkerRunnable {
 
     private ClientSC client;
     private Thread thread;
+    private int requestSenderId;
 
     public WorkerRunnableSC(Socket clientSocket, JMProtocolImpl<? extends Peer> protocol, ClientSC client) throws IOException {
         super(clientSocket, protocol);
         this.client = client;
         ((RelayNodeJMProtocolImpl) this.protocol).setClient(this.client);
+        this.requestSenderId = new SecureRandom().nextInt();
     }
+    
+    public int getRequestSenderId() {
+		return requestSenderId;
+	}
 
     @Override
     public void run() {
@@ -45,8 +52,8 @@ public class WorkerRunnableSC extends WorkerRunnable {
                 setToSend(NetConst.CONNECTED);
                 break;
             default:
-                this.client.getServer().getAwaitingAnswers().add(this);
-                setToSend(this.protocol.processInput(msg));
+            	//this.client.getServer().getAwaitingAnswers().add(this);
+                setToSend(this.protocol.processInput( msg.toString().replace("$-1$", "$"+Integer.toString(this.requestSenderId)+"$")));
                 break;
         }
     }

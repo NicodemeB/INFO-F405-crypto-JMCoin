@@ -18,6 +18,8 @@ import com.jmcoin.model.Output;
 import com.jmcoin.model.Transaction;
 
 public abstract class Peer {
+	
+	protected static final String DELIMITER = "%";
 		
 	protected Bundle<? extends Object> bundle;
 	protected Gson gson;
@@ -62,7 +64,7 @@ public abstract class Peer {
 					else
 						return false; //not normal
 					boolean unspent = false;
-					String outputKey =  trans.getHash()+"$"+outToMe.getAddress();
+					String outputKey =  trans.getHash()+DELIMITER+outToMe.getAddress();
 					for (Map.Entry<String,Output> entry : unspentOutputs.entrySet())
 					{
 						if(outputKey.equals(entry.getKey()))//Si ce n'est pas trouvé dans la liste

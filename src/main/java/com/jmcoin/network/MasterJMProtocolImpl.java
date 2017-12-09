@@ -23,11 +23,11 @@ public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 	}
 
 	@Override
-	protected String giveMeUnverifiedTransactionsImpl() {
+	protected String giveMeUnverifiedTransactionsImpl(String id) {
 		List<Transaction> transactions = this.peer.getUnverifiedTransactions().size() > NetConst.MAX_SENT_TRANSACTIONS ?
 				this.peer.getUnverifiedTransactions().subList(0, NetConst.MAX_SENT_TRANSACTIONS):
 					this.peer.getUnverifiedTransactions();
-		return JMProtocolImpl.craftMessage(NetConst.RECEIVE_UNVERIFIED_TRANS, this.peer.getGson().toJson(transactions));
+		return craftMessage(NetConst.RECEIVE_UNVERIFIED_TRANS, this.peer.getGson().toJson(transactions), id);
 	}
 
 	@Override
@@ -41,7 +41,7 @@ public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 				jse.printStackTrace();
 			}
 		}
-		return null;
+		return NetConst.RES_OKAY;
 	}
 
 	@Override
@@ -58,53 +58,53 @@ public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 	}
 
 	@Override
-	protected String giveMeDifficulty() {
-		return JMProtocolImpl.craftMessage(NetConst.RECEIVE_DIFFICULTY, Integer.toString(this.peer.getDifficulty()));
+	protected String giveMeDifficulty(String id) {
+		return craftMessage(NetConst.RECEIVE_DIFFICULTY, Integer.toString(this.peer.getDifficulty()), id);
 	}
 	
 	@Override
-	protected String giveMeRewardAmountImpl() {
-		return JMProtocolImpl.craftMessage(NetConst.RECEIVE_REWARD_AMOUNT, Integer.toString(this.peer.getRewardAmount()));
+	protected String giveMeRewardAmountImpl(String id) {
+		return craftMessage(NetConst.RECEIVE_REWARD_AMOUNT, Integer.toString(this.peer.getRewardAmount()), id);
 	}
 	
 	@Override
-	protected String giveMeBlockChainCopyImpl() {
-		return JMProtocolImpl.craftMessage(NetConst.RECEIVE_BLOCKCHAIN_COPY, this.peer.getGson().toJson(this.peer.getChain()));
+	protected String giveMeBlockChainCopyImpl(String id) {
+		return craftMessage(NetConst.RECEIVE_BLOCKCHAIN_COPY, this.peer.getGson().toJson(this.peer.getChain()), id);
 	}
 
 	@Override
-	protected String giveMeUnspentOutputs() {
-		return JMProtocolImpl.craftMessage(NetConst.RECEIVE_UNSPENT_OUTPUTS, this.peer.getGson().toJson(this.peer.getUnspentOutputs()));
+	protected String giveMeUnspentOutputs(String id) {
+		return craftMessage(NetConst.RECEIVE_UNSPENT_OUTPUTS, this.peer.getGson().toJson(this.peer.getUnspentOutputs()), id);
 	}
 
 	@Override
-	protected void receiveDifficulty(String string) {}
+	protected void receiveDifficulty(String string, String id) {}
 
 	@Override
-	protected void receiveUnverifiedTransactions(String string) {}
+	protected void receiveUnverifiedTransactions(String string, String id) {}
 
 	@Override
-	protected void receiveRewardAmount(String string) {}
+	protected void receiveRewardAmount(String string, String id) {}
 
 	@Override
-	protected void receiveBlockchainCopy(String nextToken) {}
+	protected void receiveBlockchainCopy(String nextToken, String id) {}
 
 	@Override
-	protected void receiveUnspentOutputs(String string) {}
+	protected void receiveUnspentOutputs(String string, String id) {}
 
 	@Override
-	protected String giveMeLastBlock() {
-		return JMProtocolImpl.craftMessage(NetConst.RECEIVE_LAST_BLOCK, this.peer.getGson().toJson(this.peer.getLastBlock()));
+	protected String giveMeLastBlock(String id) {
+		return craftMessage(NetConst.RECEIVE_LAST_BLOCK, this.peer.getGson().toJson(this.peer.getLastBlock()), id);
 	}
 
 	@Override
-	protected void receiveLastBlock(String block) {}
+	protected void receiveLastBlock(String block, String id) {}
 
 	@Override
-	protected void receiveTransactionToThisAddress(String trans) {}
+	protected void receiveTransactionToThisAddress(String trans, String id) {}
 
 	@Override
-	protected String giveMeTransactionsToThisAddress(String address) {
-		return JMProtocolImpl.craftMessage(NetConst.RECEIVE_TRANS_TO_THIS_ADDRESS, this.peer.getGson().toJson(this.peer.getTransactionsToThisAddress(address)));
+	protected String giveMeTransactionsToThisAddress(String address, String id) {
+		return craftMessage(NetConst.RECEIVE_TRANS_TO_THIS_ADDRESS, this.peer.getGson().toJson(this.peer.getTransactionsToThisAddress(address)), id);
 	}
 }

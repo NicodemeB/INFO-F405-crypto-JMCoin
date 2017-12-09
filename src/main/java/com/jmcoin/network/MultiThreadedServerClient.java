@@ -2,30 +2,46 @@ package com.jmcoin.network;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.LinkedList;
 import java.util.Vector;
 
 public class MultiThreadedServerClient extends MultiThreadedServer{
 
-    private Vector<WorkerRunnableSC> lThreadsSC;
-    private Vector<WorkerRunnableSC> awaitingAnswers;
+    private LinkedList<WorkerRunnableSC> lThreadsSC;
+    //private Vector<WorkerRunnableSC> awaitingAnswers;
+    //private LinkedList<WorkerRunnableSC> awaitingAnswers;
     private ClientSC client;
 
-    public Vector<WorkerRunnableSC> getAwaitingAnswers() {
+    /*public Vector<WorkerRunnableSC> getAwaitingAnswers() {
         return awaitingAnswers;
-    }
+    }*/
+    /*public LinkedList<WorkerRunnableSC> getAwaitingAnswers(){
+    	return this.awaitingAnswers;
+    }*/
 
     public MultiThreadedServerClient(int port, RelayNodeJMProtocolImpl protocol){
         super(port, protocol);
-        lThreadsSC = new Vector<WorkerRunnableSC>();
-        awaitingAnswers = new Vector<WorkerRunnableSC>();
+        lThreadsSC = new LinkedList<WorkerRunnableSC>();
+        //this.awaitingAnswers = new LinkedList<>();//awaitingAnswers = new Vector<WorkerRunnableSC>();
     }
 
     public void setClient(ClientSC client) {
         this.client = client;
     }
 
-    public Vector<WorkerRunnableSC> getlThreadsSC() {
+    public LinkedList<WorkerRunnableSC> getlThreadsSC() {
         return lThreadsSC;
+    }
+    
+    public WorkerRunnableSC findWorkerRunnable(int reqId) {
+    	WorkerRunnableSC wrsc = null;
+    	for(WorkerRunnableSC w : this.lThreadsSC) {
+    		if(w.getRequestSenderId() == reqId) {
+    			wrsc = w;
+    			break;
+    		}
+    	}
+    	return wrsc;
     }
 
     @Override
@@ -34,7 +50,7 @@ public class MultiThreadedServerClient extends MultiThreadedServer{
             this.runningThread = Thread.currentThread();
         }
         openServerSocket();
-        while(! isStopped()){
+        while(!isStopped()){
             Socket clientSocket = null;
             try {
                 clientSocket = this.serverSocket.accept();
@@ -43,12 +59,11 @@ public class MultiThreadedServerClient extends MultiThreadedServer{
                     System.out.println("Server Stopped.") ;
                     return;
                 }
-                throw new RuntimeException(
-                        "Error accepting client connection", e);
+                throw new RuntimeException("Error accepting client connection", e);
             }
             try {
                 lThreadsSC.add(new WorkerRunnableSC(clientSocket, protocol, this.client));
-                lThreadsSC.lastElement().start();
+                lThreadsSC.getLast().start();
             } catch (IOException e) {
                 e.printStackTrace();
             }

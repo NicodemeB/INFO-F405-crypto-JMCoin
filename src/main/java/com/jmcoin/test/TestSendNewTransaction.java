@@ -49,7 +49,7 @@ public class TestSendNewTransaction {
 		try {
 			Transaction transaction = node.createTransaction(protocol, "connard", "connasse", 0, privKey, pubKey);
 			if(transaction != null)
-				protocol.getClient().sendMessage(JMProtocolImpl.craftMessage(NetConst.TAKE_MY_NEW_TRANSACTION, node.getGson().toJson(transaction)));
+				protocol.getClient().sendMessage(protocol.craftMessage(NetConst.TAKE_MY_NEW_TRANSACTION, node.getGson().toJson(transaction)));
 		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException | SignatureException
 				| IOException e) {
 			e.printStackTrace();

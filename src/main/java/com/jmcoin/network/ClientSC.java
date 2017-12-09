@@ -48,11 +48,10 @@ public class ClientSC extends Client{
             case NetConst.STOP_MINING_REQ :
                 System.out.println("server.not()");
                 server.not();
-                break;
+//                break;
             default:
                 //Send what RelayNodeJMProtocolImpl return to MASTER NODE
-            	this.server.getAwaitingAnswers().firstElement().setToSend(msg);
-            	this.server.getAwaitingAnswers().remove(this.server.getAwaitingAnswers().firstElement());
+            	this.protocol.processInput(msg);
                 break;
         }
     }

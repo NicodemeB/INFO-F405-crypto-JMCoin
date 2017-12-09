@@ -28,10 +28,10 @@ public abstract class JMProtocolImpl<X extends Peer> {
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected <T> T downloadObject(Type type, char req, String body, Client client) throws IOException {
-		client.sendMessage(JMProtocolImpl.craftMessage(req, body));
+	protected <T> T downloadObject(char req, String body, Client client) throws IOException {
+		client.sendMessage(craftMessage(req, body));
 		T t;
-        while((t = (T) this.peer.getBundle().getObject(type)) == null) {
+        while((t = (T) this.peer.getBundle().getObject()) == null) {
         	try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
@@ -43,7 +43,7 @@ public abstract class JMProtocolImpl<X extends Peer> {
 
 	/**
 	 * Will assume that the payload is built as follows:
-	 * x$yyyyyyyyyyyyy$#
+	 * x$yyyyyyyyyyyyy$zz
 	 * where x is the type
 	 * and y the payload itself (can be empty, like 0$$#)
 	 * @throws IOException 
@@ -59,18 +59,22 @@ public abstract class JMProtocolImpl<X extends Peer> {
 			try {
 			    code = Integer.parseInt(type);
 			} catch (NumberFormatException e) {
+				System.out.println(message);
 				e.printStackTrace();
 			}
 			switch ((char)code) {
 			case NetConst.GIVE_ME_BLOCKCHAIN_COPY:
-				return giveMeBlockChainCopyImpl();
+				tokenizer.nextToken();
+				return giveMeBlockChainCopyImpl(tokenizer.nextToken());
 			case NetConst.GIVE_ME_REWARD_AMOUNT:
-				return giveMeRewardAmountImpl();
+				tokenizer.nextToken();
+				return giveMeRewardAmountImpl(tokenizer.nextToken());
 			case NetConst.GIVE_ME_UNVERIFIED_TRANSACTIONS:
-				return giveMeUnverifiedTransactionsImpl();
+				tokenizer.nextToken();
+				return giveMeUnverifiedTransactionsImpl(tokenizer.nextToken());
 			case NetConst.TAKE_MY_MINED_BLOCK:
 				try {
-					return takeMyMinedBlockImpl(tokenizer.nextToken()) == null ? NetConst.RES_OKAY:NetConst.RES_NOK;
+					return takeMyMinedBlockImpl(tokenizer.nextToken()); 
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -78,33 +82,36 @@ public abstract class JMProtocolImpl<X extends Peer> {
 			case NetConst.TAKE_MY_NEW_TRANSACTION:
 				return takeMyNewTransactionImpl(tokenizer.nextToken()) ? NetConst.RES_OKAY : NetConst.RES_NOK;
 			case NetConst.GIVE_ME_UNSPENT_OUTPUTS:
-				return giveMeUnspentOutputs();
+				tokenizer.nextToken();
+				return giveMeUnspentOutputs(tokenizer.nextToken());
 			case NetConst.GIVE_ME_TRANS_TO_THIS_ADDRESS:
-            	return giveMeTransactionsToThisAddress(tokenizer.nextToken());
+            	return giveMeTransactionsToThisAddress(tokenizer.nextToken(), tokenizer.nextToken());
 			case NetConst.GIVE_ME_DIFFICULTY:
-				return giveMeDifficulty();
+				tokenizer.nextToken();
+				return giveMeDifficulty(tokenizer.nextToken());
             case NetConst.RECEIVE_DIFFICULTY:
-            	receiveDifficulty(tokenizer.nextToken());
+            	receiveDifficulty(tokenizer.nextToken(), tokenizer.nextToken());
             	return NetConst.RES_OKAY;
             case NetConst.RECEIVE_REWARD_AMOUNT:
-            	receiveRewardAmount(tokenizer.nextToken());
+            	receiveRewardAmount(tokenizer.nextToken(), tokenizer.nextToken());
             	return NetConst.RES_OKAY;
             case NetConst.RECEIVE_UNVERIFIED_TRANS:
-            	receiveUnverifiedTransactions(tokenizer.nextToken());
+            	receiveUnverifiedTransactions(tokenizer.nextToken(), tokenizer.nextToken());
             	return NetConst.RES_OKAY;
             case NetConst.RECEIVE_BLOCKCHAIN_COPY:
-            	receiveBlockchainCopy(tokenizer.nextToken());
+            	receiveBlockchainCopy(tokenizer.nextToken(), tokenizer.nextToken());
             	return NetConst.RES_OKAY;
             case NetConst.RECEIVE_UNSPENT_OUTPUTS:
-            	receiveUnspentOutputs(tokenizer.nextToken());
+            	receiveUnspentOutputs(tokenizer.nextToken(), tokenizer.nextToken());
             	return NetConst.RES_OKAY;
             case NetConst.GIVE_ME_LAST_BLOCK:
-            	return giveMeLastBlock();
+            	tokenizer.nextToken();
+            	return giveMeLastBlock(tokenizer.nextToken());
             case NetConst.RECEIVE_LAST_BLOCK:
-            	receiveLastBlock(tokenizer.nextToken());
+            	receiveLastBlock(tokenizer.nextToken(), tokenizer.nextToken());
             	return NetConst.RES_OKAY;
             case NetConst.RECEIVE_TRANS_TO_THIS_ADDRESS:
-            	receiveTransactionToThisAddress(tokenizer.nextToken());
+            	receiveTransactionToThisAddress(tokenizer.nextToken(), tokenizer.nextToken());
             	return NetConst.RES_OKAY;
             case NetConst.STOP_MINING:
                 return stopMining();
@@ -115,39 +122,43 @@ public abstract class JMProtocolImpl<X extends Peer> {
 		return NetConst.ERR_BAD_REQUEST;
 	}
 
-    protected abstract void receiveUnspentOutputs(String string);
-	protected abstract void receiveBlockchainCopy(String nextToken);
-	protected abstract void receiveUnverifiedTransactions(String string);
-	protected abstract void receiveRewardAmount(String string);
-	protected abstract void receiveDifficulty(String string);
-	protected abstract void receiveLastBlock(String block);
-	protected abstract void receiveTransactionToThisAddress(String trans);
+    protected abstract void receiveUnspentOutputs(String string, String string2);
+	protected abstract void receiveBlockchainCopy(String nextToken, String string);
+	protected abstract void receiveUnverifiedTransactions(String string, String string2);
+	protected abstract void receiveRewardAmount(String string, String string2);
+	protected abstract void receiveDifficulty(String string, String string2);
+	protected abstract void receiveLastBlock(String block, String string);
+	protected abstract void receiveTransactionToThisAddress(String trans, String string);
 	
     protected abstract String stopMining();
 	/**
 	 * Returns unspent {@link Output} as a list
+	 * @param string 
 	 * @return
 	 */
-	protected abstract String giveMeUnspentOutputs();
+	protected abstract String giveMeUnspentOutputs(String string);
 
 	/**
 	 * Returns the last version of the blockchain
+	 * @param string 
 	 * @return blockchain as a string
 	 */
-	protected abstract String giveMeBlockChainCopyImpl();
+	protected abstract String giveMeBlockChainCopyImpl(String string);
 	
 	/**
 	 * Returns the last amount of the reward, computed according to the time
 	 * (or arbitrarily set)
+	 * @param string 
 	 * @return amount of the reward
 	 */
-	protected abstract String giveMeRewardAmountImpl();
+	protected abstract String giveMeRewardAmountImpl(String string);
 	
 	/**
 	 * Returns all non-verified pending transactions
+	 * @param string 
 	 * @return set of transactions
 	 */
-	protected abstract String giveMeUnverifiedTransactionsImpl();
+	protected abstract String giveMeUnverifiedTransactionsImpl(String string);
 	
 	/**
 	 * Gets a new mined {@link Block}, and returns false only if the body cannot be parsed
@@ -168,11 +179,12 @@ public abstract class JMProtocolImpl<X extends Peer> {
 	
 	/**
 	 * Returns difficulty on demand
+	 * @param string 
 	 * @return
 	 */
-	protected abstract String giveMeDifficulty();
-	protected abstract String giveMeLastBlock();
-	protected abstract String giveMeTransactionsToThisAddress(String address);
+	protected abstract String giveMeDifficulty(String string);
+	protected abstract String giveMeLastBlock(String string);
+	protected abstract String giveMeTransactionsToThisAddress(String address, String string);
 	
 	/**
 	 * Builds a message to send over the network, compliant with the protocol
@@ -180,7 +192,11 @@ public abstract class JMProtocolImpl<X extends Peer> {
 	 * @param body JSON object if needed
 	 * @return message
 	 */
-	public static String craftMessage(int request, String body) {
-		return request + "$" + body + "$#";
+	public String craftMessage(int request, String body) {
+		return request + "$" + body + "$-1$";
+	}
+	
+	public String craftMessage(int request, String body, String rand) {
+		return request + "$" + body + "$" +rand;
 	}
 }

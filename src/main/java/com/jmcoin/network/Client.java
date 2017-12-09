@@ -14,13 +14,6 @@ public class Client extends TemplateThread{
         out.flush();
         in = new ObjectInputStream(socket.getInputStream());
     }
-	
-    public synchronized void sendMessage(Object msg) throws IOException {
-        out.writeObject(msg);
-        out.flush();
-        toSend = null;
-        sendFlag = false;
-    }
 
     public void receiveAndHandleMessage() throws InterruptedException {
         try {
