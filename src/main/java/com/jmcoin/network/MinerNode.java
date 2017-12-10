@@ -1,6 +1,7 @@
 package com.jmcoin.network;
 
 import java.io.IOException;
+import java.net.SocketException;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -110,7 +111,9 @@ public class MinerNode extends Peer{
 					while(this.miningThread.running)
 						continue;//Thread.sleep(500);
 					Thread.sleep(5000);
-				} catch (InvalidKeyException | ClassNotFoundException | NoSuchAlgorithmException | NoSuchProviderException
+				} catch (SocketException e) {
+					System.err.println("Distant connection error - try again");
+				} catch(InvalidKeyException | ClassNotFoundException | NoSuchAlgorithmException | NoSuchProviderException
 						| SignatureException | IOException | InterruptedException e) {
 					e.printStackTrace();
 				}
