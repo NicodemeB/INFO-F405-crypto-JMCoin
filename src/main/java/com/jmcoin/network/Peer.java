@@ -9,6 +9,8 @@ import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 import java.util.Map;
 
+import org.bouncycastle.util.encoders.Hex;
+
 import com.jmcoin.crypto.SignaturesVerification;
 import com.jmcoin.model.Bundle;
 import com.jmcoin.model.Chain;
@@ -47,7 +49,7 @@ public abstract class Peer {
 		this.bundle = bundle;
 	}
 
-	protected Boolean verifyBlockTransaction(Transaction trans, Chain chain, Map<String, Output> unspentOutputs) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, IOException {
+	protected boolean verifyBlockTransaction(Transaction trans, Chain chain, Map<String, Output> unspentOutputs) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, IOException {
 		if(SignaturesVerification.verifyTransaction(trans.getSignature(), trans.getBytes(false), KeyGenerator.getPublicKey(trans.getPubKey()))) {
 			String address = SignaturesVerification.DeriveJMAddressFromPubKey(trans.getPubKey());
 			for(Input input : trans.getInputs()) {
@@ -62,30 +64,24 @@ public abstract class Peer {
 					else
 						return false; //not normal
 					boolean unspent = false;
-					String outputKey =  trans.getHash()+DELIMITER+outToMe.getAddress();
-					for (Map.Entry<String,Output> entry : unspentOutputs.entrySet())
-					{
-						if(outputKey.equals(entry.getKey()))//Si ce n'est pas trouvé dans la liste
-						{
+					String outputKey =  Hex.toHexString(prevTrans.getHash())+DELIMITER+outToMe.getAddress();
+					for (Map.Entry<String,Output> entry : unspentOutputs.entrySet()){
+						if(outputKey.equals(entry.getKey())) {//Si ce n'est pas trouvé dans la liste
 							unspent = true;
 						}
 					}
-					
-					if(!unspent)	return false; // Output déja dépensée
-					if(outToMe.getAmount() == input.getAmount())
-					{	
+					if(!unspent)return false; // Output déja dépensée
+					if(outToMe.getAmount() == input.getAmount()){	
 						//remove from unspent outputs
 					}
-					else 
-					{
+					else {
 						return false; // Not normal, les montants doivent correspondre car on consomme tout l'ouput
 					}	
 				}
 			}
 			return true;
 		}
-		else
-		{
+		else{
 			return false; // signatures non confirmée : vérifier si on ne retire pas les output à la toute fin quand tout est bon
 		}
 	}

@@ -16,9 +16,10 @@ public class TestMineur {
 		MinerNode minerHard;
 		try {
 			minerHard = new MinerNode("a");
-			MinerJMProtocolImpl minerJMProtocolImpl1 = new MinerJMProtocolImpl(minerHard, args[0]);
+			MinerJMProtocolImpl minerJMProtocolImpl1 = new MinerJMProtocolImpl(minerHard, "relay-02.jmcoin.technology");
 			minerHard.startMining(minerJMProtocolImpl1);
-		} catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException | IOException
+		}
+		catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException | IOException
 				| InvalidPasswordException | InvalidAESStreamException | StrongEncryptionNotAvailableException e1) {
 			e1.printStackTrace();
 			System.out.println("TestMiningFullProcess: Cannot create Miner/Wallet");

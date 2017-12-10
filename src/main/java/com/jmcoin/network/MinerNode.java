@@ -60,10 +60,11 @@ public class MinerNode extends Peer{
 		Block block = new Block();
 		if(transactions != null) {
 			for(int i = 0; i < transactions.length; i++) {
-				//FIXME uncomment if(verifyBlockTransaction(transactions[i], chain, unspentOutputs))
+				if(verifyBlockTransaction(transactions[i], chain, unspentOutputs))
 					block.getTransactions().add(transactions[i]);
 			}
 		}
+		System.out.println(this.gson.toJson(block));
 		int value = protocol.downloadObject(NetConst.GIVE_ME_REWARD_AMOUNT, null, protocol.getClient());
 		double doubleRewardAmount = value * (1.0/NetConst.MAX_SENT_TRANSACTIONS);
 		//TODO choose the key
@@ -109,7 +110,7 @@ public class MinerNode extends Peer{
 					Block block = buildBlock(protocol);
 					mine(block);
 					while(this.miningThread.running)
-						continue;//Thread.sleep(500);
+						Thread.sleep(500);
 					Thread.sleep(5000);
 				} catch (SocketException e) {
 					System.err.println("Distant connection error - try again");
@@ -160,7 +161,7 @@ public class MinerNode extends Peer{
 	        try {
 	        	while(this.running && nonce < Integer.MAX_VALUE){
 	               	if (verifyAndSetHash(nonce++)) {
-	               		System.err.println(gson.toJson(block));
+	               		System.err.println(MinerNode.this.getGson().toJson(block));
 	               		this.protocol.sendMinedBlock(block);
 	               		this.running = false;
 	               	}
@@ -171,7 +172,7 @@ public class MinerNode extends Peer{
 				e.printStackTrace();
 			}
 	        this.running = false;
-	        getBundle().getObject();
+	        //getBundle().getObject();
 		}
 	}
 }

@@ -12,8 +12,8 @@ public abstract class NetConst {
 	public static final int MINER_NODE_LISTEN_PORT				= 33335;
 	public static final int RELAY_BROADCAST_PORT 				= 4445;
 	public static final int MINER_BROADCAST_PORT 				= 4444;
-	public static final String MASTER_HOST_NAME					= "master.jmcoin.technology";
-	public static final String RELAY_DEBUG_HOST_NAME			= "relay-01.jmcoin.technology";
+	public static final String MASTER_HOST_NAME					= "localhost";//"master.jmcoin.technology";
+	public static final String RELAY_DEBUG_HOST_NAME			= "localhost";//"relay-01.jmcoin.technology";
 	public static final String DEFAULT_ID						= "-1";
 	public static final String GIVE_ME_BLOCKCHAIN_COPY			= "0"; //from wallets
 	public static final String GIVE_ME_UNVERIFIED_TRANSACTIONS	= "1"; //from miners
@@ -34,7 +34,7 @@ public abstract class NetConst {
 	public static final String CONNECTION_REQUEST 				= "ConnectionRequest";
 	public static final String CONNECTED 						= "Connected";
 	public static final int MAX_SENT_TRANSACTIONS 				= 1000;
-	public static final int DEFAULT_DIFFICULTY 					= 18;//FIXME change the difficulty
+	public static final int DEFAULT_DIFFICULTY 					= 16;//FIXME change the difficulty
 	
 	public static final String RECEIVE_DIFFICULTY 				= "A";
 	public static final String RECEIVE_REWARD_AMOUNT 			= "B";

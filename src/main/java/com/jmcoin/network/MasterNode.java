@@ -12,6 +12,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SignatureException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -87,42 +88,53 @@ public class MasterNode extends Peer{
         }
         keys.put(privateKey, publicKey);
         Random rand = new Random();
-        Block block = new Block();
-        for(int j = 0; j < 10; j++) {
-            int privKeyInt = rand.nextInt(4);
-            PrivateKey privKey = keys.keySet().toArray(new PrivateKey[0])[privKeyInt];
-            Transaction transaction = new Transaction();
-            Output tmp = new Output();
-            tmp.setAddress(SignaturesVerification.DeriveJMAddressFromPubKey(keys.get(privKey).getEncoded()));
-            tmp.setAmount(rand.nextInt(10));
-            Output tmp1 = new Output();
-            tmp1.setAddress(SignaturesVerification.DeriveJMAddressFromPubKey(keys.get(keys.keySet().toArray(new PrivateKey[0])[privKeyInt+1 > 3 ? 0 : privKeyInt+1]).getEncoded()));
-            tmp1.setAmount(rand.nextInt(10));
-            Input in1 = new Input();
-            in1.setPrevTransactionHash(("H"+rand.nextInt()).getBytes());
-            Output z = new Output();
-            z.setAmount(rand.nextInt(10));
-            in1.setAmount(z);
-            
-            Output realOut = rand.nextInt() % 2 == 0 ? tmp : tmp1;
-            transaction.setOutputOut(realOut);
-            transaction.setOutputBack(tmp.equals(realOut) ? tmp1 : tmp);
-            transaction.setPubKey(keys.get(privKey).getEncoded());
-            try {
-                transaction.setSignature(SignaturesVerification.signTransaction(transaction.getBytes(false), privKey));
-                transaction.computeHash();
-            } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException | SignatureException
-                    | IOException e) {
-                e.printStackTrace();
+        Block last = null;
+        for(int i = 0; i < 4; i++) {
+        	Block block = new Block();
+            for(int j = 0; j < 4; j++) {
+                int privKeyInt = rand.nextInt(4);
+                PrivateKey privKey = keys.keySet().toArray(new PrivateKey[0])[privKeyInt];
+                Transaction transaction = new Transaction();
+                Output tmp = new Output();
+                tmp.setAddress(SignaturesVerification.DeriveJMAddressFromPubKey(keys.get(privKey).getEncoded()));
+                tmp.setAmount(rand.nextInt(10));
+                Output tmp1 = new Output();
+                tmp1.setAddress(SignaturesVerification.DeriveJMAddressFromPubKey(keys.get(keys.keySet().toArray(new PrivateKey[0])[privKeyInt+1 > 3 ? 0 : privKeyInt+1]).getEncoded()));
+                tmp1.setAmount(rand.nextInt(10));
+                Input in1 = new Input();
+                in1.setPrevTransactionHash(("H"+rand.nextInt(10)).getBytes());
+                Output z = new Output();
+                z.setAmount(rand.nextInt(10));
+                in1.setAmount(z);
+                transaction.addInput(in1);
+                Output realOut = rand.nextInt() % 2 == 0 ? tmp : tmp1;
+                transaction.setOutputOut(realOut);
+                transaction.setOutputBack(tmp.equals(realOut) ? tmp1 : tmp);
+                transaction.setPubKey(keys.get(privKey).getEncoded());
+                try {
+                    transaction.setSignature(SignaturesVerification.signTransaction(transaction.getBytes(false), privKey));
+                    transaction.computeHash();
+                } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException | SignatureException
+                        | IOException e) {
+                    e.printStackTrace();
+                }
+                block.getTransactions().add(transaction);
+                this.unverifiedTransactions.add(transaction);
+                unspentOutputs.put(Hex.toHexString(transaction.getHash())+DELIMITER+transaction.getOutputBack().getAddress(), transaction.getOutputBack());
+                unspentOutputs.put(Hex.toHexString(transaction.getHash())+DELIMITER+transaction.getOutputOut().getAddress(), transaction.getOutputOut());
             }
-            block.getTransactions().add(transaction);
-            this.unverifiedTransactions.add(transaction);
-            unspentOutputs.put(Hex.toHexString(transaction.getHash())+DELIMITER+transaction.getOutputBack().getAddress(), transaction.getOutputBack());
-            unspentOutputs.put(Hex.toHexString(transaction.getHash())+DELIMITER+transaction.getOutputOut().getAddress(), transaction.getOutputOut());
+            block.setDifficulty(NetConst.DEFAULT_DIFFICULTY);
+            block.setNonce(5);
+            block.setFinalHash("H"+i);
+            if(last == null) {
+            	block.setPrevHash(null);
+            	last = block;
+            }
+            else
+            	block.setPrevHash(last.getFinalHash());
+            block.setTimeCreation(System.currentTimeMillis());
+            this.chain.getBlocks().put(block.getFinalHash(), block);
         }
-        block.setDifficulty(14);
-        block.setNonce(5);
-        this.chain.getBlocks().put("B1", block);
     }
     
     public Block getLastBlock() {
