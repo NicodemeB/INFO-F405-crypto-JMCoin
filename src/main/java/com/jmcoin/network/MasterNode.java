@@ -78,14 +78,15 @@ public class MasterNode extends Peer{
     	Random rand = new Random();
     	Block block = new Block();
     	for(int j = 0; j < 10; j++) {
+    		int privKeyInt = rand.nextInt(4);
+    		PrivateKey privKey = keys.keySet().toArray(new PrivateKey[0])[privKeyInt];
     		Transaction transaction = new Transaction();
     		Output tmp = new Output();
-    		tmp.setAddress("addr");
+    		tmp.setAddress(SignaturesVerification.DeriveJMAddressFromPubKey(keys.get(privKey).getEncoded()));
     		tmp.setAmount(rand.nextInt(10));
     		Output tmp1 = new Output();
-    		tmp1.setAddress("rand"+rand.nextInt());
+    		tmp1.setAddress(SignaturesVerification.DeriveJMAddressFromPubKey(keys.get(keys.keySet().toArray(new PrivateKey[0])[privKeyInt+1 > 3 ? 0 : privKeyInt+1]).getEncoded()));
     		tmp1.setAmount(rand.nextInt(10));
-    		
     		Input in1 = new Input();
     		in1.setPrevTransactionHash(("H"+rand.nextInt()).getBytes());
     		Output z = new Output();
@@ -95,7 +96,6 @@ public class MasterNode extends Peer{
     		Output realOut = rand.nextInt() % 2 == 0 ? tmp : tmp1;
     		transaction.setOutputOut(realOut);
     		transaction.setOutputBack(tmp.equals(realOut) ? tmp1 : tmp);
-    		PrivateKey privKey = keys.keySet().toArray(new PrivateKey[0])[rand.nextInt(3)];
     		transaction.setPubKey(keys.get(privKey).getEncoded());
     		try {
     			transaction.setSignature(SignaturesVerification.signTransaction(transaction.getBytes(false), privKey));

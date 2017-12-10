@@ -148,6 +148,7 @@ public class Wallet {
     }
     
     public void updatePendingOutputs(Map<String,Output> unspentOutputs){
+    	if(unspentOutputs == null)return;
 		for (String key : pendingOutputs.keySet()){
 		    if(!unspentOutputs.containsKey(key))
 				pendingOutputs.remove(key);

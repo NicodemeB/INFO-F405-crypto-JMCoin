@@ -11,6 +11,7 @@ import java.util.Map;
 import com.jmcoin.crypto.AES.InvalidAESStreamException;
 import com.jmcoin.crypto.AES.InvalidPasswordException;
 import com.jmcoin.crypto.AES.StrongEncryptionNotAvailableException;
+import com.jmcoin.crypto.SignaturesVerification;
 import com.jmcoin.model.Transaction;
 import com.jmcoin.network.NetConst;
 import com.jmcoin.network.UserJMProtocolImpl;
@@ -48,10 +49,10 @@ public class TestSendNewTransaction {
 			e1.printStackTrace();
 		}
 		try {
-			Transaction transaction = node.createTransaction(protocol, "addr", "connard", 15, privKey, pubKey);
+			Transaction transaction = node.createTransaction(protocol, SignaturesVerification.DeriveJMAddressFromPubKey(pubKey.getEncoded()), "connard", 15, privKey, pubKey);
 			protocol.getClient().sendMessage(protocol.craftMessage(NetConst.TAKE_MY_NEW_TRANSACTION, node.getGson().toJson(transaction)));
 			System.out.println("****************************************************************************");
-			transaction = node.createTransaction(protocol, "addr", "connard", 15, privKey, pubKey);
+			transaction = node.createTransaction(protocol, SignaturesVerification.DeriveJMAddressFromPubKey(pubKey.getEncoded()), "connard", 15, privKey, pubKey);
 			protocol.getClient().sendMessage(protocol.craftMessage(NetConst.TAKE_MY_NEW_TRANSACTION, node.getGson().toJson(transaction)));
 		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException | SignatureException
 				| IOException e) {

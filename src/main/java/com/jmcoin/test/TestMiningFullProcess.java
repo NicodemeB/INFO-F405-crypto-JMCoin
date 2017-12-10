@@ -8,6 +8,7 @@ import java.security.spec.InvalidKeySpecException;
 import com.jmcoin.crypto.AES.InvalidAESStreamException;
 import com.jmcoin.crypto.AES.InvalidPasswordException;
 import com.jmcoin.crypto.AES.StrongEncryptionNotAvailableException;
+import com.jmcoin.model.KeyGenerator;
 import com.jmcoin.network.MinerJMProtocolImpl;
 import com.jmcoin.network.MinerNode;
 
@@ -22,8 +23,10 @@ public class TestMiningFullProcess {
 	 */
 	public static void main(String[] args){
 		try {
-			TestMasterNode.runMaster(null, null);
-		} catch (IOException e2) {
+			KeyGenerator generator = new KeyGenerator(1024);
+			generator.createKeys();
+			TestMasterNode.runMaster(generator.getPrivateKey(), generator.getPublicKey());
+		} catch (IOException | NoSuchAlgorithmException | NoSuchProviderException e2) {
 			e2.printStackTrace();
 		}
 		try {

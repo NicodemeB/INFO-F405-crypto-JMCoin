@@ -34,7 +34,7 @@ public abstract class NetConst {
 	public static final String CONNECTION_REQUEST 				= "ConnectionRequest";
 	public static final String CONNECTED 						= "Connected";
 	public static final int MAX_SENT_TRANSACTIONS 				= 1000;
-	public static final int DEFAULT_DIFFICULTY 					= 24;//FIXME change the difficulty
+	public static final int DEFAULT_DIFFICULTY 					= 16;//FIXME change the difficulty
 	
 	public static final String RECEIVE_DIFFICULTY 				= "A";
 	public static final String RECEIVE_REWARD_AMOUNT 			= "B";

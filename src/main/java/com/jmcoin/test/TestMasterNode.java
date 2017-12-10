@@ -5,8 +5,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-
-import com.jmcoin.model.Chain;
 import com.jmcoin.model.KeyGenerator;
 import com.jmcoin.network.MasterJMProtocolImpl;
 import com.jmcoin.network.MasterNode;
@@ -20,8 +18,8 @@ public class TestMasterNode {
 		try{
 			node.debugMasterNode(privKey, pubKey);
 		}
-		catch(NoSuchAlgorithmException | NoSuchProviderException p) {
-			
+		catch(NoSuchAlgorithmException | NoSuchProviderException e) {
+			e.printStackTrace();
 		}
 		new Thread(new MultiThreadedServer(NetConst.MASTER_NODE_LISTEN_PORT, new MasterJMProtocolImpl(node))).start();
 	}

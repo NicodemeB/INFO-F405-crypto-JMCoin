@@ -1,15 +1,18 @@
 package com.jmcoin.test;
 
 import com.jmcoin.crypto.AES.InvalidAESStreamException;
-import com.jmcoin.crypto.AES.InvalidKeyLengthException;
 import com.jmcoin.crypto.AES.InvalidPasswordException;
 import com.jmcoin.crypto.AES.StrongEncryptionNotAvailableException;
+import com.jmcoin.crypto.SignaturesVerification;
 import com.jmcoin.network.UserJMProtocolImpl;
 import com.jmcoin.network.UserNode;
 
 import java.io.IOException;
+import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
+import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 /**
  *
@@ -18,16 +21,20 @@ import java.security.spec.InvalidKeySpecException;
 public class TestWallet {
     public static void main(String args[]){
     	try {
-			TestMasterNode.runMaster(null, null);
+    		UserNode userNode = new UserNode("a");
+    		PrivateKey privKey = userNode.getWallet().getKeys().keySet().iterator().next();
+    		TestMasterNode.runMaster(privKey, userNode.getWallet().getKeys().get(privKey));
 			TestRelay.run();
-	    	UserNode userNode = new UserNode("a");
-	    	userNode.getWallet().createKeys("a");
 	    	UserJMProtocolImpl protocol = new UserJMProtocolImpl(userNode);
 	    	userNode.getWallet().computeBalance(protocol);
-		} catch (IOException | NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException | InvalidPasswordException | InvalidAESStreamException | StrongEncryptionNotAvailableException | InvalidKeyLengthException e) {
+	    	System.out.println(userNode.getWallet().getAddresses());
+	    	System.out.println("Balance: "+userNode.getWallet().getBalance());
+	    	userNode.createTransaction(protocol, SignaturesVerification.DeriveJMAddressFromPubKey(userNode.getWallet().getKeys().get(privKey).getEncoded()), "@destination", 12, privKey, userNode.getWallet().getKeys().get(privKey));
+	    	userNode.getWallet().computeBalance(protocol);
+	    	System.out.println("Balance: "+userNode.getWallet().getBalance());
+		} catch (IOException | NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException | InvalidPasswordException | InvalidAESStreamException | StrongEncryptionNotAvailableException | InvalidKeyException | SignatureException e) {
 			e.printStackTrace();
-		}
-    	
+		} 	
     }
 }
 

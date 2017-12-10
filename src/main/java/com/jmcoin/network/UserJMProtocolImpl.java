@@ -3,9 +3,12 @@ package com.jmcoin.network;
 import java.io.IOException;
 import java.util.Map;
 
+import org.bouncycastle.util.encoders.Hex;
+
 import com.google.gson.reflect.TypeToken;
 import com.jmcoin.model.Block;
 import com.jmcoin.model.Chain;
+import com.jmcoin.model.Input;
 import com.jmcoin.model.Output;
 import com.jmcoin.model.Transaction;
 
@@ -90,20 +93,31 @@ public class UserJMProtocolImpl extends JMProtocolImpl<UserNode>{
 	
 	public double getAddressBalance(String ... addresses) throws IOException{
     	Transaction[] transactions = downloadObject(NetConst.GIVE_ME_TRANS_TO_THIS_ADDRESS, this.peer.getGson().toJson(addresses), getClient());
-        double totalOutputAmount = 0;
-        for(int j = 0; j < addresses.length; j++) {
-        	for(int i = 0 ; i < transactions.length; i++){
-                if(transactions[i].getOutputBack().getAddress().equals(addresses[j])){
-                    totalOutputAmount+= transactions[i].getOutputBack().getAmount();
-                }
-                else if(transactions[i].getOutputOut().getAddress().equals(addresses[j])){
-                	totalOutputAmount+= transactions[i].getOutputOut().getAmount();
-                }
-                else{
-                	System.out.println("Wallet : No output belonging to this address");
-                }
-            }
-        }
+    	Map<String, Output> unspentOutputs = downloadObject(NetConst.GIVE_ME_UNSPENT_OUTPUTS, null, this.client);
+    	this.peer.getWallet().updatePendingOutputs(unspentOutputs);
+    	System.out.println("Transactions: "+this.peer.getGson().toJson(transactions));
+    	System.out.println("Unspent: "+unspentOutputs);
+    	System.out.println("Pending out: "+this.peer.getWallet().getPendingOutputs());
+    	double totalOutputAmount = 0;
+    	for(String address : addresses) {
+    		int i = 0;
+        	while(i < transactions.length) {
+        		Output tmpOut = null;
+        		if(transactions[i].getOutputBack().getAddress().equals(address)) {
+        			tmpOut = transactions[i].getOutputBack();
+        		}
+        		else if(transactions[i].getOutputOut().getAddress().equals(address)){
+        			tmpOut = transactions[i].getOutputOut();
+        		}
+        		if(tmpOut != null) {
+        			String key = Hex.toHexString(transactions[i].getHash()) + Peer.DELIMITER+tmpOut.getAddress();
+        			if(unspentOutputs.containsKey(key) && !this.peer.getWallet().getPendingOutputs().containsKey(key)){
+        				totalOutputAmount+= tmpOut.getAmount();
+    				}
+        		}
+        		i++;
+        	}
+    	}
         return totalOutputAmount;
     }
 }

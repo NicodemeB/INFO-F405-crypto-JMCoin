@@ -50,11 +50,9 @@ public abstract class Peer {
 	protected Boolean verifyBlockTransaction(Transaction trans, Chain chain, Map<String, Output> unspentOutputs) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, IOException {
 		if(SignaturesVerification.verifyTransaction(trans.getSignature(), trans.getBytes(false), KeyGenerator.getPublicKey(trans.getPubKey()))) {
 			String address = SignaturesVerification.DeriveJMAddressFromPubKey(trans.getPubKey());
-			for(Input input : trans.getInputs()) 
-			{
+			for(Input input : trans.getInputs()) {
 				Transaction prevTrans = chain.findInBlockChain(input.getPrevTransactionHash());
-				if(prevTrans != null) 
-				{ 
+				if(prevTrans != null) { 
 					// ce n'est pas un reward
 					Output outToMe = null; //in previous transaction, find the output took as new input (outToMe)
 					if(prevTrans.getOutputBack().getAddress().equals(address))

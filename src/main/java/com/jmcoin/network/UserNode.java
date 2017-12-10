@@ -67,7 +67,6 @@ public class UserNode extends Peer{
 		Map<String,Output> pendingOutputs = this.wallet.getPendingOutputs();
 		
 		Transaction [] addressTransactions = getAvailableTransactionsForAddress(protocol,fromAddress, unspentOutputs);
-		System.out.println(this.gson.toJson(addressTransactions));
 		if(addressTransactions == null) return null;
 		Transaction tr = new Transaction();
         double totalOutputAmount = 0;
@@ -110,9 +109,7 @@ public class UserNode extends Peer{
             tr.computeHash();
             System.out.println("Back: "+tr.getOutputBack().getAmount());
             System.out.println("Out: "+tr.getOutputOut().getAmount());
-            System.out.println(this.gson.toJson(this.wallet.getPendingOutputs()));
           	this.wallet.getPendingOutputs().putAll(usedOutputs);
-          	System.out.println(this.gson.toJson(this.wallet.getPendingOutputs()));
           	return tr;
         }
         System.out.println("Wallet: Insuficient amount for that address");
@@ -121,5 +118,9 @@ public class UserNode extends Peer{
 
 	public Wallet getWallet() {
 		return wallet;
+	}
+	
+	public void debugUserNode() {
+		//this.wallet.getAddresses().add(e);
 	}
 }
