@@ -8,10 +8,13 @@ import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SignatureException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.bouncycastle.util.encoders.Hex;
 
@@ -64,50 +67,48 @@ public class MasterNode extends Peer{
 		}
     }
     
-    public void debugMasterNode() throws NoSuchAlgorithmException, NoSuchProviderException {
+    public void debugMasterNode(PrivateKey privateKey, PublicKey publicKey) throws NoSuchAlgorithmException, NoSuchProviderException {
     	KeyGenerator generator = new KeyGenerator(1024);
     	Map<PrivateKey, PublicKey> keys = new HashMap<>();
     	for(int i = 0; i < 3; i++) {
     		generator.createKeys();
     		keys.put(generator.getPrivateKey(), generator.getPublicKey());
     	}
-    	Genesis genesis = null;
-    	try {
-			genesis = Genesis.getInstance();
-		} catch (InvalidKeyException | SignatureException | IOException | InvalidKeyLengthException
-				| StrongEncryptionNotAvailableException e1) {
-			e1.printStackTrace();
-		}
-    	Output out1 = new Output();
-    	out1.setAddress("A0");
-    	out1.setAmount(42);
-    	Output out2 = new Output();
-    	out2.setAddress("A1");
-    	out2.setAmount(24);
-    	Output out3 = new Output();
-    	out3.setAddress("A2");
-    	out3.setAmount(4);
-    	unspentOutputs.put("uno!", out1);
-    	unspentOutputs.put("dos!", out2);
-    	unspentOutputs.put("tre!", out3);
-    	Input in1 = new Input();
-    	in1.setAmount(out1);
-    	in1.setPrevTransactionHash(genesis.getFinalHash().getBytes());
-    	Transaction unvfTrans1 = new Transaction();
-    	unvfTrans1.setOutputBack(out3);
-    	unvfTrans1.setOutputOut(out2);
-    	unvfTrans1.addInput(in1);
-    	PrivateKey privKey = keys.keySet().iterator().next();
-    	unvfTrans1.setPubKey(keys.get(privKey).getEncoded());
-    	try {
-			unvfTrans1.setSignature(SignaturesVerification.signTransaction(unvfTrans1.getBytes(false), privKey));
-		} catch (InvalidKeyException | SignatureException | IOException e) {
-			e.printStackTrace();
-		}
-    	unvfTrans1.computeHash();
-    	this.unverifiedTransactions.add(unvfTrans1);
+    	keys.put(privateKey, publicKey);
+    	Random rand = new Random();
     	Block block = new Block();
-    	block.getTransactions().add(unvfTrans1);
+    	for(int j = 0; j < 10; j++) {
+    		Transaction transaction = new Transaction();
+    		Output tmp = new Output();
+    		tmp.setAddress("addr");
+    		tmp.setAmount(rand.nextInt(10));
+    		Output tmp1 = new Output();
+    		tmp1.setAddress("rand"+rand.nextInt());
+    		tmp1.setAmount(rand.nextInt(10));
+    		
+    		Input in1 = new Input();
+    		in1.setPrevTransactionHash(("H"+rand.nextInt()).getBytes());
+    		Output z = new Output();
+    		z.setAmount(rand.nextInt(10));
+    		in1.setAmount(z);
+    		
+    		Output realOut = rand.nextInt() % 2 == 0 ? tmp : tmp1;
+    		transaction.setOutputOut(realOut);
+    		transaction.setOutputBack(tmp.equals(realOut) ? tmp1 : tmp);
+    		PrivateKey privKey = keys.keySet().toArray(new PrivateKey[0])[rand.nextInt(3)];
+    		transaction.setPubKey(keys.get(privKey).getEncoded());
+    		try {
+    			transaction.setSignature(SignaturesVerification.signTransaction(transaction.getBytes(false), privKey));
+    			transaction.computeHash();
+    		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException | SignatureException
+    				| IOException e) {
+    			e.printStackTrace();
+    		}
+    		block.getTransactions().add(transaction);
+    		this.unverifiedTransactions.add(transaction);
+    		unspentOutputs.put(Hex.toHexString(transaction.getHash())+DELIMITER+transaction.getOutputBack().getAddress(), transaction.getOutputBack());
+    		unspentOutputs.put(Hex.toHexString(transaction.getHash())+DELIMITER+transaction.getOutputOut().getAddress(), transaction.getOutputOut());
+    	}
     	block.setDifficulty(14);
     	block.setNonce(5);
     	this.chain.getBlocks().put("B1", block);
@@ -210,6 +211,18 @@ public class MasterNode extends Peer{
 
 	public List<Transaction> getTransactionsToThisAddress(String addresses) {
 		String[] tabAddresses = gson.fromJson(addresses, String[].class);
-		return DatabaseFacade.getAllTransactionsWithAddress(tabAddresses);
+		return debugGetTransactionsToThisAddress(tabAddresses);
+		//FIXME uncomment this return DatabaseFacade.getAllTransactionsWithAddress(tabAddresses);
+	}
+	
+	private ArrayList<Transaction> debugGetTransactionsToThisAddress(String[] addresses){
+		ArrayList<Transaction> transactions = new ArrayList<>();
+		for(String addr : addresses) {
+			for(Transaction trans : this.unverifiedTransactions) {
+				if(trans.getOutputBack().getAddress().equals(addr)||trans.getOutputOut().getAddress().equals(addr))
+					transactions.add(trans);
+			}
+		}
+		return transactions;
 	}
 }

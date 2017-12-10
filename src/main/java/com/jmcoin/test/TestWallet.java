@@ -18,12 +18,12 @@ import java.security.spec.InvalidKeySpecException;
 public class TestWallet {
     public static void main(String args[]){
     	try {
-			/*TestMasterNode.runMaster();
-			TestRelay.run();*/
+			TestMasterNode.runMaster(null, null);
+			TestRelay.run();
 	    	UserNode userNode = new UserNode("a");
 	    	userNode.getWallet().createKeys("a");
-	    	/*UserJMProtocolImpl protocol = new UserJMProtocolImpl(userNode);
-	    	userNode.getWallet().computeBalance(protocol);*/
+	    	UserJMProtocolImpl protocol = new UserJMProtocolImpl(userNode);
+	    	userNode.getWallet().computeBalance(protocol);
 		} catch (IOException | NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException | InvalidPasswordException | InvalidAESStreamException | StrongEncryptionNotAvailableException | InvalidKeyLengthException e) {
 			e.printStackTrace();
 		}

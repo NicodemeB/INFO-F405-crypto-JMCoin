@@ -147,11 +147,10 @@ public class Wallet {
     		return pendingOutputs;
     }
     
-    public void updatePendingOutputs(Map<String,Output> unspentOutputs)
-    {
-    		for (String key : pendingOutputs.keySet()){
+    public void updatePendingOutputs(Map<String,Output> unspentOutputs){
+		for (String key : pendingOutputs.keySet()){
 		    if(!unspentOutputs.containsKey(key))
-    			pendingOutputs.remove(key);
+				pendingOutputs.remove(key);
 		}
     }
 }

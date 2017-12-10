@@ -10,6 +10,7 @@ import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.bouncycastle.util.encoders.Hex;
@@ -17,7 +18,6 @@ import com.jmcoin.crypto.SignaturesVerification;
 import com.jmcoin.crypto.AES.InvalidAESStreamException;
 import com.jmcoin.crypto.AES.InvalidPasswordException;
 import com.jmcoin.crypto.AES.StrongEncryptionNotAvailableException;
-import com.jmcoin.model.Chain;
 import com.jmcoin.model.Input;
 import com.jmcoin.model.Output;
 import com.jmcoin.model.Transaction;
@@ -26,84 +26,80 @@ import com.jmcoin.model.Wallet;
 public class UserNode extends Peer{
 
 	private Wallet wallet;
-	private Map<String,Output> usedOutputs;
-	private static final String DELIMITER = "%";
 	
 	public UserNode(String password) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException, IOException, InvalidPasswordException, InvalidAESStreamException, StrongEncryptionNotAvailableException {
 		this.wallet = new Wallet(password);
 	}
 	
-	public Transaction[] getAvailableTransactionsForAddress(UserJMProtocolImpl protocol,String fromAddress, Map<String,Output> unspentOutputs, Wallet wallet){
+	public Transaction[] getAvailableTransactionsForAddress(UserJMProtocolImpl protocol,String fromAddress, Map<String,Output> unspentOutputs){
 		Transaction[] addressTransactions;
-		ArrayList<Transaction> availableTransactions = new ArrayList<Transaction>();
 		try {
 			addressTransactions = protocol.downloadObject(NetConst.GIVE_ME_TRANS_TO_THIS_ADDRESS, "[\""+fromAddress+"\"]", protocol.getClient());
-			if(addressTransactions.length == 0)return null;
-			for(int i = 0 ; i < addressTransactions.length; i++){
-				
-				String keyOut = Hex.toHexString(addressTransactions[i].getHash())+DELIMITER+addressTransactions[i].getOutputOut().getAddress();
-				String keyBack = Hex.toHexString(addressTransactions[i].getHash())+DELIMITER+addressTransactions[i].getOutputBack().getAddress();
-					
-				if(addressTransactions[i].getOutputBack().getAddress().equals(fromAddress)){	
-					//Si l'output est contenue dans le pool des output disponibles et que l'output n'est pas en attente
-					if((unspentOutputs.containsKey(keyBack)) && wallet.getPendingOutputs().containsKey(keyBack) == false){
-						availableTransactions.add(addressTransactions[i]);
-					}
-				}
-				else if((addressTransactions[i].getOutputOut().getAddress().equals(fromAddress))){
-					if((unspentOutputs.containsKey(keyOut)) && wallet.getPendingOutputs().containsKey(keyOut) == false){
-						availableTransactions.add(addressTransactions[i]);
-					}
-				}
-			}
-			return (Transaction[])availableTransactions.toArray();
 		}
 		catch (IOException e) {
 			e.printStackTrace();
+			return null;
 		}
-		return null;
-		
+		if(addressTransactions == null || addressTransactions.length == 0)return null;
+		ArrayList<Transaction> availableTransactions = new ArrayList<Transaction>();
+		for(Transaction tr : addressTransactions) {
+			if(tr.getOutputBack().getAddress().equals(fromAddress)) {
+				String keyBack = Hex.toHexString(tr.getHash())+DELIMITER+tr.getOutputBack().getAddress();
+				//Si l'output est contenue dans le pool des output disponibles et que l'output n'est pas en attente
+				if(unspentOutputs.containsKey(keyBack) && !this.wallet.getPendingOutputs().containsKey(keyBack)){
+					availableTransactions.add(tr);
+				}
+			}
+			else if(tr.getOutputOut().getAddress().equals(fromAddress)){
+				String keyOut = Hex.toHexString(tr.getHash())+DELIMITER+tr.getOutputOut().getAddress();
+				if((unspentOutputs.containsKey(keyOut)) && !this.wallet.getPendingOutputs().containsKey(keyOut)){
+					availableTransactions.add(tr);
+				}
+			}
+		}
+		return availableTransactions.toArray(new Transaction[0]);
 	}
 	
 	public Transaction createTransaction(UserJMProtocolImpl protocol, String fromAddress, String toAddress,
-		double amountToSend, PrivateKey privKey, PublicKey pubKey, Wallet wallet) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, FileNotFoundException, SignatureException{
-		Map<String,Output> pendingOutputs = this.wallet.getPendingOutputs();
+			double amountToSend, PrivateKey privKey, PublicKey pubKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, FileNotFoundException, SignatureException{
 		Map<String, Output> unspentOutputs = protocol.downloadObject(NetConst.GIVE_ME_UNSPENT_OUTPUTS, null, protocol.getClient());
-		wallet.updatePendingOutputs(unspentOutputs);
-		Transaction [] addressTransactions = getAvailableTransactionsForAddress(protocol,fromAddress, unspentOutputs, wallet);
+		this.wallet.updatePendingOutputs(unspentOutputs);
+		Map<String,Output> pendingOutputs = this.wallet.getPendingOutputs();
+		
+		Transaction [] addressTransactions = getAvailableTransactionsForAddress(protocol,fromAddress, unspentOutputs);
+		System.out.println(this.gson.toJson(addressTransactions));
 		if(addressTransactions == null) return null;
 		Transaction tr = new Transaction();
         double totalOutputAmount = 0;
         int i = 0;
-        while( i < addressTransactions.length && totalOutputAmount < amountToSend)
-        {
-        		String key = Hex.toHexString(addressTransactions[i].getHash());
+        Map<String, Output> usedOutputs = new HashMap<>();
+        while( i < addressTransactions.length && totalOutputAmount < amountToSend){
+        	String key = Hex.toHexString(addressTransactions[i].getHash());
             if(addressTransactions[i].getOutputBack().getAddress().equals(fromAddress)){
-            		//verifier si Out pas encore utilisée localement
-            		key += DELIMITER+addressTransactions[i].getOutputBack().getAddress();
-            		if(pendingOutputs.containsKey(key) == false)
-            		{
-            			totalOutputAmount+= addressTransactions[i].getOutputBack().getAmount();
-                     tr.addInput(new Input(addressTransactions[i].getOutputBack().getAmount(),addressTransactions[i].getHash()));
-                     this.usedOutputs.put(key, addressTransactions[i].getOutputBack());
-            		}
+            	//verifier si Out pas encore utilisée localement
+            	key += DELIMITER+addressTransactions[i].getOutputBack().getAddress();
+            	if(!pendingOutputs.containsKey(key)){
+            		totalOutputAmount+= addressTransactions[i].getOutputBack().getAmount();
+                    tr.addInput(new Input(addressTransactions[i].getOutputBack().getAmount(),addressTransactions[i].getHash()));
+                    usedOutputs.put(key, addressTransactions[i].getOutputBack());
+                }
             }
             else if((addressTransactions[i].getOutputOut().getAddress().equals(fromAddress))){
-	            	key += DELIMITER+addressTransactions[i].getOutputOut().getAddress();
-	            	//verifier si Out pas encore utilisée localement
-	            	if(pendingOutputs.containsKey(key) == false)
-	        		{
-		            	totalOutputAmount+= addressTransactions[i].getOutputOut().getAmount();
-		            	tr.addInput(new Input(addressTransactions[i].getOutputOut().getAmount(),addressTransactions[i].getHash()));
-		            	this.usedOutputs.put(key, addressTransactions[i].getOutputBack());
-	        		}
+            	key += DELIMITER+addressTransactions[i].getOutputOut().getAddress();
+            	//verifier si Out pas encore utilisée localement
+            	if(!pendingOutputs.containsKey(key)){
+            		totalOutputAmount+= addressTransactions[i].getOutputOut().getAmount();
+            		tr.addInput(new Input(addressTransactions[i].getOutputOut().getAmount(),addressTransactions[i].getHash()));
+            		usedOutputs.put(key, addressTransactions[i].getOutputBack());
+            	}
             }
             else {
-            		System.out.println("Wallet : No output belonging to this address");
-            		return null;
-            }  
+        		System.out.println("Usernode : No output belonging to this address");
+            }
             i++;
         }
+        System.out.println("Amount to send: " + amountToSend);
+        System.out.println("Available amount: " + totalOutputAmount);
         if(amountToSend <= totalOutputAmount){
             Output oOut = new Output(amountToSend, toAddress);
             Output oBack = new Output(totalOutputAmount-amountToSend, fromAddress);
@@ -112,23 +108,18 @@ public class UserNode extends Peer{
             tr.setOutputOut(oOut);
             tr.setSignature(SignaturesVerification.signTransaction(tr.getBytes(false), privKey));
             tr.computeHash();
+            System.out.println("Back: "+tr.getOutputBack().getAmount());
+            System.out.println("Out: "+tr.getOutputOut().getAmount());
+            System.out.println(this.gson.toJson(this.wallet.getPendingOutputs()));
           	this.wallet.getPendingOutputs().putAll(usedOutputs);
-            return tr;
+          	System.out.println(this.gson.toJson(this.wallet.getPendingOutputs()));
+          	return tr;
         }
-        else{
-            System.out.println("Wallet: Insuficient amount for that address");
-        }
+        System.out.println("Wallet: Insuficient amount for that address");
 		return null;
     }
 
 	public Wallet getWallet() {
 		return wallet;
-	}
-	
-	public void debugUserNode(UserJMProtocolImpl protocol) throws IOException {
-		Chain c1 = protocol.downloadObject(NetConst.GIVE_ME_BLOCKCHAIN_COPY, null, protocol.getClient());
-		System.err.println("User: chain received " + c1);
-		Chain c2 = protocol.downloadObject(NetConst.GIVE_ME_BLOCKCHAIN_COPY, null, protocol.getClient());
-		System.err.println("User: chain received " + c2);
 	}
 }

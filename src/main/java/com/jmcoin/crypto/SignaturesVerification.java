@@ -31,8 +31,6 @@ public abstract class SignaturesVerification {
         return dsa.sign();
     }
 	
-	
-	
     public static boolean verifyTransaction(byte[] signature, byte[] transaction, PublicKey pubKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, SignatureException{
         boolean verifies = false;
         if(signature == null || transaction == null || pubKey == null){

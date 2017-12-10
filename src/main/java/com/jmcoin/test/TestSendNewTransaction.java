@@ -19,8 +19,19 @@ import com.jmcoin.network.UserNode;
 public class TestSendNewTransaction {
 	
 	public static void main(String[] args) {
+		UserNode node = null;
 		try {
-			TestMasterNode.runMaster();
+			node = new UserNode("a");
+		} catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException | IOException
+				| InvalidPasswordException | InvalidAESStreamException | StrongEncryptionNotAvailableException e1) {
+			e1.printStackTrace();
+		}
+		Map<PrivateKey, PublicKey> keys= node.getWallet().getKeys();
+		PrivateKey privKey = keys.keySet().iterator().next();
+		PublicKey pubKey = keys.get(privKey);
+
+		try {
+			TestMasterNode.runMaster(privKey, pubKey);
 		} catch (IOException e2) {
 			e2.printStackTrace();
 		}
@@ -29,26 +40,19 @@ public class TestSendNewTransaction {
 		} catch (IOException e2) {
 			e2.printStackTrace();
 		}
-		UserNode node = null;
-		try {
-			node = new UserNode("a");
-		} catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException | IOException
-				| InvalidPasswordException | InvalidAESStreamException | StrongEncryptionNotAvailableException e1) {
-			e1.printStackTrace();
-		}
+		
 		UserJMProtocolImpl protocol = null;
 		try {
 			protocol = new UserJMProtocolImpl(node);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		Map<PrivateKey, PublicKey> keys= node.getWallet().getKeys();
-		PrivateKey privKey = keys.keySet().iterator().next();
-		PublicKey pubKey = keys.get(privKey);
 		try {
-			Transaction transaction = node.createTransaction(protocol, "connard", "connasse", 0, privKey, pubKey,node.getWallet());
-			if(transaction != null)
-				protocol.getClient().sendMessage(protocol.craftMessage(NetConst.TAKE_MY_NEW_TRANSACTION, node.getGson().toJson(transaction)));
+			Transaction transaction = node.createTransaction(protocol, "addr", "connard", 15, privKey, pubKey);
+			protocol.getClient().sendMessage(protocol.craftMessage(NetConst.TAKE_MY_NEW_TRANSACTION, node.getGson().toJson(transaction)));
+			System.out.println("****************************************************************************");
+			transaction = node.createTransaction(protocol, "addr", "connard", 15, privKey, pubKey);
+			protocol.getClient().sendMessage(protocol.craftMessage(NetConst.TAKE_MY_NEW_TRANSACTION, node.getGson().toJson(transaction)));
 		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException | SignatureException
 				| IOException e) {
 			e.printStackTrace();

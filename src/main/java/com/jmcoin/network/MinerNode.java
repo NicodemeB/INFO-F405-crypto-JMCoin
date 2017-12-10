@@ -107,7 +107,7 @@ public class MinerNode extends Peer{
 					Block block = buildBlock(protocol);
 					mine(block);
 					while(this.miningThread.running)
-						Thread.sleep(500);
+						continue;//Thread.sleep(500);
 					Thread.sleep(5000);
 				} catch (InvalidKeyException | ClassNotFoundException | NoSuchAlgorithmException | NoSuchProviderException
 						| SignatureException | IOException | InterruptedException e) {
@@ -155,6 +155,7 @@ public class MinerNode extends Peer{
 	        try {
 	        	while(this.running && nonce < Integer.MAX_VALUE){
 	               	if (verifyAndSetHash(nonce++)) {
+	               		System.err.println(gson.toJson(block));
 	               		this.protocol.sendMinedBlock(block);
 	               		this.running = false;
 	               	}

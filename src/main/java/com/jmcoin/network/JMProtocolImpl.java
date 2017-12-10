@@ -28,7 +28,7 @@ public abstract class JMProtocolImpl<X extends Peer> {
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected <T> T downloadObject(char req, String body, Client client) throws IOException {
+	protected <T> T downloadObject(String req, String body, Client client) throws IOException {
 		client.sendMessage(craftMessage(req, body));
 		T t;
         while((t = (T) this.peer.getBundle().getObject()) == null) {
@@ -50,19 +50,12 @@ public abstract class JMProtocolImpl<X extends Peer> {
 	 */
 	public String processInput(Object message) {
 		String content = (String)message;
-		StringTokenizer tokenizer = new StringTokenizer(content, String.valueOf(NetConst.DELIMITER));
+		StringTokenizer tokenizer = new StringTokenizer(content, NetConst.DELIMITER);
 		if(!tokenizer.hasMoreTokens()) return null;
 		String type = tokenizer.nextToken();
 		if(type != null && type.length() != 0) {
 			if(!tokenizer.hasMoreTokens()) return null;
-			int code = 0;
-			try {
-			    code = Integer.parseInt(type);
-			} catch (NumberFormatException e) {
-				System.out.println(message);
-				e.printStackTrace();
-			}
-			switch ((char)code) {
+			switch (type) {
 			case NetConst.GIVE_ME_BLOCKCHAIN_COPY:
 				tokenizer.nextToken();
 				return giveMeBlockChainCopyImpl(tokenizer.nextToken());
@@ -192,11 +185,11 @@ public abstract class JMProtocolImpl<X extends Peer> {
 	 * @param body JSON object if needed
 	 * @return message
 	 */
-	public String craftMessage(int request, String body) {
-		return request + "$" + body + "$-1$";
+	public String craftMessage(String request, String body) {
+		return request + NetConst.DELIMITER + body + NetConst.DEFAULT_TRAILER;
 	}
 	
-	public String craftMessage(int request, String body, String rand) {
-		return request + "$" + body + "$" +rand;
+	public String craftMessage(String request, String body, String rand) {
+		return request + NetConst.DELIMITER + body + NetConst.DELIMITER +rand;
 	}
 }
