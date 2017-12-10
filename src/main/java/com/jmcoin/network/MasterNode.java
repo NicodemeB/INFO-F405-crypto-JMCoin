@@ -1,7 +1,10 @@
 package com.jmcoin.network;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.*;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -16,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import com.jmcoin.crypto.AES;
 import org.bouncycastle.util.encoders.Hex;
 
 import com.jmcoin.crypto.AES.InvalidKeyLengthException;
@@ -24,7 +28,7 @@ import com.jmcoin.crypto.SignaturesVerification;
 import com.jmcoin.database.DatabaseFacade;
 import com.jmcoin.model.Block;
 import com.jmcoin.model.Chain;
-import com.jmcoin.model.Genesis;
+//import com.jmcoin.model.Genesis;
 import com.jmcoin.model.Input;
 import com.jmcoin.model.KeyGenerator;
 import com.jmcoin.model.Output;
@@ -61,57 +65,58 @@ public class MasterNode extends Peer{
     	}*/
     	this.chain = new Chain();
     	try {
-			this.lastBlock = Genesis.getInstance();
+			addGenesisToUnverfied();
 		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException | SignatureException
 				| IOException | InvalidKeyLengthException | StrongEncryptionNotAvailableException e) {
+    		e.printStackTrace();
 		}
     }
     
     public void debugMasterNode(PrivateKey privateKey, PublicKey publicKey) throws NoSuchAlgorithmException, NoSuchProviderException {
-    	KeyGenerator generator = new KeyGenerator(1024);
-    	Map<PrivateKey, PublicKey> keys = new HashMap<>();
-    	for(int i = 0; i < 3; i++) {
-    		generator.createKeys();
-    		keys.put(generator.getPrivateKey(), generator.getPublicKey());
-    	}
-    	keys.put(privateKey, publicKey);
-    	Random rand = new Random();
-    	Block block = new Block();
-    	for(int j = 0; j < 10; j++) {
-    		int privKeyInt = rand.nextInt(4);
-    		PrivateKey privKey = keys.keySet().toArray(new PrivateKey[0])[privKeyInt];
-    		Transaction transaction = new Transaction();
-    		Output tmp = new Output();
-    		tmp.setAddress(SignaturesVerification.DeriveJMAddressFromPubKey(keys.get(privKey).getEncoded()));
-    		tmp.setAmount(rand.nextInt(10));
-    		Output tmp1 = new Output();
-    		tmp1.setAddress(SignaturesVerification.DeriveJMAddressFromPubKey(keys.get(keys.keySet().toArray(new PrivateKey[0])[privKeyInt+1 > 3 ? 0 : privKeyInt+1]).getEncoded()));
-    		tmp1.setAmount(rand.nextInt(10));
-    		Input in1 = new Input();
-    		in1.setPrevTransactionHash(("H"+rand.nextInt()).getBytes());
-    		Output z = new Output();
-    		z.setAmount(rand.nextInt(10));
-    		in1.setAmount(z);
-    		
-    		Output realOut = rand.nextInt() % 2 == 0 ? tmp : tmp1;
-    		transaction.setOutputOut(realOut);
-    		transaction.setOutputBack(tmp.equals(realOut) ? tmp1 : tmp);
-    		transaction.setPubKey(keys.get(privKey).getEncoded());
-    		try {
-    			transaction.setSignature(SignaturesVerification.signTransaction(transaction.getBytes(false), privKey));
-    			transaction.computeHash();
-    		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException | SignatureException
-    				| IOException e) {
-    			e.printStackTrace();
-    		}
-    		block.getTransactions().add(transaction);
-    		this.unverifiedTransactions.add(transaction);
-    		unspentOutputs.put(Hex.toHexString(transaction.getHash())+DELIMITER+transaction.getOutputBack().getAddress(), transaction.getOutputBack());
-    		unspentOutputs.put(Hex.toHexString(transaction.getHash())+DELIMITER+transaction.getOutputOut().getAddress(), transaction.getOutputOut());
-    	}
-    	block.setDifficulty(14);
-    	block.setNonce(5);
-    	this.chain.getBlocks().put("B1", block);
+        KeyGenerator generator = new KeyGenerator(1024);
+        Map<PrivateKey, PublicKey> keys = new HashMap<>();
+        for(int i = 0; i < 3; i++) {
+            generator.createKeys();
+            keys.put(generator.getPrivateKey(), generator.getPublicKey());
+        }
+        keys.put(privateKey, publicKey);
+        Random rand = new Random();
+        Block block = new Block();
+        for(int j = 0; j < 10; j++) {
+            int privKeyInt = rand.nextInt(4);
+            PrivateKey privKey = keys.keySet().toArray(new PrivateKey[0])[privKeyInt];
+            Transaction transaction = new Transaction();
+            Output tmp = new Output();
+            tmp.setAddress(SignaturesVerification.DeriveJMAddressFromPubKey(keys.get(privKey).getEncoded()));
+            tmp.setAmount(rand.nextInt(10));
+            Output tmp1 = new Output();
+            tmp1.setAddress(SignaturesVerification.DeriveJMAddressFromPubKey(keys.get(keys.keySet().toArray(new PrivateKey[0])[privKeyInt+1 > 3 ? 0 : privKeyInt+1]).getEncoded()));
+            tmp1.setAmount(rand.nextInt(10));
+            Input in1 = new Input();
+            in1.setPrevTransactionHash(("H"+rand.nextInt()).getBytes());
+            Output z = new Output();
+            z.setAmount(rand.nextInt(10));
+            in1.setAmount(z);
+            
+            Output realOut = rand.nextInt() % 2 == 0 ? tmp : tmp1;
+            transaction.setOutputOut(realOut);
+            transaction.setOutputBack(tmp.equals(realOut) ? tmp1 : tmp);
+            transaction.setPubKey(keys.get(privKey).getEncoded());
+            try {
+                transaction.setSignature(SignaturesVerification.signTransaction(transaction.getBytes(false), privKey));
+                transaction.computeHash();
+            } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException | SignatureException
+                    | IOException e) {
+                e.printStackTrace();
+            }
+            block.getTransactions().add(transaction);
+            this.unverifiedTransactions.add(transaction);
+            unspentOutputs.put(Hex.toHexString(transaction.getHash())+DELIMITER+transaction.getOutputBack().getAddress(), transaction.getOutputBack());
+            unspentOutputs.put(Hex.toHexString(transaction.getHash())+DELIMITER+transaction.getOutputOut().getAddress(), transaction.getOutputOut());
+        }
+        block.setDifficulty(14);
+        block.setNonce(5);
+        this.chain.getBlocks().put("B1", block);
     }
     
     public Block getLastBlock() {
@@ -197,7 +202,9 @@ public class MasterNode extends Peer{
     
      public boolean canBeAdded(Block pBlock){
     	if(pBlock == null)return false;
-    	if(pBlock.getClass().equals(Genesis.class))return true;
+    	//if(pBlock.getClass().equals(Genesis.class))return true;
+		 //TODO check if this is a good replacement for     ^^^^
+		if(chain.getSize() == 0 && pBlock.getPrevHash() == null) return true;
     	if(!isFinalHashRight(pBlock))return false;
 //FIXME uncomment this    	if (DatabaseFacade.getBlockWithHash(pBlock.getPrevHash()) == null) return false;
     	if (pBlock.getSize() > Block.MAX_BLOCK_SIZE) return false;
@@ -214,7 +221,7 @@ public class MasterNode extends Peer{
 		return debugGetTransactionsToThisAddress(tabAddresses);
 		//FIXME uncomment this return DatabaseFacade.getAllTransactionsWithAddress(tabAddresses);
 	}
-	
+
 	private ArrayList<Transaction> debugGetTransactionsToThisAddress(String[] addresses){
 		ArrayList<Transaction> transactions = new ArrayList<>();
 		for(String addr : addresses) {
@@ -224,5 +231,37 @@ public class MasterNode extends Peer{
 			}
 		}
 		return transactions;
+	}
+
+	private void addGenesisToUnverfied() throws NoSuchAlgorithmException, IOException, NoSuchProviderException, StrongEncryptionNotAvailableException, InvalidKeyLengthException, SignatureException, InvalidKeyException {
+		Key[] keys = generateGenesisKeys("genesis");
+		PrivateKey privKey = (PrivateKey) keys[0];
+		PublicKey pubKey = (PublicKey) keys[1];
+
+		Input inGenesis = new Input();
+		inGenesis.setPrevTransactionHash(null);
+		Output outGenesis = new Output();
+		outGenesis.setAmount(42);
+		outGenesis.setAddress(SignaturesVerification.DeriveJMAddressFromPubKey(pubKey.getEncoded()));
+		Transaction transGenesis = new Transaction();
+		transGenesis.setOutputBack(null);
+		transGenesis.setOutputOut(outGenesis);
+		transGenesis.addInput(inGenesis);
+		transGenesis.setPubKey(pubKey.getEncoded());
+		transGenesis.setSignature(SignaturesVerification.signTransaction(transGenesis.getBytes(false), privKey));
+		transGenesis.computeHash();
+		unverifiedTransactions.add(transGenesis);
+	}
+
+	private Key[] generateGenesisKeys(String pass) throws NoSuchProviderException, NoSuchAlgorithmException, StrongEncryptionNotAvailableException, InvalidKeyLengthException, IOException {
+		KeyGenerator keyGen = new KeyGenerator(1024);
+		keyGen.createKeys();
+		PrivateKey privateKey = keyGen.getPrivateKey();
+		PublicKey publicKey = keyGen.getPublicKey();
+		char[] AESpw = pass.toCharArray();
+		ByteArrayInputStream inputPrivateKey = new ByteArrayInputStream(privateKey.getEncoded());
+		ByteArrayOutputStream encryptedPrivateKey = new ByteArrayOutputStream();
+		AES.encrypt(128, AESpw, inputPrivateKey , encryptedPrivateKey);
+		return new Key[] {privateKey, publicKey};
 	}
 }
