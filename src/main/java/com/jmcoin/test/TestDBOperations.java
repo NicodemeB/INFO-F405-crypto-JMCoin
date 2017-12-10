@@ -47,7 +47,7 @@ public class TestDBOperations {
         System.out.println(new GsonBuilder().setPrettyPrinting().create().toJson(DatabaseFacade.getStoredChain()));
         //showMeTheObjectTypeOfEachChildrenBlockInTheGivenChain(DatabaseFacade.getStoredChain());
         System.out.println(DatabaseFacade.getLastBlock());
-        System.out.println(DatabaseFacade.getBlockWithHash("testHash"));
+        //System.out.println(DatabaseFacade.getBlockWithHash("testHash"));
         System.out.println(DatabaseFacade.getAllTransactionsWithAddress("613ddcfef76704943d2394cee0befb1389fd698f"));
         DatabaseFacade.removeBlockChain(c);
     }
