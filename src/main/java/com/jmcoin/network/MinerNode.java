@@ -108,9 +108,9 @@ public class MinerNode extends Peer{
 				try {
 					Block block = buildBlock(protocol);
 					mine(block);
-					while(this.miningThread.running)
-						Thread.sleep(10);
-//					System.out.println("DODO");
+					//while(this.miningThread.running)
+					//	Thread.sleep(10);
+					this.miningThread.join();
 					Thread.sleep(5000);
 				} catch (SocketException e) {
 					System.err.println("Distant connection error - try again");
