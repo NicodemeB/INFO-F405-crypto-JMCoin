@@ -211,8 +211,6 @@ public class MasterNode extends Peer{
     
      public boolean canBeAdded(Block pBlock){
     	if(pBlock == null)return false;
-    	//if(pBlock.getClass().equals(Genesis.class))return true;
-		 //TODO check if this is a good replacement for     ^^^^
 		if(chain.getSize() == 0 && pBlock.getPrevHash() == null) return true;
     	if(!isFinalHashRight(pBlock))return false;
 //FIXME uncomment this    	if (DatabaseFacade.getBlockWithHash(pBlock.getPrevHash()) == null) return false;
