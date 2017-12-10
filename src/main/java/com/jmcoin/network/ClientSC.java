@@ -22,7 +22,7 @@ public class ClientSC extends Client{
         try {
             do {
                 if (getToSend() != null) {
-                    System.out.println("Thread #"+Thread.currentThread().getId() +" ClientSC - to send : " + getToSend().toString());
+//                    System.out.println("Thread #"+Thread.currentThread().getId() +" ClientSC - to send : " + getToSend().toString());
                     sendMessage(getToSend());
                 }
                 Thread.sleep(100);

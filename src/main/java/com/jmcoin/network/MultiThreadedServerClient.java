@@ -3,7 +3,6 @@ package com.jmcoin.network;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.LinkedList;
-import java.util.Vector;
 
 public class MultiThreadedServerClient extends MultiThreadedServer{
 

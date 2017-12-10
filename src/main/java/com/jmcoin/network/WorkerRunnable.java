@@ -38,7 +38,7 @@ public class WorkerRunnable extends TemplateThread{
             boolean loop = true;
             do {
                 if (getToSend() != null){
-                    System.out.println("Thread #"+Thread.currentThread().getId() +this.protocol.getClass().getSimpleName()+" WorkRunnable - to send : " + toSend.toString());
+//                    System.out.println("Thread #"+Thread.currentThread().getId() +this.protocol.getClass().getSimpleName()+" WorkRunnable - to send : " + toSend.toString());
                     if (toSend.toString().equals(NetConst.STOP_MINING_REQ))
                         server.not();
                     else

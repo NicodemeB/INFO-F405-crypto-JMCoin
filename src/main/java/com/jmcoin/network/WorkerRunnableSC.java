@@ -28,7 +28,7 @@ public class WorkerRunnableSC extends WorkerRunnable {
             thread.start();
             do {
                 if (getToSend() != null){
-                    System.out.println("WorkRunnable Thread #"+Thread.currentThread().getId() +" WorkRunnableSC - to send : " + toSend.toString());
+//                    System.out.println("WorkRunnable Thread #"+Thread.currentThread().getId() +" WorkRunnableSC - to send : " + toSend.toString());
                     sendMessage(toSend);
                 }
                 Thread.sleep(100);
@@ -52,9 +52,8 @@ public class WorkerRunnableSC extends WorkerRunnable {
                 break;
             default:
             	//this.client.getServer().getAwaitingAnswers().add(this);
-                setToSend(this.protocol.processInput( msg.toString().replace("$-1$", "$"+Integer.toString(this.requestSenderId)+"$")));
+                setToSend(this.protocol.processInput( msg.toString().replace(NetConst.DEFAULT_TRAILER, NetConst.DELIMITER+Integer.toString(this.requestSenderId)+NetConst.DELIMITER)));
                 break;
         }
     }
-
 }

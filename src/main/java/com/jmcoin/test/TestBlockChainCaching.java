@@ -14,12 +14,11 @@ import com.jmcoin.network.UserNode;
 public class TestBlockChainCaching {
 	public static void main(String[] args) {
 		try {
-			TestMasterNode.runMaster();
-			TestRelay.run();
+			/*TestMasterNode.runMaster();
+			TestRelay.run();*/
 			UserNode user = new UserNode("a");
 			UserJMProtocolImpl userProtocol = new UserJMProtocolImpl(user);
 			user.debugUserNode(userProtocol);
-			
 		}
 		catch(NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException | InvalidPasswordException | InvalidAESStreamException | StrongEncryptionNotAvailableException | IOException e) {
 			e.printStackTrace();

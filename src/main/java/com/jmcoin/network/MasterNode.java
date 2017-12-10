@@ -5,10 +5,19 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.*;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.SignatureException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import com.jmcoin.crypto.AES;
 import org.bouncycastle.util.encoders.Hex;
@@ -212,7 +221,19 @@ public class MasterNode extends Peer{
 
 	public List<Transaction> getTransactionsToThisAddress(String addresses) {
 		String[] tabAddresses = gson.fromJson(addresses, String[].class);
-		return DatabaseFacade.getAllTransactionsWithAddress(tabAddresses);
+		return debugGetTransactionsToThisAddress(tabAddresses);
+		//FIXME uncomment this return DatabaseFacade.getAllTransactionsWithAddress(tabAddresses);
+	}
+
+	private ArrayList<Transaction> debugGetTransactionsToThisAddress(String[] addresses){
+		ArrayList<Transaction> transactions = new ArrayList<>();
+		for(String addr : addresses) {
+			for(Transaction trans : this.unverifiedTransactions) {
+				if(trans.getOutputBack().getAddress().equals(addr)||trans.getOutputOut().getAddress().equals(addr))
+					transactions.add(trans);
+			}
+		}
+		return transactions;
 	}
 
 	private void addGenesisToUnverfied() throws NoSuchAlgorithmException, IOException, NoSuchProviderException, StrongEncryptionNotAvailableException, InvalidKeyLengthException, SignatureException, InvalidKeyException {

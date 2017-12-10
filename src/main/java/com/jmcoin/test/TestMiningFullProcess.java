@@ -22,7 +22,7 @@ public class TestMiningFullProcess {
 	 */
 	public static void main(String[] args){
 		try {
-			TestMasterNode.runMaster();
+			TestMasterNode.runMaster(null, null);
 		} catch (IOException e2) {
 			e2.printStackTrace();
 		}

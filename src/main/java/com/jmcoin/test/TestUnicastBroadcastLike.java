@@ -8,7 +8,7 @@ import java.io.IOException;
 public class TestUnicastBroadcastLike {
     public static void main(String[] args) {
         try {
-			TestMasterNode.runMaster();
+			TestMasterNode.runMaster(null, null);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
