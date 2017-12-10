@@ -154,5 +154,10 @@ public class Wallet {
 				pendingOutputs.remove(key);
 		}
     }
+
+	public void setBalance(double pBalance) {
+		this.balance = pBalance;
+		
+	}
 }
  

@@ -8,7 +8,6 @@ import org.bouncycastle.util.encoders.Hex;
 import com.google.gson.reflect.TypeToken;
 import com.jmcoin.model.Block;
 import com.jmcoin.model.Chain;
-import com.jmcoin.model.Input;
 import com.jmcoin.model.Output;
 import com.jmcoin.model.Transaction;
 
@@ -96,8 +95,8 @@ public class UserJMProtocolImpl extends JMProtocolImpl<UserNode>{
     	Map<String, Output> unspentOutputs = downloadObject(NetConst.GIVE_ME_UNSPENT_OUTPUTS, null, this.client);
     	this.peer.getWallet().updatePendingOutputs(unspentOutputs);
     	System.out.println("Transactions: "+this.peer.getGson().toJson(transactions));
-    	System.out.println("Unspent: "+unspentOutputs);
-    	System.out.println("Pending out: "+this.peer.getWallet().getPendingOutputs());
+    	System.out.println("Unspent: "+this.peer.getGson().toJson(unspentOutputs));
+    	System.out.println("Pending out: "+this.peer.getGson().toJson(this.peer.getWallet().getPendingOutputs()));
     	double totalOutputAmount = 0;
     	for(String address : addresses) {
     		int i = 0;

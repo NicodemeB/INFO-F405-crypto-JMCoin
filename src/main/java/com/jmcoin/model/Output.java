@@ -38,7 +38,7 @@ public class Output implements Serializable {
 	public Output() {}
 	
 	public boolean equals(Output pOutput) {
-		return this.amount == pOutput.amount && this.address.equals(pOutput.getAddress());
+		return this.amount == pOutput.amount && (this.address == null && pOutput.address == null) || (this.address.equals(pOutput.getAddress()));
 	}
 	
 	public int getSize() {

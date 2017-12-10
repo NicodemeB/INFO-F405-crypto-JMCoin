@@ -111,7 +111,6 @@ public class Transaction implements Serializable {
         for (int i = 0; i < this.inputs.size() && i < transaction.inputs.size(); i++) {
             if (!this.inputs.get(i).equals(transaction.inputs.get(i))) return false;
         }
-
         if (!this.outputOut.equals(transaction.outputOut)) return false;
         if (!this.outputBack.equals(transaction.outputBack)) return false;
         return Arrays.equals(this.hash, transaction.hash) &&

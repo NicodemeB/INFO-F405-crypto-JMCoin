@@ -64,7 +64,6 @@ public class UserNode extends Peer{
 			double amountToSend, PrivateKey privKey, PublicKey pubKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, FileNotFoundException, SignatureException{
 		Map<String, Output> unspentOutputs = protocol.downloadObject(NetConst.GIVE_ME_UNSPENT_OUTPUTS, null, protocol.getClient());
 		this.wallet.updatePendingOutputs(unspentOutputs);
-		Map<String,Output> pendingOutputs = this.wallet.getPendingOutputs();
 		
 		Transaction [] addressTransactions = getAvailableTransactionsForAddress(protocol,fromAddress, unspentOutputs);
 		if(addressTransactions == null) return null;
@@ -72,12 +71,12 @@ public class UserNode extends Peer{
         double totalOutputAmount = 0;
         int i = 0;
         Map<String, Output> usedOutputs = new HashMap<>();
-        while( i < addressTransactions.length && totalOutputAmount < amountToSend){
+        while( i < addressTransactions.length && totalOutputAmount <= amountToSend){
         	String key = Hex.toHexString(addressTransactions[i].getHash());
             if(addressTransactions[i].getOutputBack().getAddress().equals(fromAddress)){
             	//verifier si Out pas encore utilisée localement
             	key += DELIMITER+addressTransactions[i].getOutputBack().getAddress();
-            	if(!pendingOutputs.containsKey(key)){
+            	if(!this.wallet.getPendingOutputs().containsKey(key)){
             		totalOutputAmount+= addressTransactions[i].getOutputBack().getAmount();
                     tr.addInput(new Input(addressTransactions[i].getOutputBack().getAmount(),addressTransactions[i].getHash()));
                     usedOutputs.put(key, addressTransactions[i].getOutputBack());
@@ -86,10 +85,10 @@ public class UserNode extends Peer{
             else if((addressTransactions[i].getOutputOut().getAddress().equals(fromAddress))){
             	key += DELIMITER+addressTransactions[i].getOutputOut().getAddress();
             	//verifier si Out pas encore utilisée localement
-            	if(!pendingOutputs.containsKey(key)){
+            	if(!this.wallet.getPendingOutputs().containsKey(key)){
             		totalOutputAmount+= addressTransactions[i].getOutputOut().getAmount();
             		tr.addInput(new Input(addressTransactions[i].getOutputOut().getAmount(),addressTransactions[i].getHash()));
-            		usedOutputs.put(key, addressTransactions[i].getOutputBack());
+            		usedOutputs.put(key, addressTransactions[i].getOutputOut());
             	}
             }
             else {

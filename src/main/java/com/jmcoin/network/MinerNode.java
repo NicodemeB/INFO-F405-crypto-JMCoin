@@ -79,7 +79,8 @@ public class MinerNode extends Peer{
 
 		block.setDifficulty(difficulty);
 		block.setTimeCreation(System.currentTimeMillis());
-		block.setPrevHash(lastBlock.getFinalHash());
+		if(!lastBlock.getFinalHash().equals(NetConst.GENESIS))
+			block.setPrevHash(lastBlock.getFinalHash());
 		return block;
 	}
 	

@@ -12,7 +12,6 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SignatureException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,7 +27,6 @@ import com.jmcoin.crypto.SignaturesVerification;
 import com.jmcoin.database.DatabaseFacade;
 import com.jmcoin.model.Block;
 import com.jmcoin.model.Chain;
-//import com.jmcoin.model.Genesis;
 import com.jmcoin.model.Input;
 import com.jmcoin.model.KeyGenerator;
 import com.jmcoin.model.Output;
@@ -65,7 +63,7 @@ public class MasterNode extends Peer{
     	}*/
     	this.chain = new Chain();
     	try {
-			addGenesisToUnverfied();
+			addGenesisToUnverified();
 		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException | SignatureException
 				| IOException | InvalidKeyLengthException | StrongEncryptionNotAvailableException e) {
     		e.printStackTrace();
@@ -185,9 +183,12 @@ public class MasterNode extends Peer{
 				}
 			}
 		}
+		
 		for(final Transaction trans : pBlock.getTransactions()){
-			if(!this.unverifiedTransactions.removeIf(trans::equals))
-				return false; //transaction has to be in unverified transaction pool before being added to the chain
+			if(!this.unverifiedTransactions.removeIf(trans::equals)) {
+				return false;
+			}
+			//transaction has to be in unverified transaction pool before being added to the chain
 		}
 		for (String key : tempToRemoveOutputs.keySet()){
 		    unspentOutputs.remove(key);
@@ -226,15 +227,15 @@ public class MasterNode extends Peer{
 		ArrayList<Transaction> transactions = new ArrayList<>();
 		for(String addr : addresses) {
 			for(Transaction trans : this.unverifiedTransactions) {
-				if(trans.getOutputBack().getAddress().equals(addr)||trans.getOutputOut().getAddress().equals(addr))
+				if(addr.equals(trans.getOutputBack().getAddress())||addr.equals(trans.getOutputOut().getAddress()))
 					transactions.add(trans);
 			}
 		}
 		return transactions;
 	}
 
-	private void addGenesisToUnverfied() throws NoSuchAlgorithmException, IOException, NoSuchProviderException, StrongEncryptionNotAvailableException, InvalidKeyLengthException, SignatureException, InvalidKeyException {
-		Key[] keys = generateGenesisKeys("genesis");
+	private void addGenesisToUnverified() throws NoSuchAlgorithmException, IOException, NoSuchProviderException, StrongEncryptionNotAvailableException, InvalidKeyLengthException, SignatureException, InvalidKeyException {
+		Key[] keys = generateGenesisKeys(NetConst.GENESIS);
 		PrivateKey privKey = (PrivateKey) keys[0];
 		PublicKey pubKey = (PublicKey) keys[1];
 
@@ -244,13 +245,18 @@ public class MasterNode extends Peer{
 		outGenesis.setAmount(42);
 		outGenesis.setAddress(SignaturesVerification.DeriveJMAddressFromPubKey(pubKey.getEncoded()));
 		Transaction transGenesis = new Transaction();
-		transGenesis.setOutputBack(null);
+		Output outputBack = new Output();
+		outputBack.setAddress(null);
+		outputBack.setAmount(0);
+		transGenesis.setOutputBack(outputBack);
 		transGenesis.setOutputOut(outGenesis);
 		transGenesis.addInput(inGenesis);
 		transGenesis.setPubKey(pubKey.getEncoded());
 		transGenesis.setSignature(SignaturesVerification.signTransaction(transGenesis.getBytes(false), privKey));
 		transGenesis.computeHash();
 		unverifiedTransactions.add(transGenesis);
+		this.lastBlock = new Block();
+		this.lastBlock.setFinalHash(NetConst.GENESIS);
 	}
 
 	private Key[] generateGenesisKeys(String pass) throws NoSuchProviderException, NoSuchAlgorithmException, StrongEncryptionNotAvailableException, InvalidKeyLengthException, IOException {

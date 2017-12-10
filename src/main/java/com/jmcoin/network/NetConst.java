@@ -34,7 +34,7 @@ public abstract class NetConst {
 	public static final String CONNECTION_REQUEST 				= "ConnectionRequest";
 	public static final String CONNECTED 						= "Connected";
 	public static final int MAX_SENT_TRANSACTIONS 				= 1000;
-	public static final int DEFAULT_DIFFICULTY 					= 16;//FIXME change the difficulty
+	public static final int DEFAULT_DIFFICULTY 					= 18;//FIXME change the difficulty
 	
 	public static final String RECEIVE_DIFFICULTY 				= "A";
 	public static final String RECEIVE_REWARD_AMOUNT 			= "B";
@@ -46,4 +46,5 @@ public abstract class NetConst {
 	
 	public static final String DEFAULT_TRAILER					= NetConst.DELIMITER + NetConst.DEFAULT_ID + NetConst.DELIMITER;
 	public static final String STOP_MINING_REQ 					= NetConst.STOP_MINING+NetConst.DELIMITER+"null"+NetConst.DEFAULT_TRAILER;
+	public static final String GENESIS 							= "genesis";
 }
