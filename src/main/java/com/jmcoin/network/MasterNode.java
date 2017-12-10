@@ -51,23 +51,31 @@ public class MasterNode extends Peer{
     	this.unspentOutputs = new HashMap<>();
     	
     	//TODO uncomment this
-    	/*this.chain = DatabaseFacade.getStoredChain();
+    	/*
+    	this.chain = DatabaseFacade.getStoredChain();
+    	if(chain == null){
+    		chain = new Chain();
+    		DatabaseFacade.storeBlockChain(chain);
+		}
     	this.lastBlock = DatabaseFacade.getLastBlock();
-    	if(this.lastBlock == null) {
-    		try {
-				this.lastBlock = Genesis.getInstance();
+		if(chain.getSize() == 0) {
+			try {
+				addGenesisToUnverfied();
 			} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException | SignatureException
 					| IOException | InvalidKeyLengthException | StrongEncryptionNotAvailableException e) {
 				e.printStackTrace();
 			}
-    	}*/
-    	this.chain = new Chain();
-    	try {
-			addGenesisToUnverified();
-		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException | SignatureException
-				| IOException | InvalidKeyLengthException | StrongEncryptionNotAvailableException e) {
-    		e.printStackTrace();
-		}
+		}*/
+    	//TODO remove this to use database
+		chain = new Chain();
+		if(chain.getSize() == 0) {
+			try {
+				addGenesisToUnverified();
+			} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException | SignatureException
+					| IOException | InvalidKeyLengthException | StrongEncryptionNotAvailableException e) {
+				e.printStackTrace();
+			}
+    	}
     }
     
     public void debugMasterNode(PrivateKey privateKey, PublicKey publicKey) throws NoSuchAlgorithmException, NoSuchProviderException {

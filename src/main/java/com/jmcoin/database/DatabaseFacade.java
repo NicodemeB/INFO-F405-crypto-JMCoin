@@ -4,6 +4,7 @@ import com.jmcoin.model.Block;
 import com.jmcoin.model.Chain;
 import com.jmcoin.model.Transaction;
 
+import javax.persistence.NoResultException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -23,7 +24,12 @@ public class DatabaseFacade {
 
     public static Chain getStoredChain(){
         Connection.getTransaction().begin();
-        Chain chain = (Chain) Connection.getManager().createNamedQuery("Chain.findAll").getSingleResult();
+        Chain chain;
+        try {
+            chain = (Chain) Connection.getManager().createNamedQuery("Chain.findAll").getSingleResult();
+        }catch(NoResultException e){
+            chain = null;
+        }
         Connection.getTransaction().commit();
         return chain;
     }
@@ -52,14 +58,24 @@ public class DatabaseFacade {
 
     public static Block getBlockWithHash(String finalHash){
         Connection.getTransaction().begin();
-        Block b = (Block) Connection.getManager().createQuery("SELECT b from Block b where b.finalHash = :finalHash").setParameter("finalHash", finalHash).getSingleResult();
+        Block b;
+        try {
+            b = (Block) Connection.getManager().createQuery("SELECT b from Block b where b.finalHash = :finalHash").setParameter("finalHash", finalHash).getSingleResult();
+        }catch(NoResultException e){
+            b = null;
+        }
         Connection.getTransaction().commit();
         return b;
     }
 
     public static Block getLastBlock() {
         Connection.getTransaction().begin();
-        Block b = (Block) Connection.getManager().createQuery("SELECT b from Block b where b.id = (SELECT max(b2.id) from Block b2)").getSingleResult();
+        Block b;
+        try {
+            b = (Block) Connection.getManager().createQuery("SELECT b from Block b where b.id = (SELECT max(b2.id) from Block b2)").getSingleResult();
+        }catch(NoResultException e){
+            b = null;
+        }
         Connection.getTransaction().commit();
         return b;
     }
