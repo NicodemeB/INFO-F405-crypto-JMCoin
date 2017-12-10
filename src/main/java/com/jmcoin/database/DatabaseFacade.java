@@ -13,6 +13,10 @@ public class DatabaseFacade {
 
     public static void storeBlockChain(Chain chain){
         Connection.getTransaction().begin();
+        if(!Connection.getManager().createNamedQuery("Chain.findAll").getResultList().isEmpty()){
+            Connection.getTransaction().rollback();
+            throw new IllegalStateException("There's already a chain in the database");
+        }
         Connection.getManager().persist(chain);
         Connection.getTransaction().commit();
     }

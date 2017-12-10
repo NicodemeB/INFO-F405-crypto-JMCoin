@@ -1,18 +1,16 @@
 package com.jmcoin.network;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.SignatureException;
+import java.security.*;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.jmcoin.crypto.AES;
 import org.bouncycastle.util.encoders.Hex;
 
 import com.jmcoin.crypto.AES.InvalidKeyLengthException;
@@ -21,7 +19,7 @@ import com.jmcoin.crypto.SignaturesVerification;
 import com.jmcoin.database.DatabaseFacade;
 import com.jmcoin.model.Block;
 import com.jmcoin.model.Chain;
-import com.jmcoin.model.Genesis;
+//import com.jmcoin.model.Genesis;
 import com.jmcoin.model.Input;
 import com.jmcoin.model.KeyGenerator;
 import com.jmcoin.model.Output;
@@ -58,14 +56,16 @@ public class MasterNode extends Peer{
     	}*/
     	this.chain = new Chain();
     	try {
-			this.lastBlock = Genesis.getInstance();
+			addGenesisToUnverfied();
 		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException | SignatureException
 				| IOException | InvalidKeyLengthException | StrongEncryptionNotAvailableException e) {
+    		e.printStackTrace();
 		}
     }
     
     public void debugMasterNode() throws NoSuchAlgorithmException, NoSuchProviderException {
-    	KeyGenerator generator = new KeyGenerator(1024);
+    	throw new UnsupportedOperationException("Broken due to the deletion of Genesis class");
+    	/*KeyGenerator generator = new KeyGenerator(1024);
     	Map<PrivateKey, PublicKey> keys = new HashMap<>();
     	for(int i = 0; i < 3; i++) {
     		generator.createKeys();
@@ -110,7 +110,7 @@ public class MasterNode extends Peer{
     	block.getTransactions().add(unvfTrans1);
     	block.setDifficulty(14);
     	block.setNonce(5);
-    	this.chain.getBlocks().put("B1", block);
+    	this.chain.getBlocks().put("B1", block);*/
     }
     
     public Block getLastBlock() {
@@ -196,7 +196,9 @@ public class MasterNode extends Peer{
     
      public boolean canBeAdded(Block pBlock){
     	if(pBlock == null)return false;
-    	if(pBlock.getClass().equals(Genesis.class))return true;
+    	//if(pBlock.getClass().equals(Genesis.class))return true;
+		 //TODO check if this is a good replacement for     ^^^^
+		if(chain.getSize() == 0 && pBlock.getPrevHash() == null) return true;
     	if(!isFinalHashRight(pBlock))return false;
 //FIXME uncomment this    	if (DatabaseFacade.getBlockWithHash(pBlock.getPrevHash()) == null) return false;
     	if (pBlock.getSize() > Block.MAX_BLOCK_SIZE) return false;
@@ -211,5 +213,37 @@ public class MasterNode extends Peer{
 	public List<Transaction> getTransactionsToThisAddress(String addresses) {
 		String[] tabAddresses = gson.fromJson(addresses, String[].class);
 		return DatabaseFacade.getAllTransactionsWithAddress(tabAddresses);
+	}
+
+	private void addGenesisToUnverfied() throws NoSuchAlgorithmException, IOException, NoSuchProviderException, StrongEncryptionNotAvailableException, InvalidKeyLengthException, SignatureException, InvalidKeyException {
+		Key[] keys = generateGenesisKeys("genesis");
+		PrivateKey privKey = (PrivateKey) keys[0];
+		PublicKey pubKey = (PublicKey) keys[1];
+
+		Input inGenesis = new Input();
+		inGenesis.setPrevTransactionHash(null);
+		Output outGenesis = new Output();
+		outGenesis.setAmount(42);
+		outGenesis.setAddress(SignaturesVerification.DeriveJMAddressFromPubKey(pubKey.getEncoded()));
+		Transaction transGenesis = new Transaction();
+		transGenesis.setOutputBack(null);
+		transGenesis.setOutputOut(outGenesis);
+		transGenesis.addInput(inGenesis);
+		transGenesis.setPubKey(pubKey.getEncoded());
+		transGenesis.setSignature(SignaturesVerification.signTransaction(transGenesis.getBytes(false), privKey));
+		transGenesis.computeHash();
+		unverifiedTransactions.add(transGenesis);
+	}
+
+	private Key[] generateGenesisKeys(String pass) throws NoSuchProviderException, NoSuchAlgorithmException, StrongEncryptionNotAvailableException, InvalidKeyLengthException, IOException {
+		KeyGenerator keyGen = new KeyGenerator(1024);
+		keyGen.createKeys();
+		PrivateKey privateKey = keyGen.getPrivateKey();
+		PublicKey publicKey = keyGen.getPublicKey();
+		char[] AESpw = pass.toCharArray();
+		ByteArrayInputStream inputPrivateKey = new ByteArrayInputStream(privateKey.getEncoded());
+		ByteArrayOutputStream encryptedPrivateKey = new ByteArrayOutputStream();
+		AES.encrypt(128, AESpw, inputPrivateKey , encryptedPrivateKey);
+		return new Key[] {privateKey, publicKey};
 	}
 }
