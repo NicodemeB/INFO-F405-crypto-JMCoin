@@ -16,7 +16,7 @@ public class TestMineur {
 		MinerNode minerHard;
 		try {
 			minerHard = new MinerNode("a");
-			MinerJMProtocolImpl minerJMProtocolImpl1 = new MinerJMProtocolImpl(minerHard);
+			MinerJMProtocolImpl minerJMProtocolImpl1 = new MinerJMProtocolImpl(minerHard, args[0]);
 			minerHard.startMining(minerJMProtocolImpl1);
 		} catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException | IOException
 				| InvalidPasswordException | InvalidAESStreamException | StrongEncryptionNotAvailableException e1) {

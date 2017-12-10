@@ -47,7 +47,7 @@ public class MinerNode extends Peer{
 	}
 	
 	public void stopMiningThread() {
-		if(this.superThread.miningThread != null)
+		if(this.superThread != null && this.superThread.miningThread != null)
 			this.superThread.miningThread.running = false;
 	}
 	

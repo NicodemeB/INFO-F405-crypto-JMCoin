@@ -20,13 +20,25 @@ public class MinerJMProtocolImpl extends JMProtocolImpl<MinerNode>{
 	public MinerJMProtocolImpl(MinerNode peer) throws IOException, NoSuchAlgorithmException {
 		super(peer);
 		this.client = new Client(NetConst.RELAY_NODE_LISTEN_PORT, NetConst.RELAY_DEBUG_HOST_NAME, this);
-        new Thread(new ReceiverThread<Client>(this.client)).start();
-        new Thread(this.client).start();
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+		new Thread(new ReceiverThread<Client>(this.client)).start();
+		new Thread(this.client).start();
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public MinerJMProtocolImpl(MinerNode peer, String hostname) throws IOException, NoSuchAlgorithmException {
+		super(peer);
+		this.client = new Client(NetConst.RELAY_NODE_LISTEN_PORT, hostname, this);
+		new Thread(new ReceiverThread<Client>(this.client)).start();
+		new Thread(this.client).start();
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public Client getClient() {
