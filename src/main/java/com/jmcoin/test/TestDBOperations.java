@@ -1,5 +1,6 @@
 package com.jmcoin.test;
 
+import com.google.gson.GsonBuilder;
 import com.jmcoin.crypto.AES;
 import com.jmcoin.crypto.SignaturesVerification;
 import com.jmcoin.database.DatabaseFacade;
@@ -42,13 +43,13 @@ public class TestDBOperations {
         genesis.setPrevHash(null);
         addOutputs(outGenesis, outGenesisBack, transGenesis);
         addBlock(genesis, c);
-        //DatabaseFacade.storeBlockChain(c);
-        //System.out.println(new Gson().toJson(DatabaseFacade.getStoredChain()));
+        DatabaseFacade.storeBlockChain(c);
+        System.out.println(new GsonBuilder().setPrettyPrinting().create().toJson(DatabaseFacade.getStoredChain()));
         //showMeTheObjectTypeOfEachChildrenBlockInTheGivenChain(DatabaseFacade.getStoredChain());
         System.out.println(DatabaseFacade.getLastBlock());
         System.out.println(DatabaseFacade.getBlockWithHash("testHash"));
         System.out.println(DatabaseFacade.getAllTransactionsWithAddress("613ddcfef76704943d2394cee0befb1389fd698f"));
-        //DatabaseFacade.removeBlockChain(c);
+        DatabaseFacade.removeBlockChain(c);
     }
 
     public static Key[] createKeys(String password) throws IOException, AES.InvalidKeyLengthException, AES.StrongEncryptionNotAvailableException, NoSuchAlgorithmException, NoSuchProviderException {
