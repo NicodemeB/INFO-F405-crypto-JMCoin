@@ -113,6 +113,7 @@ public class MinerNode extends Peer{
 					Thread.sleep(5000);
 				} catch (SocketException e) {
 					System.err.println("Distant connection error - try again");
+					System.exit(0);
 				} catch(InvalidKeyException | ClassNotFoundException | NoSuchAlgorithmException | NoSuchProviderException
 						| SignatureException | IOException | InterruptedException e) {
 					e.printStackTrace();
