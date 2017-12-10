@@ -72,7 +72,7 @@ public class MasterNode extends Peer{
 		}
     }
     
-    public void debugMasterNode() throws NoSuchAlgorithmException, NoSuchProviderException {
+    public void debugMasterNode(PrivateKey privateKey, PublicKey publicKey) throws NoSuchAlgorithmException, NoSuchProviderException {
     	throw new UnsupportedOperationException("Broken due to the deletion of Genesis class");
     	/*KeyGenerator generator = new KeyGenerator(1024);
     	Map<PrivateKey, PublicKey> keys = new HashMap<>();
