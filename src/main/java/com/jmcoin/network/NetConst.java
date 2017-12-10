@@ -12,8 +12,8 @@ public abstract class NetConst {
 	public static final int MINER_NODE_LISTEN_PORT				= 33335;
 	public static final int RELAY_BROADCAST_PORT 				= 4445;
 	public static final int MINER_BROADCAST_PORT 				= 4444;
-	public static final String MASTER_HOST_NAME					= "localhost";//"kali.nicode.me";
-	public static final String RELAY_DEBUG_HOST_NAME			= "localhost"; //TODO remove this
+	public static final String MASTER_HOST_NAME					= "master.jmcoin.technology";
+	public static final String RELAY_DEBUG_HOST_NAME			= "localhost";
 	public static final String DEFAULT_ID						= "-1";
 	public static final String GIVE_ME_BLOCKCHAIN_COPY			= "0"; //from wallets
 	public static final String GIVE_ME_UNVERIFIED_TRANSACTIONS	= "1"; //from miners
