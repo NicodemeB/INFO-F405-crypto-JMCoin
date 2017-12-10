@@ -2,6 +2,7 @@ package com.jmcoin.network;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class WorkerRunnable extends TemplateThread{
 
@@ -75,7 +76,8 @@ public class WorkerRunnable extends TemplateThread{
     synchronized protected void not(){
         try {
             sendMessage(this.protocol.craftMessage(NetConst.STOP_MINING, null));
-        } catch (IOException e) {
+        } catch (SocketException e){ } //FIXME - PAS BEAU
+        catch (IOException e) {
             e.printStackTrace();
         }
     }
