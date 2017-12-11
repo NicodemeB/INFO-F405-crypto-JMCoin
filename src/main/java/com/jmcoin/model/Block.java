@@ -26,7 +26,7 @@ public class Block implements Serializable {
 	private Long id;
 
 	@Transient
-	public static final int MAX_BLOCK_SIZE = Integer.MAX_VALUE; //FIXME do we need to set this value ? check
+	public static final int MAX_BLOCK_SIZE = Integer.MAX_VALUE;
 
 	@OneToMany(cascade = CascadeType.ALL)
 	protected List<Transaction> transactions;

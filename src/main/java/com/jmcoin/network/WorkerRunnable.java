@@ -78,7 +78,8 @@ public class WorkerRunnable extends TemplateThread{
     synchronized protected void not(){
         try {
             sendMessage(this.protocol.craftMessage(NetConst.STOP_MINING, null));
-        } catch (SocketException e){ } //FIXME - PAS BEAU
+        }
+        catch (SocketException ignored){ }
         catch (IOException e) {
             e.printStackTrace();
         }

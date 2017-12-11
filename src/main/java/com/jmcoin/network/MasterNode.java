@@ -65,15 +65,14 @@ public class MasterNode extends Peer {
 			}
 		}
 		else{
-			this.unspentOutputs = initiateUnspentOutputs(chain);
+			this.unspentOutputs = initiateUnspentOutputs();
 		}
     }
     
-    private Map<String,Output> initiateUnspentOutputs (Chain chain){
+    private Map<String,Output> initiateUnspentOutputs (){
 		Map<String,Output> unspentOutputs = new HashMap<String,Output>();
 		Map<String,Input> inputs = new HashMap<String,Input>();
-		Map<String,Block> blocks = chain.getBlocks();
-		Block currentBlock = blocks.get(this.lastBlock.getFinalHash());
+		Block currentBlock = chain.getBlocks().get(this.lastBlock.getFinalHash());
 		String previousBlockHash = currentBlock.getPrevHash();
 		while(previousBlockHash != null){
 			for(Transaction tr : currentBlock.getTransactions()) {			
@@ -108,7 +107,7 @@ public class MasterNode extends Peer {
 					unspentOutputs.put(Hex.toHexString(tr.getHash())+DELIMITER+tr.getOutputOut().getAddress(), tr.getOutputOut());
 				}					
 			}
-			currentBlock = blocks.get(currentBlock.getPrevHash());
+			currentBlock = chain.getBlocks().get(currentBlock.getPrevHash());
 			previousBlockHash = currentBlock.getPrevHash();
 		}
 		return unspentOutputs;
@@ -204,7 +203,6 @@ public class MasterNode extends Peer {
 		System.out.println("--------------------------------------------");
 		this.chain.getBlocks().put(pBlock.getFinalHash() + pBlock.getTimeCreation(), pBlock);
 		this.lastBlock = pBlock;
-		//FIXME Uncomment this to save in DB
 		DatabaseFacade.updateChain(this.chain);
 		return true;
     }
@@ -213,8 +211,8 @@ public class MasterNode extends Peer {
     	if(pBlock == null)return false;
 		if(chain.getSize() == 0 && pBlock.getPrevHash() == null) return true;
     	if(!isFinalHashRight(pBlock))return false;
-//FIXME uncomment this    	if (DatabaseFacade.getBlockWithHash(pBlock.getPrevHash()) == null) return false;
-    	if (pBlock.getSize() > Block.MAX_BLOCK_SIZE) return false;
+    	if (DatabaseFacade.getBlockWithHash(pBlock.getPrevHash()) == null) return false;
+//    	if (pBlock.getSize() > Block.MAX_BLOCK_SIZE) return false;
     	return true;
     }
      

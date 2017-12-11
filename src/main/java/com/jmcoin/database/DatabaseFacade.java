@@ -49,7 +49,8 @@ public class DatabaseFacade {
     public static List<Transaction> getAllTransactionsWithAddress(String... addresses){
         List<String> addr = Arrays.asList(addresses);
         Connection.getTransaction().begin();
-        List<Transaction> transactions = Connection.getManager().createQuery("SELECT t from Transaction t where t.outputOut.address IN :addr1 or t.outputBack.address IN :addr2")
+        @SuppressWarnings("unchecked")
+		List<Transaction> transactions = Connection.getManager().createQuery("SELECT t from Transaction t where t.outputOut.address IN :addr1 or t.outputBack.address IN :addr2")
                 .setParameter("addr1", addr)
                 .setParameter("addr2", addr).getResultList();
         Connection.getTransaction().commit();
