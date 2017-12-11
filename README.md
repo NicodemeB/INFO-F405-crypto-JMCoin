@@ -20,7 +20,7 @@ Il est possible de consulter les logs de ces machines en temps réel sur les adr
 
 Ces logs sont consultables sans la moindre authentification/authorisation.
 
-Tous les tests sont faisables en local mais nécessitent cependant la création d'un base de donnée MySQL, les test sont alors plus faciles à réaliser sur les serveurs distants car la base de donnée est déjà présente sur le Master Node distant. 
+Tous les tests sont faisables en local mais nécessitent cependant la création d'un base de données MySQL, les test sont alors plus faciles à réaliser sur les serveurs distants car la base de données est déjà présente sur le Master Node distant. 
 
 ## Prérequis : maven
 
@@ -150,7 +150,7 @@ mvn exec:java -Dexec.mainClass="com.jmcoin.runme.GetBlockchain" -Dexec.args="MyS
 ````
 
 
-## Facultatif : installation et configuration de la base de donnée locale:
+## Facultatif : installation et configuration de la base de données locale:
 
 Le MasterNode stocke la chaine (et tout son contenu) dans une base de données MySQL. Il est donc nécessaire d'en creer une afin de pouvoir lancer le MasterNode
 Il faut donc d'abord installer un serveur MySQL
