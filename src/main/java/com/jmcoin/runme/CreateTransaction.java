@@ -39,7 +39,10 @@ public class CreateTransaction {
 		}
 		UserNode node = null;
 		try {
-			node = new UserNode(args[0]);			
+			node = new UserNode(args[0]);
+			/*PrivateKey privKey = node.getWallet().getKeys().keySet().iterator().next();
+			TestMasterNode.runMaster(privKey, node.getWallet().getKeys().get(privKey));
+			TestRelay.run();*/
 		} catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException | IOException
 				| InvalidPasswordException | InvalidAESStreamException | StrongEncryptionNotAvailableException e1) {
 			System.out.println("Cannot create node");

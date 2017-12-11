@@ -41,7 +41,7 @@ public class UserNode extends Peer{
 			e.printStackTrace();
 			return null;
 		}
-		if(addressTransactions == null || addressTransactions.length == 0)return null;
+		if(addressTransactions == null)return null;
 		ArrayList<Transaction> availableTransactions = new ArrayList<Transaction>();
 		for(Transaction tr : addressTransactions) {
 			if(Objects.equals(tr.getOutputBack().getAddress(), fromAddress)) {

@@ -11,7 +11,6 @@ import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SignatureException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -50,7 +49,6 @@ public class MasterNode extends Peer {
     	this.unverifiedTransactions = new LinkedList<>();
     	this.unspentOutputs = new HashMap<>();
     	
-    	//TODO uncomment this
     	this.chain = DatabaseFacade.getStoredChain();
     	if(chain == null){
     		chain = new Chain();
@@ -67,25 +65,8 @@ public class MasterNode extends Peer {
 		}
     }    
     
-    public void debugMasterNode(PrivateKey privateKey, PublicKey publicKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException, IOException, StrongEncryptionNotAvailableException, InvalidKeyLengthException {
-    	/*KeyGenerator generator = new KeyGenerator(1024);
-=======
-=======
-		}*/
-    	//TODO remove this to use database
-		chain = new Chain();
-		if(chain.getSize() == 0) {
-			try {
-				addGenesisToUnverified();
-			} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException | SignatureException
-					| IOException | InvalidKeyLengthException | StrongEncryptionNotAvailableException e) {
-				e.printStackTrace();
-			}
-    	}
-    }
-    /*public void debugMasterNode(PrivateKey privateKey, PublicKey publicKey) throws NoSuchAlgorithmException, NoSuchProviderException {
-        /*KeyGenerator generator = new KeyGenerator(1024);
->>>>>>> f0050082a306ca637e02a8ed4598c789502104ee
+    /*public void debugMasterNode(PrivateKey privateKey, PublicKey publicKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, FileNotFoundException, SignatureException, IOException {
+        KeyGenerator generator = new KeyGenerator(1024);
         Map<PrivateKey, PublicKey> keys = new HashMap<>();
         PrivateKey[] keyskeys = new PrivateKey[4];
         for(int i = 0; i < 3; i++) {
@@ -94,11 +75,10 @@ public class MasterNode extends Peer {
             keys.put(keyskeys[i], generator.getPublicKey());
         }
         keys.put(privateKey, publicKey);
-<<<<<<< HEAD
         keyskeys[3] = privateKey;
         
         //create one random block
-        /*Block inChain = new Block();
+        Block inChain = new Block();
         inChain.setDifficulty(12);
         inChain.setFinalHash("00001");
         inChain.setNonce(0);

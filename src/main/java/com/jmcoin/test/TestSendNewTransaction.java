@@ -22,7 +22,7 @@ public class TestSendNewTransaction {
 	public static void main(String[] args) {
 		UserNode node = null;
 		try {
-			node = new UserNode("a");
+			node = new UserNode("connard");
 		} catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException | IOException
 				| InvalidPasswordException | InvalidAESStreamException | StrongEncryptionNotAvailableException e1) {
 			e1.printStackTrace();
