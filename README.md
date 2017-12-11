@@ -121,7 +121,7 @@ mvn exec:java -Dexec.mainClass="com.jmcoin.runme.CreateMiner" -Dexec.args="MySim
 Dans le dossier du projet, il faut faire :
 
 ````
-mvn exec:java -Dexec.mainClass="com.jmcoin.runme.CreateMiner" -Dexec.args="wallet_password sestination_address amout hostname"
+mvn exec:java -Dexec.mainClass="com.jmcoin.runme.CreateMiner" -Dexec.args="wallet_password destination_address amount hostname"
 ````
 
 Connexion sur le Relay Node 01 : 
