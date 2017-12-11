@@ -144,16 +144,36 @@ Dans le dossier du projet, il faut faire :
 mvn exec:java -Dexec.mainClass="com.jmcoin.runme.GetBlockchain" -Dexec.args="wallet_password"
 ````
 
-connexion sur le Relay Node 01 : 
+Connexion sur le Relay Node 01 : 
 
 ````
 mvn exec:java -Dexec.mainClass="com.jmcoin.runme.GetBlockchain" -Dexec.args="MySimplePassword"
 ````
 
-connexion sur le Relay Node 02 :
+Connexion sur le Relay Node 02 :
 
 ````
 mvn exec:java -Dexec.mainClass="com.jmcoin.runme.GetBlockchain" -Dexec.args="MySimplePassword"
+````
+
+### Récupérer la balance
+
+Dans le dossier du projet, il faut faire :
+
+````
+mvn exec:java -Dexec.mainClass="com.jmcoin.runme.ComputeBalance" -Dexec.args="wallet_password"
+````
+
+Connexion sur le Relay Node 01 : 
+
+````
+mvn exec:java -Dexec.mainClass="com.jmcoin.runme.ComputeBalance" -Dexec.args="MySimplePassword"
+````
+
+Connexion sur le Relay Node 02 :
+
+````
+mvn exec:java -Dexec.mainClass="com.jmcoin.runme.ComputeBalance" -Dexec.args="MySimplePassword"
 ````
 
 
