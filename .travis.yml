@@ -1,5 +1,8 @@
 language: java
 jdk:
+  - oraclejdk8
   - oraclejdk9
- notifications:
+  - openjdk9
+notifications:
   slack: passerellecybersecu:McvvuOS20uru8amwfw0ABerF#crypto-project
+

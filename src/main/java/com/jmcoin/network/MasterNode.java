@@ -48,7 +48,6 @@ public class MasterNode extends Peer {
     	super();
     	this.unverifiedTransactions = new LinkedList<>();
     	this.unspentOutputs = new HashMap<>();
-    	
     	this.chain = DatabaseFacade.getStoredChain();
     	if(chain == null){
     		chain = new Chain();
