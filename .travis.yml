@@ -2,6 +2,4 @@ language: java
 jdk:
   - oraclejdk9
  notifications:
-  slack:
-    rooms:
-      - passerellecybersecu:McvvuOS20uru8amwfw0ABerF#crypto-project
+  slack: passerellecybersecu:McvvuOS20uru8amwfw0ABerF#crypto-project

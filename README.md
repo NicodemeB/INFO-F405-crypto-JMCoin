@@ -1,5 +1,5 @@
 # JMCoin
-[![Build Status](https://travis-ci.com/NicodemeB/JMCoin.svg?token=CMaSjYW1VJT7FyWUsiJw&branch=dev)](https://travis-ci.com/NicodemeB/JMCoin)
+[![Build Status](https://travis-ci.org/NicodemeB/JMCoin.svg?branch=dev)](https://travis-ci.org/NicodemeB/JMCoin)
 
 
 ## Structure :
