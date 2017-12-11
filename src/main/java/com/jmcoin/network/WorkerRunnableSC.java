@@ -51,8 +51,10 @@ public class WorkerRunnableSC extends WorkerRunnable {
                 setToSend(NetConst.CONNECTED);
                 break;
             default:
+                System.out.println("BEFORE - this.protocol.processInput INTO WorkerRunnableSC");
             	//this.client.getServer().getAwaitingAnswers().add(this);
                 setToSend(this.protocol.processInput( msg.toString().replace(NetConst.DEFAULT_TRAILER, NetConst.DELIMITER+Integer.toString(this.requestSenderId)+NetConst.DELIMITER)));
+                System.out.println("AFTER - this.protocol.processInput INTO WorkerRunnableSC");
                 break;
         }
     }

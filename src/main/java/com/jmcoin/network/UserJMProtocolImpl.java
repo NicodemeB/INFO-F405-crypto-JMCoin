@@ -3,6 +3,7 @@ package com.jmcoin.network;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 
 import org.bouncycastle.util.encoders.Hex;
 
@@ -112,12 +113,12 @@ public class UserJMProtocolImpl extends JMProtocolImpl<UserNode>{
     		int i = 0;
         	while(i < transactions.length) {
         		Output tmpOut = null;
-        		if(transactions[i].getOutputBack().getAddress().equals(address)) {
-        			tmpOut = transactions[i].getOutputBack();
-        		}
-        		else if(transactions[i].getOutputOut().getAddress().equals(address)){
-        			tmpOut = transactions[i].getOutputOut();
-        		}
+				if(Objects.equals(transactions[i].getOutputBack().getAddress(), address)) {
+					tmpOut = transactions[i].getOutputBack();
+				}
+				else if(Objects.equals(transactions[i].getOutputOut().getAddress(), address)){
+					tmpOut = transactions[i].getOutputOut();
+				}
         		if(tmpOut != null) {
         			String key = Hex.toHexString(transactions[i].getHash()) + Peer.DELIMITER+tmpOut.getAddress();
         			if(unspentOutputs.containsKey(key) && !this.peer.getWallet().getPendingOutputs().containsKey(key)){

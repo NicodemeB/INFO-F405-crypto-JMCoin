@@ -20,7 +20,9 @@ public class ReceiverThread<X extends TemplateThread> implements Runnable{
             do {
                 Object read = input.readObject();
                 if (read != null) {
+                    System.out.println("BEFORE - this.runnable.handleMessage INTO ReceiverThread" + read);
                     this.runnable.handleMessage(read);
+                    System.out.println("AFTER - this.runnable.handleMessage INTO ReceiverThread");
                 }
                 Thread.sleep(10);
             }while (loop);
