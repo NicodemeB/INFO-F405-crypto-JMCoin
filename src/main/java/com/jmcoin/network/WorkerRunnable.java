@@ -68,9 +68,7 @@ public class WorkerRunnable extends TemplateThread{
                 setToSend(NetConst.CONNECTED);
                 break;
             default:
-                System.out.println("BEFORE - this.protocol.processInput INTO WorkerRunnable");
                 setToSend(this.protocol.processInput(msg));
-                System.out.println("BEFORE - this.protocol.processInput INTO WorkerRunnable");
                 break;
         }
     }
