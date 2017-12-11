@@ -12,6 +12,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import org.bouncycastle.util.encoders.Hex;
 import com.jmcoin.crypto.SignaturesVerification;
@@ -43,14 +44,14 @@ public class UserNode extends Peer{
 		if(addressTransactions == null || addressTransactions.length == 0)return null;
 		ArrayList<Transaction> availableTransactions = new ArrayList<Transaction>();
 		for(Transaction tr : addressTransactions) {
-			if(tr.getOutputBack().getAddress().equals(fromAddress)) {
+			if(Objects.equals(tr.getOutputBack().getAddress(), fromAddress)) {
 				String keyBack = Hex.toHexString(tr.getHash())+DELIMITER+tr.getOutputBack().getAddress();
 				//Si l'output est contenue dans le pool des output disponibles et que l'output n'est pas en attente
 				if(unspentOutputs.containsKey(keyBack) && !this.wallet.getPendingOutputs().containsKey(keyBack)){
 					availableTransactions.add(tr);
 				}
 			}
-			else if(tr.getOutputOut().getAddress().equals(fromAddress)){
+			else if(Objects.equals(tr.getOutputOut().getAddress(), fromAddress)){
 				String keyOut = Hex.toHexString(tr.getHash())+DELIMITER+tr.getOutputOut().getAddress();
 				if((unspentOutputs.containsKey(keyOut)) && !this.wallet.getPendingOutputs().containsKey(keyOut)){
 					availableTransactions.add(tr);
@@ -73,7 +74,7 @@ public class UserNode extends Peer{
         Map<String, Output> usedOutputs = new HashMap<>();
         while( i < addressTransactions.length && totalOutputAmount <= amountToSend){
         	String key = Hex.toHexString(addressTransactions[i].getHash());
-            if(addressTransactions[i].getOutputBack().getAddress().equals(fromAddress)){
+            if(Objects.equals(addressTransactions[i].getOutputBack().getAddress(), fromAddress)){
             	//verifier si Out pas encore utilisée localement
             	key += DELIMITER+addressTransactions[i].getOutputBack().getAddress();
             	if(!this.wallet.getPendingOutputs().containsKey(key)){
@@ -82,7 +83,7 @@ public class UserNode extends Peer{
                     usedOutputs.put(key, addressTransactions[i].getOutputBack());
                 }
             }
-            else if((addressTransactions[i].getOutputOut().getAddress().equals(fromAddress))){
+            else if(Objects.equals(addressTransactions[i].getOutputOut().getAddress(), fromAddress)){
             	key += DELIMITER+addressTransactions[i].getOutputOut().getAddress();
             	//verifier si Out pas encore utilisée localement
             	if(!this.wallet.getPendingOutputs().containsKey(key)){

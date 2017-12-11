@@ -8,6 +8,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 import java.util.Map;
+import java.util.Objects;
 
 import org.bouncycastle.util.encoders.Hex;
 
@@ -57,9 +58,9 @@ public abstract class Peer {
 				if(prevTrans != null) { 
 					// ce n'est pas un reward
 					Output outToMe = null; //in previous transaction, find the output took as new input (outToMe)
-					if(prevTrans.getOutputBack().getAddress().equals(address))
+					if(Objects.equals(prevTrans.getOutputBack().getAddress(), address))
 						outToMe = prevTrans.getOutputBack();
-					else if (prevTrans.getOutputOut().getAddress().equals(address))
+					else if (Objects.equals(prevTrans.getOutputOut().getAddress(), address))
 						outToMe = prevTrans.getOutputOut();
 					else
 						return false; //not normal
