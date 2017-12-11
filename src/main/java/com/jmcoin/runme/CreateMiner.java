@@ -14,18 +14,20 @@ import com.jmcoin.network.MinerNode;
 public class CreateMiner {
 	
 	public static void main(String[] args) {
-		if(args.length < 2) {
+		if(args.length < 1) {
 			System.out.println("1 argument is required:");
 			System.out.println("(1) password of the wallet (String)");
 			System.out.println("(2) (optional) hostname of the relay");
 			return;
 		}
 		MinerNode minerNode;
+		String hostname = args.length < 2 ? "localhost" : args[1];
 		try {
 			minerNode = new MinerNode(args[0]);
-			minerNode.startMining(new MinerJMProtocolImpl(minerNode, args[1]));
+			minerNode.startMining(new MinerJMProtocolImpl(minerNode, hostname));
 		} catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException | IOException
 				| InvalidPasswordException | InvalidAESStreamException | StrongEncryptionNotAvailableException e) {
+			e.printStackTrace();
 			System.out.println("Unable to mine");
 		}
 	}

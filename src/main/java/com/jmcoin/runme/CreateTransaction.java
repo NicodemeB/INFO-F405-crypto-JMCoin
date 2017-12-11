@@ -25,7 +25,7 @@ public class CreateTransaction {
 			System.out.println("(1) password of the wallet (String)");
 			System.out.println("(2) destination address (can be random) (String)");
 			System.out.println("(3) amount to send (Double)");
-			System.out.println("(4) hostname (String)");
+			System.out.println("(4) (optional) hostname (String)");
 			return;
 		}
 		String amount = args[2];
@@ -40,9 +40,6 @@ public class CreateTransaction {
 		UserNode node = null;
 		try {
 			node = new UserNode(args[0]);
-			/*PrivateKey privKey = node.getWallet().getKeys().keySet().iterator().next();
-			TestMasterNode.runMaster(privKey, node.getWallet().getKeys().get(privKey));
-			TestRelay.run();*/
 		} catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException | IOException
 				| InvalidPasswordException | InvalidAESStreamException | StrongEncryptionNotAvailableException e1) {
 			System.out.println("Cannot create node");
@@ -50,7 +47,8 @@ public class CreateTransaction {
 		}
 		if(node!= null && !node.getWallet().getKeys().keySet().isEmpty()) {
 			try {
-				UserJMProtocolImpl protocol = new UserJMProtocolImpl(node, args[3]);
+				String hostname = args.length < 4 ? "localhost" : args[3];
+				UserJMProtocolImpl protocol = new UserJMProtocolImpl(node, hostname);
 				PrivateKey privKey = node.getWallet().getKeys().keySet().iterator().next();
 				node.getWallet().computeBalance(protocol);
 				System.out.println("Addresses: "+ node.getWallet().getAddresses());
@@ -66,12 +64,14 @@ public class CreateTransaction {
 					return;
 				}
 				protocol.getClient().sendMessage(protocol.craftMessage(NetConst.TAKE_MY_NEW_TRANSACTION, node.getGson().toJson(transaction)));
-				System.out.println("--------------------------------------------");
+				System.out.println("--------------------- DONE -----------------------");
 			} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException | SignatureException
 					| IOException e) {
-				e.printStackTrace();
 				System.out.println("Cannot create transaction");
 			}
+		}
+		else {
+			System.out.println("Keys not found");
 		}
 	}
 }
