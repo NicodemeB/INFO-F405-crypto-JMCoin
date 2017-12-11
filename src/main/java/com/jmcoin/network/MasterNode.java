@@ -284,7 +284,7 @@ public class MasterNode extends Peer {
 		this.chain.getBlocks().put(pBlock.getFinalHash() + pBlock.getTimeCreation(), pBlock);
 		this.lastBlock = pBlock;
 		//FIXME Uncomment this to save in DB
-		//DatabaseFacade.updateChain(this.chain);
+		DatabaseFacade.updateChain(this.chain);
 		return true;
     }
     
