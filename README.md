@@ -84,14 +84,14 @@ mvn exec:java -Dexec.mainClass="com.jmcoin.runnme.RunMaster" -Dexec.cleanupDaemo
 ### Tests avec les Relay Nodes distants
 Rien n'est à faire, les Relay Node tournent en permanence automatiquement. 
 
-### Tests avec le Relay Nodes local
+### Tests avec le Relay Node local
 ### ⚠️ Attention ⚠️ 
 Il n'est possible que de lancer **un seul Relay Node** sur la même machine !! (car ils écoutent sur le même port)
 
 Dans le dossier du projet, il faut faire :
 
 ````
-mvn exec:java -Dexec.mainClass="com.jmcoin.runnme.RunRelay" -Dexec.cleanupDaemonThreads=false
+mvn exec:java -Dexec.mainClass="com.jmcoin.runnme.RunRelay" -Dexec.args="master.jmcoin.tchnology" -Dexec.cleanupDaemonThreads=false
 ````
 
 
