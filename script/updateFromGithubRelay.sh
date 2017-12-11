@@ -18,6 +18,7 @@ NC='\033[0m' # No Color
 
 if [ "$((LOCALCOMMITNUMBER))" -lt "$((CURRENTCOMMITNUMBER))" ]
 then
+	echo "" > $DIR'jm.log';
 	echo "${BLUE}[$(date) - SCRIPT UPDATE INFO] Seems to have a new commit..${NC}"
 	echo $((CURRENTCOMMITNUMBER)) > $DIR'commits.txt'
 
@@ -35,15 +36,15 @@ then
 
 	mvn package
 
-	if [ $(ps -ax |grep 'TestRelay' | awk '{print $1}' |grep -c "") -gt 0 ]
+	if [ $(ps -ax |grep 'RunRelay' | awk '{print $1}' |grep -c "") -gt 0 ]
         then
 		echo "${BLUE}[$(date) - SCRIPT UPDATE INFO] Killing old java ...${NC}"
-		sudo kill $(ps -ax |grep 'TestRelay' | awk '{print $1}')
+		sudo kill $(ps -ax |grep 'RunRelay' | awk '{print $1}')
 	fi
 
 	echo "${BLUE}[$(date) - SCRIPT UPDATE INFO] Running new commit ...${NC}"
 	sleep 15
-	mvn exec:java -Dexec.mainClass="com.jmcoin.test.TestRelay"
+	mvn exec:java -Dexec.mainClass="com.jmcoin.runme.RunRelay" -Dexec.args="master.jmcoin.technology"
 #else
 #	echo "${BLUE}[SCRIPT UPDATE INFO] Seems to NOT have a new commit..${NC}"
 fi
