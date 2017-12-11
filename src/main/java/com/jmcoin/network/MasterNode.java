@@ -22,6 +22,7 @@ import org.bouncycastle.util.encoders.Hex;
 import com.jmcoin.crypto.AES.InvalidKeyLengthException;
 import com.jmcoin.crypto.AES.StrongEncryptionNotAvailableException;
 import com.jmcoin.crypto.SignaturesVerification;
+import com.jmcoin.database.DatabaseFacade;
 import com.jmcoin.model.Block;
 import com.jmcoin.model.Chain;
 import com.jmcoin.model.Input;
@@ -46,9 +47,6 @@ public class MasterNode extends Peer {
     	super();
     	this.unverifiedTransactions = new LinkedList<>();
     	this.unspentOutputs = new HashMap<>();
-    	
-    	//TODO uncomment this
-
     	this.chain = DatabaseFacade.getStoredChain();
     	if(chain == null){
     		chain = new Chain();
@@ -63,19 +61,7 @@ public class MasterNode extends Peer {
 				e.printStackTrace();
 			}
 		}
-    	//TODO remove this to use database
-		/*chain = new Chain();
-		if(chain.getSize() == 0) {
-			try {
-				addGenesisToUnverified();
-			} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException | SignatureException
-					| IOException | InvalidKeyLengthException | StrongEncryptionNotAvailableException e) {
-				e.printStackTrace();
-			}
-    	}*/
-    }
-<<<<<<< HEAD
-    
+    }    
     public void debugMasterNode(PrivateKey privateKey, PublicKey publicKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException, IOException, StrongEncryptionNotAvailableException, InvalidKeyLengthException {
     	/*KeyGenerator generator = new KeyGenerator(1024);
 =======
@@ -188,8 +174,8 @@ public class MasterNode extends Peer {
             else
             	block.setPrevHash(last.getFinalHash());
             block.setTimeCreation(System.currentTimeMillis());
-            this.chain.getBlocks().put(block.getFinalHash(), block);*/
-        }
+            this.chain.getBlocks().put(block.getFinalHash(), block);
+        }*/
     }
     
     public Block getLastBlock() {

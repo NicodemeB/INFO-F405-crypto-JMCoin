@@ -22,10 +22,10 @@ public class TestMasterNode {
 		MasterNode node = MasterNode.getInstance();
 		/*try{
 			node.debugMasterNode(privKey, pubKey);
-		}*/
+		}
 		catch(NoSuchAlgorithmException | NoSuchProviderException | InvalidKeyException | SignatureException | StrongEncryptionNotAvailableException | InvalidKeyLengthException e) {
 			e.printStackTrace();
-		}
+		}*/
 		new Thread(new MultiThreadedServer(NetConst.MASTER_NODE_LISTEN_PORT, new MasterJMProtocolImpl(node))).start();
 	}
 	
