@@ -111,7 +111,9 @@ public class RelayNodeJMProtocolImpl extends JMProtocolImpl<RelayNode> {
 	@Override
 	protected boolean takeMyNewTransactionImpl(String payload) {
 		if (payload != null) {
+			System.out.println("BEFORE - this.client.setToSend ");
 			this.client.setToSend(craftMessage(NetConst.TAKE_MY_NEW_TRANSACTION, payload));
+			System.out.println("AFTER - this.client.setToSend \n");
 			return true;
 		}
 		return false;

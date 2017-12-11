@@ -82,7 +82,7 @@ mvn exec:java -Dexec.mainClass="com.jmcoin.runme.RunMaster" -Dexec.cleanupDaemon
 
 ## Relay Node
 ### Tests avec les Relay Nodes distants
-Rien n'est à faire, les Relay Node tournent en permanence automatiquement. 
+Rien n'est à faire, les Relay Nodes tournent en permanence automatiquement. 
 
 ### Tests avec le Relay Node local
 ### ⚠️ Attention ⚠️ 
@@ -141,19 +141,19 @@ mvn exec:java -Dexec.mainClass="com.jmcoin.runme.CreateTransaction" -Dexec.args=
 Dans le dossier du projet, il faut faire :
 
 ````
-mvn exec:java -Dexec.mainClass="com.jmcoin.runme.GetBlockchain" -Dexec.args="wallet_password"
+mvn exec:java -Dexec.mainClass="com.jmcoin.runme.GetBlockchain" -Dexec.args="wallet_password hostname"
 ````
 
 Connexion sur le Relay Node 01 : 
 
 ````
-mvn exec:java -Dexec.mainClass="com.jmcoin.runme.GetBlockchain" -Dexec.args="MySimplePassword"
+mvn exec:java -Dexec.mainClass="com.jmcoin.runme.GetBlockchain" -Dexec.args="MySimplePassword relay-01.jmcoin.technology"
 ````
 
 Connexion sur le Relay Node 02 :
 
 ````
-mvn exec:java -Dexec.mainClass="com.jmcoin.runme.GetBlockchain" -Dexec.args="MySimplePassword"
+mvn exec:java -Dexec.mainClass="com.jmcoin.runme.GetBlockchain" -Dexec.args="MySimplePassword relay-02.jmcoin.technology"
 ````
 
 ### Récupérer la balance
@@ -161,19 +161,19 @@ mvn exec:java -Dexec.mainClass="com.jmcoin.runme.GetBlockchain" -Dexec.args="MyS
 Dans le dossier du projet, il faut faire :
 
 ````
-mvn exec:java -Dexec.mainClass="com.jmcoin.runme.ComputeBalance" -Dexec.args="wallet_password"
+mvn exec:java -Dexec.mainClass="com.jmcoin.runme.ComputeBalance" -Dexec.args="wallet_password hostname"
 ````
 
 Connexion sur le Relay Node 01 : 
 
 ````
-mvn exec:java -Dexec.mainClass="com.jmcoin.runme.ComputeBalance" -Dexec.args="MySimplePassword"
+mvn exec:java -Dexec.mainClass="com.jmcoin.runme.ComputeBalance" -Dexec.args="MySimplePassword relay-01.jmcoin.technology"
 ````
 
 Connexion sur le Relay Node 02 :
 
 ````
-mvn exec:java -Dexec.mainClass="com.jmcoin.runme.ComputeBalance" -Dexec.args="MySimplePassword"
+mvn exec:java -Dexec.mainClass="com.jmcoin.runme.ComputeBalance" -Dexec.args="MySimplePassword relay-02.jmcoin.technology"
 ````
 
 
