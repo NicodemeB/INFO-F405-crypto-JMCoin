@@ -18,6 +18,11 @@ public class CreateKey {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		if(args.length < 1) {
+			System.out.println("1 argument is required:");
+			System.out.println("(1) password (String)");
+			return;
+		}
 		try {
 			UserNode node = new UserNode(args[0]);
 			node.getWallet().createKeys(args[0]);
