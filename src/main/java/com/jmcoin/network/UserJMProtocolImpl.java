@@ -1,6 +1,7 @@
 package com.jmcoin.network;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Map;
 
 import org.bouncycastle.util.encoders.Hex;
@@ -18,6 +19,18 @@ public class UserJMProtocolImpl extends JMProtocolImpl<UserNode>{
 	public UserJMProtocolImpl(UserNode peer) throws IOException {
 		super(peer);
 		this.client = new Client(NetConst.RELAY_NODE_LISTEN_PORT, NetConst.RELAY_DEBUG_HOST_NAME, this);
+        new Thread(new ReceiverThread<Client>(this.client)).start();
+        new Thread(this.client).start();
+        try {
+            Thread.sleep(2000); 
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+	}
+	
+	public UserJMProtocolImpl(UserNode peer, String hostname) throws IOException {
+		super(peer);
+		this.client = new Client(NetConst.RELAY_NODE_LISTEN_PORT, hostname, this);
         new Thread(new ReceiverThread<Client>(this.client)).start();
         new Thread(this.client).start();
         try {
@@ -91,7 +104,7 @@ public class UserJMProtocolImpl extends JMProtocolImpl<UserNode>{
 	protected String giveMeTransactionsToThisAddress(String address, String id) {return null;}
 	
 	public double getAddressBalance(String ... addresses) throws IOException{
-    	Transaction[] transactions = downloadObject(NetConst.GIVE_ME_TRANS_TO_THIS_ADDRESS, this.peer.getGson().toJson(addresses), getClient());
+		Transaction[] transactions = downloadObject(NetConst.GIVE_ME_TRANS_TO_THIS_ADDRESS, this.peer.getGson().toJson(addresses), getClient());
     	Map<String, Output> unspentOutputs = downloadObject(NetConst.GIVE_ME_UNSPENT_OUTPUTS, null, this.client);
     	this.peer.getWallet().updatePendingOutputs(unspentOutputs);
     	double totalOutputAmount = 0;

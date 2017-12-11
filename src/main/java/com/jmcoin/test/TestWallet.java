@@ -21,18 +21,18 @@ import java.security.spec.InvalidKeySpecException;
 public class TestWallet {
     public static void main(String args[]){
     	try {
-    		UserNode userNode = new UserNode("a");
-    		PrivateKey privKey = userNode.getWallet().getKeys().keySet().iterator().next();
-    		TestMasterNode.runMaster(privKey, userNode.getWallet().getKeys().get(privKey));
-			TestRelay.run();
-	    	UserJMProtocolImpl protocol = new UserJMProtocolImpl(userNode);
+    		UserNode userNode = new UserNode(args[0]);
+    		//PrivateKey privKey = userNode.getWallet().getKeys().keySet().iterator().next();
+    		//TestMasterNode.runMaster(privKey, userNode.getWallet().getKeys().get(privKey));
+			//TestRelay.run();
+	    	UserJMProtocolImpl protocol = new UserJMProtocolImpl(userNode, args[1]);
 	    	userNode.getWallet().computeBalance(protocol);
 	    	System.out.println(userNode.getWallet().getAddresses());
 	    	System.out.println("Balance: "+userNode.getWallet().getBalance());
-	    	userNode.createTransaction(protocol, SignaturesVerification.DeriveJMAddressFromPubKey(userNode.getWallet().getKeys().get(privKey).getEncoded()), "@destination", 12, privKey, userNode.getWallet().getKeys().get(privKey));
+	    	/*userNode.createTransaction(protocol, SignaturesVerification.DeriveJMAddressFromPubKey(userNode.getWallet().getKeys().get(privKey).getEncoded()), "@destination", 12, privKey, userNode.getWallet().getKeys().get(privKey));
 	    	userNode.getWallet().computeBalance(protocol);
-	    	System.out.println("Balance: "+userNode.getWallet().getBalance());
-		} catch (IOException | NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException | InvalidPasswordException | InvalidAESStreamException | StrongEncryptionNotAvailableException | InvalidKeyException | SignatureException e) {
+	    	System.out.println("Balance: "+userNode.getWallet().getBalance());*/
+		} catch (IOException | NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException | InvalidPasswordException | InvalidAESStreamException | StrongEncryptionNotAvailableException e) {
 			e.printStackTrace();
 		} 	
     }

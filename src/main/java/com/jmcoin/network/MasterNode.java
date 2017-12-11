@@ -304,11 +304,11 @@ public class MasterNode extends Peer {
 
 	public List<Transaction> getTransactionsToThisAddress(String addresses) {
 		String[] tabAddresses = gson.fromJson(addresses, String[].class);
-		return debugGetTransactionsToThisAddress(tabAddresses);
-		//FIXME uncomment this return DatabaseFacade.getAllTransactionsWithAddress(tabAddresses);
+		//return debugGetTransactionsToThisAddress(tabAddresses);
+		return DatabaseFacade.getAllTransactionsWithAddress(tabAddresses);
 	}
 
-	private ArrayList<Transaction> debugGetTransactionsToThisAddress(String[] addresses){
+	/*private ArrayList<Transaction> debugGetTransactionsToThisAddress(String[] addresses){
 		ArrayList<Transaction> transactions = new ArrayList<>();
 		for(String addr : addresses) {
 			for(Transaction trans : this.unverifiedTransactions) {
@@ -317,7 +317,7 @@ public class MasterNode extends Peer {
 			}
 		}
 		return transactions;
-	}
+	}*/
 
 	private void addGenesisToUnverified() throws NoSuchAlgorithmException, IOException, NoSuchProviderException, StrongEncryptionNotAvailableException, InvalidKeyLengthException, SignatureException, InvalidKeyException {
 		Key[] keys = generateGenesisKeys(NetConst.GENESIS);
