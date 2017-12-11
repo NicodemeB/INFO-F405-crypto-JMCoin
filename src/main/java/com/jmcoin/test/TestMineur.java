@@ -15,8 +15,8 @@ public class TestMineur {
 	public static void main(String[] args) {
 		MinerNode minerHard;
 		try {
-			minerHard = new MinerNode("a");
-			MinerJMProtocolImpl minerJMProtocolImpl1 = new MinerJMProtocolImpl(minerHard, "relay-02.jmcoin.technology");
+			minerHard = new MinerNode(args[0]);
+			MinerJMProtocolImpl minerJMProtocolImpl1 = new MinerJMProtocolImpl(minerHard, args[1]);
 			minerHard.startMining(minerJMProtocolImpl1);
 		}
 		catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException | IOException
