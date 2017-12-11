@@ -33,7 +33,7 @@ import com.jmcoin.model.KeyGenerator;
 import com.jmcoin.model.Output;
 import com.jmcoin.model.Transaction;
 
-public class MasterNode extends Peer{
+public class MasterNode extends Peer {
 
     private static MasterNode instance = new MasterNode();
 	public static final int REWARD_START_VALUE = 10;
@@ -52,7 +52,7 @@ public class MasterNode extends Peer{
     	this.unspentOutputs = new HashMap<>();
     	
     	//TODO uncomment this
-    	/*
+
     	this.chain = DatabaseFacade.getStoredChain();
     	if(chain == null){
     		chain = new Chain();
@@ -61,14 +61,14 @@ public class MasterNode extends Peer{
     	this.lastBlock = DatabaseFacade.getLastBlock();
 		if(chain.getSize() == 0) {
 			try {
-				addGenesisToUnverfied();
+				addGenesisToUnverified();
 			} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException | SignatureException
 					| IOException | InvalidKeyLengthException | StrongEncryptionNotAvailableException e) {
 				e.printStackTrace();
 			}
-		}*/
+		}
     	//TODO remove this to use database
-		chain = new Chain();
+		/*chain = new Chain();
 		if(chain.getSize() == 0) {
 			try {
 				addGenesisToUnverified();
@@ -76,9 +76,9 @@ public class MasterNode extends Peer{
 					| IOException | InvalidKeyLengthException | StrongEncryptionNotAvailableException e) {
 				e.printStackTrace();
 			}
-    	}
+    	}*/
     }
-    
+    //FIXME Is this still relevant after tests ?
     public void debugMasterNode(PrivateKey privateKey, PublicKey publicKey) throws NoSuchAlgorithmException, NoSuchProviderException {
         KeyGenerator generator = new KeyGenerator(1024);
         Map<PrivateKey, PublicKey> keys = new HashMap<>();
@@ -102,6 +102,7 @@ public class MasterNode extends Peer{
                 tmp1.setAddress(SignaturesVerification.DeriveJMAddressFromPubKey(keys.get(keys.keySet().toArray(new PrivateKey[0])[privKeyInt+1 > 3 ? 0 : privKeyInt+1]).getEncoded()));
                 tmp1.setAmount(rand.nextInt(10));
                 Input in1 = new Input();
+				//FIXME Transaction are here
                 in1.setPrevTransactionHash(("H"+rand.nextInt(10)).getBytes());
                 Output z = new Output();
                 z.setAmount(rand.nextInt(10));
@@ -125,6 +126,7 @@ public class MasterNode extends Peer{
             }
             block.setDifficulty(NetConst.DEFAULT_DIFFICULTY);
             block.setNonce(5);
+			//FIXME and here
             block.setFinalHash("H"+i);
             if(last == null) {
             	block.setPrevHash(null);
@@ -218,6 +220,8 @@ public class MasterNode extends Peer{
 		}
 		this.chain.getBlocks().put(pBlock.getFinalHash() + pBlock.getTimeCreation(), pBlock);
 		this.lastBlock = pBlock;
+		//FIXME Uncomment this to save in DB
+		DatabaseFacade.updateChain(this.chain);
 		return true;
     }
     
