@@ -66,9 +66,6 @@ public class CreateTransaction {
 					return;
 				}
 				protocol.getClient().sendMessage(protocol.craftMessage(NetConst.TAKE_MY_NEW_TRANSACTION, node.getGson().toJson(transaction)));
-				node.getWallet().computeBalance(protocol);
-				System.out.println("Transaction: done");
-				System.out.println("Balance: " + node.getWallet().getBalance());
 				System.out.println("--------------------------------------------");
 			} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException | SignatureException
 					| IOException e) {

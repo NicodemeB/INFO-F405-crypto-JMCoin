@@ -18,6 +18,7 @@ import com.jmcoin.crypto.AES.InvalidPasswordException;
 import com.jmcoin.crypto.AES.StrongEncryptionNotAvailableException;
 import com.jmcoin.model.Block;
 import com.jmcoin.model.Chain;
+import com.jmcoin.model.Input;
 import com.jmcoin.model.Output;
 import com.jmcoin.model.Transaction;
 import com.jmcoin.model.Wallet;
@@ -72,6 +73,7 @@ public class MinerNode extends Peer{
 		Output out = new Output();
 		out.setAddress(SignaturesVerification.DeriveJMAddressFromPubKey(pubKey.getEncoded()));
 		out.setAmount(doubleRewardAmount);
+		reward.addInput(new Input());
 		reward.setOutputOut(out);
 		reward.setOutputBack(new Output());
 		reward.setPubKey(pubKey.getEncoded());
