@@ -72,7 +72,7 @@ public class MasterNode extends Peer {
     private Map<String,Output> initiateUnspentOutputs (){
 		Map<String,Output> unspentOutputs = new HashMap<String,Output>();
 		Map<String,Input> inputs = new HashMap<String,Input>();
-		Block currentBlock = chain.getBlocks().get(this.lastBlock.getFinalHash());
+		Block currentBlock = DatabaseFacade.getBlockWithHash(lastBlock.getFinalHash());
 		String previousBlockHash = currentBlock.getPrevHash();
 		while(previousBlockHash != null){
 			for(Transaction tr : currentBlock.getTransactions()) {			
@@ -107,7 +107,7 @@ public class MasterNode extends Peer {
 					unspentOutputs.put(Hex.toHexString(tr.getHash())+DELIMITER+tr.getOutputOut().getAddress(), tr.getOutputOut());
 				}					
 			}
-			currentBlock = chain.getBlocks().get(currentBlock.getPrevHash());
+			currentBlock = DatabaseFacade.getBlockWithHash(currentBlock.getPrevHash());
 			previousBlockHash = currentBlock.getPrevHash();
 		}
 		return unspentOutputs;

@@ -58,12 +58,12 @@ mvn package
 ### Step 0 : create keys
 
 ````
-mvn exec:java -Dexec.mainClass="com.jmcoin.runme.CreateMiner" -Dexec.args="wallet_password"
+mvn exec:java -Dexec.mainClass="com.jmcoin.runme.CreateKeyr" -Dexec.args="wallet_password"
 ````
 Exemple : 
 
 ````
-mvn exec:java -Dexec.mainClass="com.jmcoin.runme.CreateMiner" -Dexec.args="MySimplePassword"
+mvn exec:java -Dexec.mainClass="com.jmcoin.runme.CreateKey" -Dexec.args="MySimplePassword"
 ````
 
 
@@ -76,7 +76,7 @@ Rien n'est à faire, le Master Node tourne en permanence automatiquement.
 Dans le dossier du projet, il faut faire :
 
 ````
-mvn exec:java -Dexec.mainClass="com.jmcoin.runnme.RunMaster" -Dexec.cleanupDaemonThreads=false
+mvn exec:java -Dexec.mainClass="com.jmcoin.runme.RunMaster" -Dexec.cleanupDaemonThreads=false
 ````
 
 
@@ -84,14 +84,14 @@ mvn exec:java -Dexec.mainClass="com.jmcoin.runnme.RunMaster" -Dexec.cleanupDaemo
 ### Tests avec les Relay Nodes distants
 Rien n'est à faire, les Relay Node tournent en permanence automatiquement. 
 
-### Tests avec le Relay Nodes local
+### Tests avec le Relay Node local
 ### ⚠️ Attention ⚠️ 
 Il n'est possible que de lancer **un seul Relay Node** sur la même machine !! (car ils écoutent sur le même port)
 
 Dans le dossier du projet, il faut faire :
 
 ````
-mvn exec:java -Dexec.mainClass="com.jmcoin.runnme.RunRelay" -Dexec.cleanupDaemonThreads=false
+mvn exec:java -Dexec.mainClass="com.jmcoin.runme.RunRelay" -Dexec.args="master.jmcoin.technology" -Dexec.cleanupDaemonThreads=false
 ````
 
 
@@ -121,7 +121,7 @@ mvn exec:java -Dexec.mainClass="com.jmcoin.runme.CreateMiner" -Dexec.args="MySim
 Dans le dossier du projet, il faut faire :
 
 ````
-mvn exec:java -Dexec.mainClass="com.jmcoin.runme.CreateMiner" -Dexec.args="wallet_password destination_address amount hostname"
+mvn exec:java -Dexec.mainClass="com.jmcoin.runme.CreateTransaction" -Dexec.args="wallet_password destination_address amount hostname"
 ````
 
 Connexion sur le Relay Node 01 : 
@@ -144,16 +144,36 @@ Dans le dossier du projet, il faut faire :
 mvn exec:java -Dexec.mainClass="com.jmcoin.runme.GetBlockchain" -Dexec.args="wallet_password"
 ````
 
-connexion sur le Relay Node 01 : 
+Connexion sur le Relay Node 01 : 
 
 ````
 mvn exec:java -Dexec.mainClass="com.jmcoin.runme.GetBlockchain" -Dexec.args="MySimplePassword"
 ````
 
-connexion sur le Relay Node 02 :
+Connexion sur le Relay Node 02 :
 
 ````
 mvn exec:java -Dexec.mainClass="com.jmcoin.runme.GetBlockchain" -Dexec.args="MySimplePassword"
+````
+
+### Récupérer la balance
+
+Dans le dossier du projet, il faut faire :
+
+````
+mvn exec:java -Dexec.mainClass="com.jmcoin.runme.ComputeBalance" -Dexec.args="wallet_password"
+````
+
+Connexion sur le Relay Node 01 : 
+
+````
+mvn exec:java -Dexec.mainClass="com.jmcoin.runme.ComputeBalance" -Dexec.args="MySimplePassword"
+````
+
+Connexion sur le Relay Node 02 :
+
+````
+mvn exec:java -Dexec.mainClass="com.jmcoin.runme.ComputeBalance" -Dexec.args="MySimplePassword"
 ````
 
 
