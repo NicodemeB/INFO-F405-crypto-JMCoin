@@ -47,11 +47,13 @@ public class MasterJMProtocolImpl extends JMProtocolImpl<MasterNode>{
 	@Override
 	protected boolean takeMyNewTransactionImpl(String payload) {
 		try {
+			System.out.println("MasterNode: transaction received");
 			Transaction transaction = this.peer.getGson().fromJson(payload, Transaction.class);
 			this.peer.getUnverifiedTransactions().add(transaction);
 			return true;
 		}
 		catch(JsonSyntaxException jse) {
+			System.out.println("MasterNode: transaction rejected");
 			jse.printStackTrace();
 		}
 		return false;

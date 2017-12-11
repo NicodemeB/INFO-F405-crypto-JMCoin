@@ -1,10 +1,15 @@
 package com.jmcoin.test;
 
 import java.io.IOException;
+import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.SignatureException;
+
+import com.jmcoin.crypto.AES.InvalidKeyLengthException;
+import com.jmcoin.crypto.AES.StrongEncryptionNotAvailableException;
 import com.jmcoin.model.KeyGenerator;
 import com.jmcoin.network.MasterJMProtocolImpl;
 import com.jmcoin.network.MasterNode;
@@ -15,10 +20,10 @@ public class TestMasterNode {
 	
 	public static void runMaster(PrivateKey privKey, PublicKey pubKey) throws IOException {
 		MasterNode node = MasterNode.getInstance();
-		try{
+		/*try{
 			node.debugMasterNode(privKey, pubKey);
-		}
-		catch(NoSuchAlgorithmException | NoSuchProviderException e) {
+		}*/
+		catch(NoSuchAlgorithmException | NoSuchProviderException | InvalidKeyException | SignatureException | StrongEncryptionNotAvailableException | InvalidKeyLengthException e) {
 			e.printStackTrace();
 		}
 		new Thread(new MultiThreadedServer(NetConst.MASTER_NODE_LISTEN_PORT, new MasterJMProtocolImpl(node))).start();

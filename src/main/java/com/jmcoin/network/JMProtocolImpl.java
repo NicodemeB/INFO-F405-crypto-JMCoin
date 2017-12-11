@@ -28,7 +28,7 @@ public abstract class JMProtocolImpl<X extends Peer> {
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected <T> T downloadObject(String req, String body, Client client) throws IOException {
+	public <T> T downloadObject(String req, String body, Client client) throws IOException {
 		client.sendMessage(craftMessage(req, body));
 		T t;
         while((t = (T) this.peer.getBundle().getObject()) == null) {

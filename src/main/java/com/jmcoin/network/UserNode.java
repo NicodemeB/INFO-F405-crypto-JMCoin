@@ -118,8 +118,4 @@ public class UserNode extends Peer{
 	public Wallet getWallet() {
 		return wallet;
 	}
-	
-	public void debugUserNode() {
-		//this.wallet.getAddresses().add(e);
-	}
 }

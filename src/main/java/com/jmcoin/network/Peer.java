@@ -68,15 +68,24 @@ public abstract class Peer {
 					for (Map.Entry<String,Output> entry : unspentOutputs.entrySet()){
 						if(outputKey.equals(entry.getKey())) {//Si ce n'est pas trouvé dans la liste
 							unspent = true;
+							break;
 						}
 					}
-					if(!unspent)return false; // Output déja dépensée
+					if(!unspent) {
+						return false; // Output déja dépensée
+					}
+					System.out.println(outToMe.getAmount() + " " + input.getAmount());
 					if(outToMe.getAmount() == input.getAmount()){	
-						//remove from unspent outputs
+						unspentOutputs.remove(outputKey);
 					}
 					else {
 						return false; // Not normal, les montants doivent correspondre car on consomme tout l'ouput
 					}	
+				}
+				else {
+					if(input.getPrevTransactionHash() != null) {
+						return false;//means that the prevHash exists but the transaction doesn't
+					}
 				}
 			}
 			return true;

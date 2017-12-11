@@ -64,10 +64,8 @@ public class MinerNode extends Peer{
 					block.getTransactions().add(transactions[i]);
 			}
 		}
-		System.out.println(this.gson.toJson(block));
 		int value = protocol.downloadObject(NetConst.GIVE_ME_REWARD_AMOUNT, null, protocol.getClient());
 		double doubleRewardAmount = value * (1.0/NetConst.MAX_SENT_TRANSACTIONS);
-		//TODO choose the key
 		PrivateKey privKey = this.wallet.getKeys().keySet().iterator().next();
         PublicKey pubKey = this.wallet.getKeys().get(privKey);
 		Transaction reward = new Transaction();
@@ -78,7 +76,8 @@ public class MinerNode extends Peer{
 		reward.setOutputBack(new Output());
 		reward.setPubKey(pubKey.getEncoded());
 		reward.setSignature(SignaturesVerification.signTransaction(reward.getBytes(false), privKey));
-
+		reward.computeHash();
+		block.getTransactions().add(reward);
 		block.setDifficulty(difficulty);
 		block.setTimeCreation(System.currentTimeMillis());
 		if(!lastBlock.getFinalHash().equals(NetConst.GENESIS))
@@ -171,7 +170,6 @@ public class MinerNode extends Peer{
 				e.printStackTrace();
 			}
 	        this.running = false;
-	        //getBundle().getObject();
 		}
 	}
 }

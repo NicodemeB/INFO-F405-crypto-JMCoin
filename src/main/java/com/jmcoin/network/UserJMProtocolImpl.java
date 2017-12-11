@@ -94,9 +94,6 @@ public class UserJMProtocolImpl extends JMProtocolImpl<UserNode>{
     	Transaction[] transactions = downloadObject(NetConst.GIVE_ME_TRANS_TO_THIS_ADDRESS, this.peer.getGson().toJson(addresses), getClient());
     	Map<String, Output> unspentOutputs = downloadObject(NetConst.GIVE_ME_UNSPENT_OUTPUTS, null, this.client);
     	this.peer.getWallet().updatePendingOutputs(unspentOutputs);
-    	System.out.println("Transactions: "+this.peer.getGson().toJson(transactions));
-    	System.out.println("Unspent: "+this.peer.getGson().toJson(unspentOutputs));
-    	System.out.println("Pending out: "+this.peer.getGson().toJson(this.peer.getWallet().getPendingOutputs()));
     	double totalOutputAmount = 0;
     	for(String address : addresses) {
     		int i = 0;
