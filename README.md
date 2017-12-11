@@ -1,21 +1,187 @@
 # JMCoin
 [![Build Status](https://travis-ci.org/NicodemeB/JMCoin.svg?branch=dev)](https://travis-ci.org/NicodemeB/JMCoin)
+ 
 
 
-## Structure :
-Le fichier fourni contient différents dossiers :
+## Architecture 
+Le **Master Node** ainsi que 2 **Relay Node** sont déployés sur 3 machines Debian9 hébergées par Azure (Cloud Microsoft) différentes afin d'être joignables par n'importe quel **Miner/Wallet**, et cela n'importe où (voir avertissement). Ces 3 machines sont joignables sur les domaines suivants :
 
--	Crypto: comprend les classes implémentant la cryptographique.
--	Database : méthodes de façades pour lecture, update et modification de la base de données.
--	Model : contient les objets métiers de l’application (Block, Bundle, Chain, Input, KeyGenerator, Output, Transaction et Wallet).
--	Network : contient les classes nécessaires à la mise en place des protocoles réseaux, les fichiers se terminant par Node contiennent la machine elle-même, voir même l’utilisateur qui utilise la machine.
+-	master.jmcoin.technology
+-	relay-01.jmcoin.technology
+- 	relay-02.jmcoin.technology
 
-## Fonctionnement :
-Il faut tout d’abord créer des clés liées au Wallet, pour se faire exécutez la classe createKey.java en passant en argument un mot de passe (String) pour la création des clés publiques et privées.
+Si nécessaire, contacter <benjamin.nicodeme@ulb.ac.be> pour avoir un accès SSH à ces machines (CLI only). 
 
-Pour effectuer une transaction : exécutez la classe createTransaction.java avec comme arguments le mot de passe du Wallet d’où provient l’argent, l’adresse du destinataire et la quantité à transférer. Lors de la première transaction la classe UserNode va se charger de créer le Wallet associé aux clés créées dans la première étape. Le mot de passe du Wallet permet de déverrouiller toutes les clés associées à celui-ci.
+Il est possible de consulter les logs de ces machines en temps réel sur les adresses suivantes : 
 
-Pour obtenir la liste de la chaine de blocs, lancer la classe getBlockchain.java avec en paramètre le mot de passe du Wallet.
-Pour miner : lancez la classe createMiner.java avec en paramètres le mot de passe lié au Wallet de ce mineur et l’hôte du serveur distant : relay-02.jmcoin.technology ou relay-01.jmcoin.technology (nécessite une connexion internet) en fonction du relais désiré. 
+-	<http://master.jmcoin.technology/jm.log>
+-	<http://relay-01.jmcoin.technology/jm.log>
+-	<http://relay-02.jmcoin.technology/jm.log>
 
-Le Wallet du mineur lui permet également de toucher sa récompense, il est considéré comme un utilisateur un peu particulier. 
+Ces logs sont consultables sans la moindre authentification/authorisation.
+
+Tous les tests sont faisables en local mais nécessitent cependant la création d'un base de donnée MySQL, les test sont alors plus faciles à réaliser sur les serveurs distants car la base de donnée est déjà présente sur le Master Node distant. 
+
+## Prérequis : maven
+
+### Ubuntu/Debian 
+````
+sudo apt install maven
+````
+
+### Mac OS 
+````
+/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+brew install maven 
+````
+
+
+## Lancement
+
+#### ⚠️ **Avertissement** ⚠️ 
+Les ports **TCP 33333 et 33334** sont utilisés par le JMCoin, ce qui signifie en d'autres thermes que le réseau **"eduroam"**, **"Plaine-WiFi"** et ainsi de suite ne permettent pas de réaliser les tests (sauf VPN, proxy, etc permettant de bypass le firewall) car il sera impossible de contacter les serveurs distant sur ces ports dû au firewall de l'école.
+
+#### Optionnel : Git
+
+````
+git clone https://github.com/NicodemeB/JMCoin.git --branch=dev
+cd JMCoin
+````
+
+### Step 0 : create keys
+
+````
+mvn exec:java -Dexec.mainClass="com.jmcoin.runme.CreateMiner" -Dexec.args="wallet_password"
+````
+Exemple : 
+
+````
+mvn exec:java -Dexec.mainClass="com.jmcoin.runme.CreateMiner" -Dexec.args="MySimplePassword"
+````
+
+
+### Master Node
+
+#### Tests avec le Master Node distant 
+Rien n'est à faire, le Master Node tourne en permanence automatique. 
+
+#### Tests avec le Master Node local
+Dans le dossier du projet, il faut faire :
+
+````
+mvn exec:java -Dexec.mainClass="com.jmcoin.runnme.RunMaster" -Dexec.cleanupDaemonThreads=false
+````
+
+
+### Relay Node
+#### Tests avec les Relay Node distants
+Rien n'est à faire, les Relay Node tournent en permanence automatique. 
+
+#### Tests avec le Relay Node local
+#### ⚠️ Attention ⚠️ 
+Il n'est possible que de lancer un seul Relay Node sur la même machine !! (car ils écoutent sur le même port)
+
+Dans le dossier du projet, il faut faire :
+
+````
+mvn exec:java -Dexec.mainClass="com.jmcoin.runnme.RunRelay" -Dexec.cleanupDaemonThreads=false
+````
+
+
+### Miner 
+Dans le dossier du projet, il faut faire :
+
+````
+mvn exec:java -Dexec.mainClass="com.jmcoin.runme.CreateMiner" -Dexec.args="wallet_password hostname"
+````
+
+Connection sur le Relay Node 01 : 
+
+````
+mvn exec:java -Dexec.mainClass="com.jmcoin.runme.CreateMiner" -Dexec.args="MySimplePassword relay-01.jmcoin.technology"
+````
+
+Connection sur le Relay Node 02 :
+
+````
+mvn exec:java -Dexec.mainClass="com.jmcoin.runme.CreateMiner" -Dexec.args="MySimplePassword relay-02.jmcoin.technology"
+````
+
+### Wallet 
+
+#### Creer une transaction 
+
+Dans le dossier du projet, il faut faire :
+
+````
+mvn exec:java -Dexec.mainClass="com.jmcoin.runme.CreateMiner" -Dexec.args="wallet_password sestination_address amout hostname"
+````
+
+Connection sur le Relay Node 01 : 
+
+````
+mvn exec:java -Dexec.mainClass="com.jmcoin.runme.CreateTransaction" -Dexec.args="MySimplePassword ea2f34e3ce079b942abd420b94d1ab7a0c05e67a 0.01 relay-01.jmcoin.technology"
+````
+
+Connection sur le Relay Node 02 :
+
+````
+mvn exec:java -Dexec.mainClass="com.jmcoin.runme.CreateTransaction" -Dexec.args="MySimplePassword ea2f34e3ce079b942abd420b94d1ab7a0c05e67a 0.01 relay-02.jmcoin.technology"
+````
+
+#### Récupérer la blockchain
+
+Dans le dossier du projet, il faut faire :
+
+````
+mvn exec:java -Dexec.mainClass="com.jmcoin.runme.GetBlockchain" -Dexec.args="wallet_password"
+````
+
+Connection sur le Relay Node 01 : 
+
+````
+mvn exec:java -Dexec.mainClass="com.jmcoin.runme.GetBlockchain" -Dexec.args="MySimplePassword"
+````
+
+Connection sur le Relay Node 02 :
+
+````
+mvn exec:java -Dexec.mainClass="com.jmcoin.runme.GetBlockchain" -Dexec.args="MySimplePassword"
+````
+
+
+## Facultatif : installation et configuration de la base de donnée locale:
+
+Le MasterNode stocke la chaine (et tout son contenu) dans une base de données MySQL. Il est donc nécessaire d'en creer une afin de pouvoir lancer le MasterNode
+Il faut donc d'abord installer un serveur MySQL
+    
+Une fois le serveur MySQL créé, il suffit de creer un utilisateur et une base de données
+
+````
+CREATE USER 'usename' IDENTIFIED BY 'password';
+CREATE DATABASE jmcoin;
+````
+    
+Il suffit ensuite de configurer l'application dans `META-INF/persistance.xml`
+
+````
+<properties>
+    <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
+    <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost/jmcoin"/>
+    <property name="javax.persistence.jdbc.user" value="user"/>
+    <property name="javax.persistence.jdbc.password" value="password"/>
+    <property name="javax.persistence.schema-generation.database.action" value="create"/>
+    <property name="eclipselink.logging.level" value="FINE"/>
+</properties>
+````
+
+où
+
+- `localhost` est le nom de l'hôte sur lequel tourne la base de données
+- `value="user"` user est l'utilisateur de la base de données
+- `value="password"` password est le mot de passe de l'utilisateur de la base de données
+        
+
+
+
+
