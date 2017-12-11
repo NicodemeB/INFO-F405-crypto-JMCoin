@@ -11,6 +11,7 @@ import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SignatureException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -78,7 +79,8 @@ public class MasterNode extends Peer {
 			for(Transaction tr : currentBlock.getTransactions()) {			
 				for(Input input : tr.getInputs()){
 					String adr = SignaturesVerification.DeriveJMAddressFromPubKey(tr.getPubKey());
-					inputs.put(Hex.toHexString(input.getPrevTransactionHash())+DELIMITER+adr,input);
+					if(input.getPrevTransactionHash() != null)
+						inputs.put(Hex.toHexString(input.getPrevTransactionHash())+DELIMITER+adr,input);
 				}
 				boolean foundBack = false;
 				boolean foundOut = false;
@@ -86,7 +88,7 @@ public class MasterNode extends Peer {
 				while (iter.hasNext()){
 					Map.Entry<String, Input> pair = iter.next();
 					String[] splitArray = pair.getKey().split("[%]");
-					if(splitArray.length >= 2 && Objects.equals(pair.getValue().getPrevTransactionHash(), tr.getHash()) && Objects.equals(tr.getOutputBack().getAddress(), splitArray[1])){
+					if(splitArray.length >= 2 && Arrays.equals(pair.getValue().getPrevTransactionHash(), tr.getHash()) && Objects.equals(tr.getOutputBack().getAddress(), splitArray[1])){
 						foundBack = true;
 						iter.remove();
 					}
@@ -95,8 +97,8 @@ public class MasterNode extends Peer {
 				while(iter.hasNext()){
 					Map.Entry<String, Input> pair = iter.next();
 					String[] splitArray = pair.getKey().split("[%]");
-					if(splitArray.length >= 2 && Objects.equals(pair.getValue().getPrevTransactionHash(), tr.getHash()) && Objects.equals(tr.getOutputOut().getAddress(), splitArray[1])){
-						foundBack = true;
+					if(splitArray.length >= 2 && Arrays.equals(pair.getValue().getPrevTransactionHash(), tr.getHash()) && Objects.equals(tr.getOutputOut().getAddress(), splitArray[1])){
+						foundOut = true;
 						iter.remove();
 					}
 				}
