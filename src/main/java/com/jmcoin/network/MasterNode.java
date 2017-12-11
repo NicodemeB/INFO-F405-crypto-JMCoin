@@ -65,15 +65,16 @@ public class MasterNode extends Peer {
 			}
 		}
 		else{
-			this.unspentOutputs = initiateUnspentOutputs(chain);
+			this.unspentOutputs = initiateUnspentOutputs();
 		}
     }
     
-    private Map<String,Output> initiateUnspentOutputs (Chain chain){
+    private Map<String,Output> initiateUnspentOutputs (){
 		Map<String,Output> unspentOutputs = new HashMap<String,Output>();
 		Map<String,Input> inputs = new HashMap<String,Input>();
-		Map<String,Block> blocks = chain.getBlocks();
-		Block currentBlock = blocks.get(this.lastBlock.getFinalHash());
+		//Map<String,Block> blocks = chain.getBlocks();
+		//Block currentBlock = blocks.get(this.lastBlock.getFinalHash());
+		Block currentBlock = DatabaseFacade.getBlockWithHash(lastBlock.getFinalHash());
 		String previousBlockHash = currentBlock.getPrevHash();
 		while(previousBlockHash != null){
 			for(Transaction tr : currentBlock.getTransactions()) {			
@@ -108,7 +109,8 @@ public class MasterNode extends Peer {
 					unspentOutputs.put(Hex.toHexString(tr.getHash())+DELIMITER+tr.getOutputOut().getAddress(), tr.getOutputOut());
 				}					
 			}
-			currentBlock = blocks.get(currentBlock.getPrevHash());
+			//currentBlock = blocks.get(currentBlock.getPrevHash());
+			currentBlock = DatabaseFacade.getBlockWithHash(currentBlock.getPrevHash());
 			previousBlockHash = currentBlock.getPrevHash();
 		}
 		return unspentOutputs;
