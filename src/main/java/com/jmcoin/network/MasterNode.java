@@ -52,7 +52,7 @@ public class MasterNode extends Peer {
     	this.unspentOutputs = new HashMap<>();
     	
     	//TODO uncomment this
-
+        /*
     	this.chain = DatabaseFacade.getStoredChain();
     	if(chain == null){
     		chain = new Chain();
@@ -66,9 +66,9 @@ public class MasterNode extends Peer {
 					| IOException | InvalidKeyLengthException | StrongEncryptionNotAvailableException e) {
 				e.printStackTrace();
 			}
-		}
+		}*/
     	//TODO remove this to use database
-		/*chain = new Chain();
+		chain = new Chain();
 		if(chain.getSize() == 0) {
 			try {
 				addGenesisToUnverified();
@@ -76,7 +76,7 @@ public class MasterNode extends Peer {
 					| IOException | InvalidKeyLengthException | StrongEncryptionNotAvailableException e) {
 				e.printStackTrace();
 			}
-    	}*/
+    	}
     }
     //FIXME Is this still relevant after tests ?
     public void debugMasterNode(PrivateKey privateKey, PublicKey publicKey) throws NoSuchAlgorithmException, NoSuchProviderException {
@@ -221,7 +221,7 @@ public class MasterNode extends Peer {
 		this.chain.getBlocks().put(pBlock.getFinalHash() + pBlock.getTimeCreation(), pBlock);
 		this.lastBlock = pBlock;
 		//FIXME Uncomment this to save in DB
-		DatabaseFacade.updateChain(this.chain);
+		//DatabaseFacade.updateChain(this.chain);
 		return true;
     }
     
