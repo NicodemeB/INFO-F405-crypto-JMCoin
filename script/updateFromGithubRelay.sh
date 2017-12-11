@@ -42,7 +42,7 @@ then
 	fi
 
 	echo "${BLUE}[$(date) - SCRIPT UPDATE INFO] Running new commit ...${NC}"
-	sleep 15
+	sleep 60
 	mvn exec:java -Dexec.mainClass="com.jmcoin.test.TestRelay"
 #else
 #	echo "${BLUE}[SCRIPT UPDATE INFO] Seems to NOT have a new commit..${NC}"
