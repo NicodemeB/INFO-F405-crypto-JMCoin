@@ -4,7 +4,7 @@
 
 
 ## Architecture 
-Le **Master Node** ainsi que 2 **Relay Node** sont déployés sur 3 machines Debian9 hébergées par Azure (Cloud Microsoft) différentes afin d'être joignables par n'importe quel **Miner/Wallet**, et cela n'importe où (voir avertissement). Ces 3 machines sont joignables sur les domaines suivants :
+Le **Master Node** ainsi que 2 **Relay Nodes** sont déployés sur 3 machines Debian9 hébergées par Azure (Cloud Microsoft) différentes afin d'être joignables par n'importe quel **Miner/Wallet**, et cela n'importe où (voir avertissement). Ces 3 machines sont joignables sur les domaines suivants :
 
 -	master.jmcoin.technology
 -	relay-01.jmcoin.technology
@@ -18,9 +18,9 @@ Il est possible de consulter les logs de ces machines en temps réel sur les adr
 -	<http://relay-01.jmcoin.technology/jm.log>
 -	<http://relay-02.jmcoin.technology/jm.log>
 
-Ces logs sont consultables sans la moindre authentification/authorisation.
+Ces logs sont consultables sans la moindre authentification/autorisation.
 
-Tous les tests sont faisables en local mais nécessitent cependant la création d'un base de données MySQL, les test sont alors plus faciles à réaliser sur les serveurs distants car la base de données est déjà présente sur le Master Node distant. 
+Tous les tests sont faisables en local mais nécessitent cependant la création d'un base de données MySQL, les tests sont alors plus faciles à réaliser sur les serveurs distants car la base de données est déjà présente sur le Master Node distant. 
 
 ## Prérequis : maven
 
@@ -39,13 +39,19 @@ brew install maven
 ## Lancement
 
 #### ⚠️ **Avertissement** ⚠️ 
-Les ports **TCP 33333 et 33334** sont utilisés par le JMCoin, ce qui signifie en d'autres thermes que le réseau **"eduroam"**, **"Plaine-WiFi"** et ainsi de suite ne permettent pas de réaliser les tests (sauf VPN, proxy, etc permettant de bypass le firewall) car il sera impossible de contacter les serveurs distant sur ces ports dû au firewall de l'école.
+Les ports **TCP 33333 et 33334** sont utilisés par le JMCoin, ce qui signifie en d'autres termes que le réseau **"eduroam"**, **"Plaine-WiFi"** et ainsi de suite ne permettent pas de réaliser les tests (sauf VPN, proxy, etc permettant de bypass le firewall) car il sera impossible de contacter les serveurs distants sur ces ports du au firewall de l'école.
 
 #### Optionnel : Git
 
 ````
 git clone https://github.com/NicodemeB/JMCoin.git --branch=dev
 cd JMCoin
+````
+
+### Compilation 
+
+````
+mvn package
 ````
 
 ### Step 0 : create keys
@@ -63,7 +69,7 @@ mvn exec:java -Dexec.mainClass="com.jmcoin.runme.CreateMiner" -Dexec.args="MySim
 ### Master Node
 
 #### Tests avec le Master Node distant 
-Rien n'est à faire, le Master Node tourne en permanence automatique. 
+Rien n'est à faire, le Master Node tourne en permanence automatiquement. 
 
 #### Tests avec le Master Node local
 Dans le dossier du projet, il faut faire :
@@ -74,12 +80,12 @@ mvn exec:java -Dexec.mainClass="com.jmcoin.runnme.RunMaster" -Dexec.cleanupDaemo
 
 
 ### Relay Node
-#### Tests avec les Relay Node distants
-Rien n'est à faire, les Relay Node tournent en permanence automatique. 
+#### Tests avec les Relay Nodes distants
+Rien n'est à faire, les Relay Node tournent en permanence automatiquement. 
 
-#### Tests avec le Relay Node local
+#### Tests avec le Relay Nodes local
 #### ⚠️ Attention ⚠️ 
-Il n'est possible que de lancer un seul Relay Node sur la même machine !! (car ils écoutent sur le même port)
+Il n'est possible que de lancer **un seul Relay Node** sur la même machine !! (car ils écoutent sur le même port)
 
 Dans le dossier du projet, il faut faire :
 
@@ -95,13 +101,13 @@ Dans le dossier du projet, il faut faire :
 mvn exec:java -Dexec.mainClass="com.jmcoin.runme.CreateMiner" -Dexec.args="wallet_password hostname"
 ````
 
-Connection sur le Relay Node 01 : 
+Connexion sur le Relay Node 01 : 
 
 ````
 mvn exec:java -Dexec.mainClass="com.jmcoin.runme.CreateMiner" -Dexec.args="MySimplePassword relay-01.jmcoin.technology"
 ````
 
-Connection sur le Relay Node 02 :
+Connexion sur le Relay Node 02 :
 
 ````
 mvn exec:java -Dexec.mainClass="com.jmcoin.runme.CreateMiner" -Dexec.args="MySimplePassword relay-02.jmcoin.technology"
@@ -109,7 +115,7 @@ mvn exec:java -Dexec.mainClass="com.jmcoin.runme.CreateMiner" -Dexec.args="MySim
 
 ### Wallet 
 
-#### Creer une transaction 
+#### Créer une transaction 
 
 Dans le dossier du projet, il faut faire :
 
@@ -117,13 +123,13 @@ Dans le dossier du projet, il faut faire :
 mvn exec:java -Dexec.mainClass="com.jmcoin.runme.CreateMiner" -Dexec.args="wallet_password sestination_address amout hostname"
 ````
 
-Connection sur le Relay Node 01 : 
+Connexion sur le Relay Node 01 : 
 
 ````
 mvn exec:java -Dexec.mainClass="com.jmcoin.runme.CreateTransaction" -Dexec.args="MySimplePassword ea2f34e3ce079b942abd420b94d1ab7a0c05e67a 0.01 relay-01.jmcoin.technology"
 ````
 
-Connection sur le Relay Node 02 :
+Connexion sur le Relay Node 02 :
 
 ````
 mvn exec:java -Dexec.mainClass="com.jmcoin.runme.CreateTransaction" -Dexec.args="MySimplePassword ea2f34e3ce079b942abd420b94d1ab7a0c05e67a 0.01 relay-02.jmcoin.technology"
@@ -137,25 +143,38 @@ Dans le dossier du projet, il faut faire :
 mvn exec:java -Dexec.mainClass="com.jmcoin.runme.GetBlockchain" -Dexec.args="wallet_password"
 ````
 
-Connection sur le Relay Node 01 : 
+connexion sur le Relay Node 01 : 
 
 ````
 mvn exec:java -Dexec.mainClass="com.jmcoin.runme.GetBlockchain" -Dexec.args="MySimplePassword"
 ````
 
-Connection sur le Relay Node 02 :
+connexion sur le Relay Node 02 :
 
 ````
 mvn exec:java -Dexec.mainClass="com.jmcoin.runme.GetBlockchain" -Dexec.args="MySimplePassword"
 ````
 
 
-## Facultatif : installation et configuration de la base de données locale:
+## Facultatif : installation et configuration de la base de données locale
 
-Le MasterNode stocke la chaine (et tout son contenu) dans une base de données MySQL. Il est donc nécessaire d'en creer une afin de pouvoir lancer le MasterNode
+### Step 0 : install mysql-server
+
+#### Ubuntu/Debian
+````
+sudo apt install mysql-server
+````
+
+#### Mac OS 
+````
+brew install mysql
+````
+
+
+Le MasterNode stocke la chaine (et tout son contenu) dans une base de données MySQL. Il est donc nécessaire d'en créer une afin de pouvoir lancer le MasterNode
 Il faut donc d'abord installer un serveur MySQL
     
-Une fois le serveur MySQL créé, il suffit de creer un utilisateur et une base de données
+Une fois le serveur MySQL créé, il suffit de créer un utilisateur et une base de données
 
 ````
 CREATE USER 'usename' IDENTIFIED BY 'password';
