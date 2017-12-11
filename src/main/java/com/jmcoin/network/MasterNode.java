@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+
 import com.jmcoin.crypto.AES;
 import org.bouncycastle.util.encoders.Hex;
 
@@ -241,10 +243,10 @@ public class MasterNode extends Peer {
 				for(Input input : trans.getInputs()){
 					Transaction prevTrans = chain.findInBlockChain(input.getPrevTransactionHash());
 					if(prevTrans != null) {
-						if(prevTrans.getOutputOut().getAddress().equals(address)){
+						if(Objects.equals(prevTrans.getOutputOut().getAddress(), address)){
 							tempToRemoveOutputs.put(Hex.toHexString(prevTrans.getHash())+DELIMITER+prevTrans.getOutputOut().getAddress(),prevTrans.getOutputOut());
 						}
-						else if (prevTrans.getOutputBack().getAddress().equals(address)){
+						else if (Objects.equals(prevTrans.getOutputBack().getAddress(), address)){
 							tempToRemoveOutputs.put(Hex.toHexString(prevTrans.getHash())+DELIMITER+prevTrans.getOutputBack().getAddress(),prevTrans.getOutputBack());
 						}
 						else {

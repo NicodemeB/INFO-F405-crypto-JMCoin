@@ -16,8 +16,6 @@ import com.jmcoin.model.Transaction;
 import com.jmcoin.network.NetConst;
 import com.jmcoin.network.UserJMProtocolImpl;
 import com.jmcoin.network.UserNode;
-import com.jmcoin.test.TestMasterNode;
-import com.jmcoin.test.TestRelay;
 
 public class CreateTransaction {
 	
@@ -26,13 +24,14 @@ public class CreateTransaction {
 			System.out.println("3 arguments are required:");
 			System.out.println("(1) password of the wallet (String)");
 			System.out.println("(2) destination address (can be random) (String)");
-			System.out.println("(3) amount to send (Integer)");
+			System.out.println("(3) amount to send (Double)");
+			System.out.println("(4) hostname (String)");
 			return;
 		}
 		String amount = args[2];
-		int amountInt = 0;
+		double doubleAmount = 0.0;
 		try {
-			amountInt = Integer.parseInt(amount);
+			doubleAmount = Double.parseDouble(amount);
 		}
 		catch(NumberFormatException nfe) {
 			System.out.println("The amount was not a valid integer");
@@ -48,7 +47,7 @@ public class CreateTransaction {
 		}
 		if(node!= null && !node.getWallet().getKeys().keySet().isEmpty()) {
 			try {
-				UserJMProtocolImpl protocol = new UserJMProtocolImpl(node);
+				UserJMProtocolImpl protocol = new UserJMProtocolImpl(node, args[3]);
 				PrivateKey privKey = node.getWallet().getKeys().keySet().iterator().next();
 				node.getWallet().computeBalance(protocol);
 				System.out.println("Addresses: "+ node.getWallet().getAddresses());
@@ -56,7 +55,7 @@ public class CreateTransaction {
 				Transaction transaction = node.createTransaction(protocol,
 						SignaturesVerification.DeriveJMAddressFromPubKey(node.getWallet().getKeys().get(privKey).getEncoded()),
 						args[1],
-						amountInt,
+						doubleAmount,
 						privKey,
 						node.getWallet().getKeys().get(privKey));
 				if(transaction == null) {
@@ -70,6 +69,7 @@ public class CreateTransaction {
 				System.out.println("--------------------------------------------");
 			} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException | SignatureException
 					| IOException e) {
+				e.printStackTrace();
 				System.out.println("Cannot create transaction");
 			}
 		}
