@@ -29,7 +29,7 @@ import com.jmcoin.model.KeyGenerator;
 import com.jmcoin.model.Output;
 import com.jmcoin.model.Transaction;
 
-public class MasterNode extends Peer{
+public class MasterNode extends Peer {
 
     private static MasterNode instance = new MasterNode();
 	public static final int REWARD_START_VALUE = 10;
@@ -48,7 +48,7 @@ public class MasterNode extends Peer{
     	this.unspentOutputs = new HashMap<>();
     	
     	//TODO uncomment this
-    	/*
+
     	this.chain = DatabaseFacade.getStoredChain();
     	if(chain == null){
     		chain = new Chain();
@@ -57,14 +57,14 @@ public class MasterNode extends Peer{
     	this.lastBlock = DatabaseFacade.getLastBlock();
 		if(chain.getSize() == 0) {
 			try {
-				addGenesisToUnverfied();
+				addGenesisToUnverified();
 			} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException | SignatureException
 					| IOException | InvalidKeyLengthException | StrongEncryptionNotAvailableException e) {
 				e.printStackTrace();
 			}
-		}*/
+		}
     	//TODO remove this to use database
-		chain = new Chain();
+		/*chain = new Chain();
 		if(chain.getSize() == 0) {
 			try {
 				addGenesisToUnverified();
@@ -72,11 +72,17 @@ public class MasterNode extends Peer{
 					| IOException | InvalidKeyLengthException | StrongEncryptionNotAvailableException e) {
 				e.printStackTrace();
 			}
-    	}
+    	}*/
     }
+<<<<<<< HEAD
     
     public void debugMasterNode(PrivateKey privateKey, PublicKey publicKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException, IOException, StrongEncryptionNotAvailableException, InvalidKeyLengthException {
     	/*KeyGenerator generator = new KeyGenerator(1024);
+=======
+    //FIXME Is this still relevant after tests ?
+    public void debugMasterNode(PrivateKey privateKey, PublicKey publicKey) throws NoSuchAlgorithmException, NoSuchProviderException {
+        KeyGenerator generator = new KeyGenerator(1024);
+>>>>>>> f0050082a306ca637e02a8ed4598c789502104ee
         Map<PrivateKey, PublicKey> keys = new HashMap<>();
         PrivateKey[] keyskeys = new PrivateKey[4];
         for(int i = 0; i < 3; i++) {
@@ -85,6 +91,7 @@ public class MasterNode extends Peer{
             keys.put(keyskeys[i], generator.getPublicKey());
         }
         keys.put(privateKey, publicKey);
+<<<<<<< HEAD
         keyskeys[3] = privateKey;
         
         //create one random block
@@ -132,7 +139,57 @@ public class MasterNode extends Peer{
         tr2.setSignature(SignaturesVerification.signTransaction(tr2.getBytes(false), keyskeys[1]));
         tr2.computeHash();
         this.unverifiedTransactions.add(tr1);
-        this.unverifiedTransactions.add(tr2);*/
+        this.unverifiedTransactions.add(tr2);
+        Random rand = new Random();
+        Block last = null;
+        for(int i = 0; i < 4; i++) {
+        	Block block = new Block();
+            for(int j = 0; j < 4; j++) {
+                int privKeyInt = rand.nextInt(4);
+                PrivateKey privKey = keys.keySet().toArray(new PrivateKey[0])[privKeyInt];
+                Transaction transaction = new Transaction();
+                Output tmp = new Output();
+                tmp.setAddress(SignaturesVerification.DeriveJMAddressFromPubKey(keys.get(privKey).getEncoded()));
+                tmp.setAmount(rand.nextInt(10));
+                Output tmp1 = new Output();
+                tmp1.setAddress(SignaturesVerification.DeriveJMAddressFromPubKey(keys.get(keys.keySet().toArray(new PrivateKey[0])[privKeyInt+1 > 3 ? 0 : privKeyInt+1]).getEncoded()));
+                tmp1.setAmount(rand.nextInt(10));
+                Input in1 = new Input();
+				//FIXME Transaction are here
+                in1.setPrevTransactionHash(("H"+rand.nextInt(10)).getBytes());
+                Output z = new Output();
+                z.setAmount(rand.nextInt(10));
+                in1.setAmount(z);
+                transaction.addInput(in1);
+                Output realOut = rand.nextInt() % 2 == 0 ? tmp : tmp1;
+                transaction.setOutputOut(realOut);
+                transaction.setOutputBack(tmp.equals(realOut) ? tmp1 : tmp);
+                transaction.setPubKey(keys.get(privKey).getEncoded());
+                try {
+                    transaction.setSignature(SignaturesVerification.signTransaction(transaction.getBytes(false), privKey));
+                    transaction.computeHash();
+                } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException | SignatureException
+                        | IOException e) {
+                    e.printStackTrace();
+                }
+                block.getTransactions().add(transaction);
+                this.unverifiedTransactions.add(transaction);
+                unspentOutputs.put(Hex.toHexString(transaction.getHash())+DELIMITER+transaction.getOutputBack().getAddress(), transaction.getOutputBack());
+                unspentOutputs.put(Hex.toHexString(transaction.getHash())+DELIMITER+transaction.getOutputOut().getAddress(), transaction.getOutputOut());
+            }
+            block.setDifficulty(NetConst.DEFAULT_DIFFICULTY);
+            block.setNonce(5);
+			//FIXME and here
+            block.setFinalHash("H"+i);
+            if(last == null) {
+            	block.setPrevHash(null);
+            	last = block;
+            }
+            else
+            	block.setPrevHash(last.getFinalHash());
+            block.setTimeCreation(System.currentTimeMillis());
+            this.chain.getBlocks().put(block.getFinalHash(), block);*/
+        }
     }
     
     public Block getLastBlock() {
@@ -225,6 +282,8 @@ public class MasterNode extends Peer{
 		System.out.println("--------------------------------------------");
 		this.chain.getBlocks().put(pBlock.getFinalHash() + pBlock.getTimeCreation(), pBlock);
 		this.lastBlock = pBlock;
+		//FIXME Uncomment this to save in DB
+		DatabaseFacade.updateChain(this.chain);
 		return true;
     }
     
