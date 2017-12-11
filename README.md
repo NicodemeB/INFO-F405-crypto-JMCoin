@@ -26,6 +26,7 @@ Tous les tests sont faisables en local mais nécessitent cependant la création 
 
 ### Ubuntu/Debian 
 ````
+sudo apt update
 sudo apt install maven
 ````
 
@@ -38,10 +39,10 @@ brew install maven
 
 ## Lancement
 
-#### ⚠️ **Avertissement** ⚠️ 
+### ⚠️ **Avertissement** ⚠️ 
 Les ports **TCP 33333 et 33334** sont utilisés par le JMCoin, ce qui signifie en d'autres termes que le réseau **"eduroam"**, **"Plaine-WiFi"** et ainsi de suite ne permettent pas de réaliser les tests (sauf VPN, proxy, etc permettant de bypass le firewall) car il sera impossible de contacter les serveurs distants sur ces ports du au firewall de l'école.
 
-#### Optionnel : Git
+### Optionnel : Git
 
 ````
 git clone https://github.com/NicodemeB/JMCoin.git --branch=dev
@@ -66,12 +67,12 @@ mvn exec:java -Dexec.mainClass="com.jmcoin.runme.CreateMiner" -Dexec.args="MySim
 ````
 
 
-### Master Node
+## Master Node
 
-#### Tests avec le Master Node distant 
+### Tests avec le Master Node distant 
 Rien n'est à faire, le Master Node tourne en permanence automatiquement. 
 
-#### Tests avec le Master Node local
+### Tests avec le Master Node local
 Dans le dossier du projet, il faut faire :
 
 ````
@@ -79,12 +80,12 @@ mvn exec:java -Dexec.mainClass="com.jmcoin.runnme.RunMaster" -Dexec.cleanupDaemo
 ````
 
 
-### Relay Node
-#### Tests avec les Relay Nodes distants
+## Relay Node
+### Tests avec les Relay Nodes distants
 Rien n'est à faire, les Relay Node tournent en permanence automatiquement. 
 
-#### Tests avec le Relay Nodes local
-#### ⚠️ Attention ⚠️ 
+### Tests avec le Relay Nodes local
+### ⚠️ Attention ⚠️ 
 Il n'est possible que de lancer **un seul Relay Node** sur la même machine !! (car ils écoutent sur le même port)
 
 Dans le dossier du projet, il faut faire :
@@ -94,7 +95,7 @@ mvn exec:java -Dexec.mainClass="com.jmcoin.runnme.RunRelay" -Dexec.cleanupDaemon
 ````
 
 
-### Miner 
+## Miner 
 Dans le dossier du projet, il faut faire :
 
 ````
@@ -113,9 +114,9 @@ Connexion sur le Relay Node 02 :
 mvn exec:java -Dexec.mainClass="com.jmcoin.runme.CreateMiner" -Dexec.args="MySimplePassword relay-02.jmcoin.technology"
 ````
 
-### Wallet 
+## Wallet 
 
-#### Créer une transaction 
+### Créer une transaction 
 
 Dans le dossier du projet, il faut faire :
 
@@ -135,7 +136,7 @@ Connexion sur le Relay Node 02 :
 mvn exec:java -Dexec.mainClass="com.jmcoin.runme.CreateTransaction" -Dexec.args="MySimplePassword ea2f34e3ce079b942abd420b94d1ab7a0c05e67a 0.01 relay-02.jmcoin.technology"
 ````
 
-#### Récupérer la blockchain
+### Récupérer la blockchain
 
 Dans le dossier du projet, il faut faire :
 
@@ -162,6 +163,7 @@ mvn exec:java -Dexec.mainClass="com.jmcoin.runme.GetBlockchain" -Dexec.args="MyS
 
 #### Ubuntu/Debian
 ````
+sudo apt update
 sudo apt install mysql-server
 ````
 
