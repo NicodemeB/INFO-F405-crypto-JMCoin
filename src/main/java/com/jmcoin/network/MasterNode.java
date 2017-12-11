@@ -47,6 +47,8 @@ public class MasterNode extends Peer {
     	super();
     	this.unverifiedTransactions = new LinkedList<>();
     	this.unspentOutputs = new HashMap<>();
+    	
+    	//TODO uncomment this
     	this.chain = DatabaseFacade.getStoredChain();
     	if(chain == null){
     		chain = new Chain();
@@ -62,12 +64,25 @@ public class MasterNode extends Peer {
 			}
 		}
     }    
+    
     public void debugMasterNode(PrivateKey privateKey, PublicKey publicKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException, IOException, StrongEncryptionNotAvailableException, InvalidKeyLengthException {
     	/*KeyGenerator generator = new KeyGenerator(1024);
 =======
-    //FIXME Is this still relevant after tests ?
-    public void debugMasterNode(PrivateKey privateKey, PublicKey publicKey) throws NoSuchAlgorithmException, NoSuchProviderException {
-        KeyGenerator generator = new KeyGenerator(1024);
+=======
+		}*/
+    	//TODO remove this to use database
+		chain = new Chain();
+		if(chain.getSize() == 0) {
+			try {
+				addGenesisToUnverified();
+			} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException | SignatureException
+					| IOException | InvalidKeyLengthException | StrongEncryptionNotAvailableException e) {
+				e.printStackTrace();
+			}
+    	}
+    }
+    /*public void debugMasterNode(PrivateKey privateKey, PublicKey publicKey) throws NoSuchAlgorithmException, NoSuchProviderException {
+        /*KeyGenerator generator = new KeyGenerator(1024);
 >>>>>>> f0050082a306ca637e02a8ed4598c789502104ee
         Map<PrivateKey, PublicKey> keys = new HashMap<>();
         PrivateKey[] keyskeys = new PrivateKey[4];
@@ -175,8 +190,8 @@ public class MasterNode extends Peer {
             	block.setPrevHash(last.getFinalHash());
             block.setTimeCreation(System.currentTimeMillis());
             this.chain.getBlocks().put(block.getFinalHash(), block);
-        }*/
-    }
+        }
+    }*/
     
     public Block getLastBlock() {
 		return lastBlock;
@@ -269,7 +284,7 @@ public class MasterNode extends Peer {
 		this.chain.getBlocks().put(pBlock.getFinalHash() + pBlock.getTimeCreation(), pBlock);
 		this.lastBlock = pBlock;
 		//FIXME Uncomment this to save in DB
-		DatabaseFacade.updateChain(this.chain);
+		//DatabaseFacade.updateChain(this.chain);
 		return true;
     }
     
