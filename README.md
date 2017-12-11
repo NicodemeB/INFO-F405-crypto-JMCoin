@@ -58,12 +58,12 @@ mvn package
 ### Step 0 : create keys
 
 ````
-mvn exec:java -Dexec.mainClass="com.jmcoin.runme.CreateMiner" -Dexec.args="wallet_password"
+mvn exec:java -Dexec.mainClass="com.jmcoin.runme.CreateKeyr" -Dexec.args="wallet_password"
 ````
 Exemple : 
 
 ````
-mvn exec:java -Dexec.mainClass="com.jmcoin.runme.CreateMiner" -Dexec.args="MySimplePassword"
+mvn exec:java -Dexec.mainClass="com.jmcoin.runme.CreateKey" -Dexec.args="MySimplePassword"
 ````
 
 
@@ -76,7 +76,7 @@ Rien n'est à faire, le Master Node tourne en permanence automatiquement.
 Dans le dossier du projet, il faut faire :
 
 ````
-mvn exec:java -Dexec.mainClass="com.jmcoin.runnme.RunMaster" -Dexec.cleanupDaemonThreads=false
+mvn exec:java -Dexec.mainClass="com.jmcoin.runme.RunMaster" -Dexec.cleanupDaemonThreads=false
 ````
 
 
@@ -91,7 +91,7 @@ Il n'est possible que de lancer **un seul Relay Node** sur la même machine !! (
 Dans le dossier du projet, il faut faire :
 
 ````
-mvn exec:java -Dexec.mainClass="com.jmcoin.runnme.RunRelay" -Dexec.args="master.jmcoin.tchnology" -Dexec.cleanupDaemonThreads=false
+mvn exec:java -Dexec.mainClass="com.jmcoin.runme.RunRelay" -Dexec.args="master.jmcoin.technology" -Dexec.cleanupDaemonThreads=false
 ````
 
 
@@ -121,7 +121,7 @@ mvn exec:java -Dexec.mainClass="com.jmcoin.runme.CreateMiner" -Dexec.args="MySim
 Dans le dossier du projet, il faut faire :
 
 ````
-mvn exec:java -Dexec.mainClass="com.jmcoin.runme.CreateMiner" -Dexec.args="wallet_password destination_address amount hostname"
+mvn exec:java -Dexec.mainClass="com.jmcoin.runme.CreateTransaction" -Dexec.args="wallet_password destination_address amount hostname"
 ````
 
 Connexion sur le Relay Node 01 : 
