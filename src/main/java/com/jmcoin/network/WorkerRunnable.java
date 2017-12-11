@@ -20,6 +20,7 @@ public class WorkerRunnable extends TemplateThread{
     public WorkerRunnable(Socket clientSocket, JMProtocolImpl<? extends Peer> protocol) throws  IOException{
         super(protocol);
         this.socket = clientSocket;
+        socket.setSoTimeout(0);
         in  = new ObjectInputStream(socket.getInputStream());
         out = new ObjectOutputStream(socket.getOutputStream());
 

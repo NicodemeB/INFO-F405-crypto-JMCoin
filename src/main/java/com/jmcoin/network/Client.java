@@ -10,6 +10,7 @@ public class Client extends TemplateThread{
 	public Client (int port, String host, JMProtocolImpl<? extends Peer> protocol) throws IOException {
 		super(protocol);
         socket = new Socket(host, port);
+        socket.setSoTimeout(0);
         out = new ObjectOutputStream(socket.getOutputStream());
         out.flush();
         in = new ObjectInputStream(socket.getInputStream());
